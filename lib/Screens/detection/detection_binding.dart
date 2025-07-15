@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
-import 'package:pose_detection/Controllers/detection_controller.dart';
 import 'package:pose_detection/Models/excercise_data_model.dart';
+
+import '../detection/detection_controller.dart';
+
 
 class DetectionBinding extends Bindings {
   final ExcerciseDataModel dataModel;

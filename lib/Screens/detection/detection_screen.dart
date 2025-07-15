@@ -1,10 +1,12 @@
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pose_detection/Controllers/detection_controller.dart';
+import 'package:pose_detection/Components/exercise_info_dialog.dart';
+import 'package:pose_detection/Components/frosted_glass_effect.dart';
+import 'package:pose_detection/Constants/app_colors.dart';
+import 'package:pose_detection/Screens/detection/detection_controller.dart';
 import 'package:pose_detection/Models/excercise_data_model.dart';
 import 'package:pose_detection/Utility/pose_painter.dart';
-import 'package:pose_detection/Utility/utility.dart';
 
 class DetectionScreen extends StatelessWidget {
   final ExcerciseDataModel dataModel;
@@ -12,15 +14,16 @@ class DetectionScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint(">> DetectionScreen build() called");
+    debugPrint("TAG_DetectionScreen build() called");
     final DetectionController controller = Get.put(
       DetectionController(dataModel),
     );
 
     return Scaffold(
-      backgroundColor: Colors.black,
+      backgroundColor: Colors.transparent,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.primary,
+        backgroundColor: Colors.transparent,
         title: Text(
           dataModel.title,
           style: const TextStyle(color: Colors.white),
@@ -35,7 +38,8 @@ class DetectionScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline, color: Colors.white),
-            onPressed: () => showExerciseInfo(context, dataModel),
+            onPressed:
+                () => ExerciseInfoDialog.showExerciseInfo(context, dataModel),
           ),
         ],
       ),
@@ -44,7 +48,7 @@ class DetectionScreen extends StatelessWidget {
 
         final camController = controller.controller.value;
         if (camController != null && camController.value.isInitialized) {
-          debugPrint(">> Camera initialized, rendering preview and results");
+          debugPrint("TAG_Camera initialized, rendering preview and results");
           children.add(Positioned.fill(child: CameraPreview(camController)));
 
           children.add(
@@ -57,7 +61,7 @@ class DetectionScreen extends StatelessWidget {
                     cameraController == null ||
                     !cameraController.value.isInitialized) {
                   debugPrint(
-                    ">> Skipping result render: results/controller not ready",
+                    "TAG_Skipping result render: results/controller not ready",
                   );
                   return const SizedBox.shrink();
                 }
@@ -67,17 +71,21 @@ class DetectionScreen extends StatelessWidget {
                   cameraController.value.previewSize!.width,
                 );
 
-                debugPrint(">> Rendering PosePainter with ${results.length} poses");
+                debugPrint(
+                  "TAG_Rendering PosePainter with ${results.length} poses",
+                );
                 return CustomPaint(painter: PosePainter(imageSize, results));
               }),
             ),
           );
         } else {
-          debugPrint(">> Camera controller not initialized");
+          debugPrint("TAG_Camera controller not initialized");
         }
 
         if (controller.warningMessage.value.isNotEmpty) {
-          debugPrint(">> Warning message shown: ${controller.warningMessage.value}");
+          debugPrint(
+            "TAG_Warning message shown: ${controller.warningMessage.value}",
+          );
           children.add(
             Align(
               alignment: Alignment.bottomCenter,
@@ -105,7 +113,9 @@ class DetectionScreen extends StatelessWidget {
         }
 
         if (controller.distanceFeedback.value.isNotEmpty) {
-          debugPrint(">> Distance feedback: ${controller.distanceFeedback.value}");
+          debugPrint(
+            "TAG_Distance feedback: ${controller.distanceFeedback.value}",
+          );
           children.add(
             Positioned(
               top: 20,
@@ -132,7 +142,7 @@ class DetectionScreen extends StatelessWidget {
         }
 
         debugPrint(
-          ">> Current Distance Ratio: ${controller.distanceRatio.value.toStringAsFixed(2)}",
+          "TAG_Current Distance Ratio: ${controller.distanceRatio.value.toStringAsFixed(2)}",
         );
         children.add(
           Positioned(
@@ -145,25 +155,25 @@ class DetectionScreen extends StatelessWidget {
           ),
         );
 
-        debugPrint(">> Current Count: ${controller.getCount()}");
+        debugPrint("TAG_Current Count: ${controller.getCount()}");
         children.add(
           Align(
             alignment: Alignment.bottomCenter,
-            child: Container(
-              margin: const EdgeInsets.only(bottom: 20),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.primary,
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: FrostedGlass(
+                width: 70,
+                height: 70,
+                applyFilter: false,
                 borderRadius: BorderRadius.circular(50),
-              ),
-              width: 70,
-              height: 70,
-              child: Center(
-                child: Text(
-                  controller.getCount().toString(),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                child: Center(
+                  child: Text(
+                    controller.getCount().toString(),
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
@@ -172,7 +182,7 @@ class DetectionScreen extends StatelessWidget {
         );
 
         if (controller.showCountdown.value) {
-          debugPrint(">> Showing countdown: ${controller.countdown.value}");
+          debugPrint("TAG_Showing countdown: ${controller.countdown.value}");
           children.add(
             Positioned.fill(
               child: Container(
@@ -192,7 +202,23 @@ class DetectionScreen extends StatelessWidget {
           );
         }
 
-        return Stack(children: children);
+        return Stack(
+          children: [
+            Positioned.fill(
+              child: FrostedGlass(
+                applyFilter: false,
+                borderRadius: BorderRadius.zero,
+                gradientColors: [
+                  ColorConstants.startColor,
+                  ColorConstants.endColor,
+                ],
+                child: SizedBox.expand(),
+              ),
+            ),
+
+            SafeArea(child: Stack(children: children)),
+          ],
+        );
       }),
     );
   }
