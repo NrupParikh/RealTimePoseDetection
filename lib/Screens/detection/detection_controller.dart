@@ -51,34 +51,34 @@ class DetectionController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    debugPrint('>> DetectionController initialized for: ${dataModel.title}');
+    debugPrint('TAG_DetectionController initialized for: ${dataModel.title}');
     startCountdown();
     startInactivityWatcher();
   }
 
   void markExerciseStarted() {
     lastRepTime = DateTime.now();
-    debugPrint('>> Exercise started');
+    debugPrint('TAG_Exercise started');
   }
 
   void startCountdown() async {
-    debugPrint('>> Starting countdown');
+    debugPrint('TAG_Starting countdown');
     await initializeCamera();
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (countdown.value > 0) {
         countdown.value--;
-        debugPrint('>> Countdown: ${countdown.value}');
+        debugPrint('TAG_Countdown: ${countdown.value}');
       } else {
         countdown.value = 0;
         showCountdown.value = false;
-        debugPrint('>> Countdown finished');
+        debugPrint('TAG_Countdown finished');
         timer.cancel();
       }
     });
   }
 
   Future<void> initializeCamera() async {
-    debugPrint('>> Initializing camera');
+    debugPrint('TAG_Initializing camera');
     final options = PoseDetectorOptions(mode: PoseDetectionMode.stream);
     poseDetector = PoseDetector(options: options);
 
@@ -96,27 +96,27 @@ class DetectionController extends GetxController {
       if (!isBusy && !showCountdown.value) {
         isBusy = true;
         img = image;
-        debugPrint('>> Frame received, starting pose estimation');
+        debugPrint('TAG_Frame received, starting pose estimation');
         doPoseEstimationOnFrame();
       }
     });
 
     controller.value = newController;
-    debugPrint('>> CameraController set and image stream started');
+    debugPrint('TAG_CameraController set and image stream started');
   }
 
   void doPoseEstimationOnFrame() async {
     final inputImage = _inputImageFromCameraImage();
     if (inputImage == null) {
       isBusy = false;
-      debugPrint('>> Failed to convert camera image to InputImage');
+      debugPrint('TAG_Failed to convert camera image to InputImage');
       return;
     }
 
     try {
       final poses = await poseDetector.processImage(inputImage);
       scanResults.value = poses;
-      debugPrint('>> Poses detected: ${poses.length}');
+      debugPrint('TAG_Poses detected: ${poses.length}');
 
       if (poses.isNotEmpty) {
         final pose = poses.first;
@@ -144,7 +144,7 @@ class DetectionController extends GetxController {
                 : '';
 
         if (distanceFeedback.value.isNotEmpty) {
-          debugPrint('>> Distance feedback: ${distanceFeedback.value}');
+          debugPrint('TAG_Distance feedback: ${distanceFeedback.value}');
         }
 
         switch (dataModel.type) {
@@ -153,7 +153,7 @@ class DetectionController extends GetxController {
               landmarks: landmarks,
               onPushUpCount: () {
                 pushCount.value++;
-                debugPrint('>> Push-up count: ${pushCount.value}');
+                debugPrint('TAG_Push-up count: ${pushCount.value}');
               },
               isLowered: isLowered,
               updateLowered: (val) => isLowered = val,
@@ -165,7 +165,7 @@ class DetectionController extends GetxController {
               landmarks: landmarks,
               onSquatCount: () {
                 squatCount.value++;
-                debugPrint('>> Squat count: ${squatCount.value}');
+                debugPrint('TAG_Squat count: ${squatCount.value}');
               },
               isSquatting: isSquatting,
               updateSquatting: (val) => isSquatting = val,
@@ -177,7 +177,7 @@ class DetectionController extends GetxController {
               landmarks: landmarks,
               onJumpingJackCount: () {
                 jumpingJackCount.value++;
-                debugPrint('>> Jumping Jack count: ${jumpingJackCount.value}');
+                debugPrint('TAG_Jumping Jack count: ${jumpingJackCount.value}');
               },
               isOpen: isJumpingJackOpen,
               updateOpen: (val) => isJumpingJackOpen = val,
@@ -195,7 +195,7 @@ class DetectionController extends GetxController {
               },
               getWasPlank: () => wasInPlank,
               updateWasPlank: (val) {
-                debugPrint('>> wasInPlank updated to: $val');
+                debugPrint('TAG_wasInPlank updated to: $val');
                 wasInPlank = val;
               },
               onRepDetected: showWarningOnScreen,
@@ -206,7 +206,7 @@ class DetectionController extends GetxController {
               landmarks: landmarks,
               onClapCount: () {
                 clapCount.value++;
-                debugPrint('>> Arm Clap count: ${clapCount.value}');
+                debugPrint('TAG_Arm Clap count: ${clapCount.value}');
               },
               isClapped: isClapOpen,
               updateClapState: (val) => isClapOpen = val,
@@ -216,7 +216,7 @@ class DetectionController extends GetxController {
         }
       }
     } catch (e) {
-      debugPrint('>> Error during pose detection: $e');
+      debugPrint('TAG_Error during pose detection: $e');
     }
 
     isBusy = false;
@@ -229,7 +229,7 @@ class DetectionController extends GetxController {
       if (elapsed >= 3 && !warningShown) {
         warningMessage.value = "Please do ${dataModel.title} properly";
         warningShown = true;
-        debugPrint('>> Showing inactivity warning');
+        debugPrint('TAG_Showing inactivity warning');
       }
     });
   }
@@ -239,7 +239,7 @@ class DetectionController extends GetxController {
     if (warningShown) {
       warningShown = false;
       warningMessage.value = '';
-      debugPrint('>> Hiding warning');
+      debugPrint('TAG_Hiding warning');
     }
   }
 
@@ -250,7 +250,7 @@ class DetectionController extends GetxController {
       final rotation = InputImageRotationValue.fromRawValue(sensorOrientation);
 
       if (rotation == null) {
-        debugPrint('>> Rotation is null');
+        debugPrint('TAG_Rotation is null');
         return null;
       }
 
@@ -284,10 +284,10 @@ class DetectionController extends GetxController {
         ),
       );
 
-      debugPrint('>> InputImage created successfully');
+      debugPrint('TAG_InputImage created successfully');
       return inputImage;
     } catch (e) {
-      debugPrint('>> Error in _inputImageFromCameraImage: $e');
+      debugPrint('TAG_Error in _inputImageFromCameraImage: $e');
       return null;
     }
   }
@@ -314,7 +314,7 @@ class DetectionController extends GetxController {
     controller.value?.dispose();
     poseDetector.close();
     inactivityTimer?.cancel();
-    debugPrint('>> DetectionController disposed');
+    debugPrint('TAG_DetectionController disposed');
     super.onClose();
   }
 }

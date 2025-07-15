@@ -1,5 +1,7 @@
 // Show exercise information dialog
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:pose_detection/Constants/app_string.dart';
 import 'package:pose_detection/Models/excercise_data_model.dart';
 
 final List<ExcerciseDataModel> exerciseList = [
@@ -64,109 +66,46 @@ final List<ExcerciseDataModel> exerciseList = [
         "- Activates shoulders and upper back.\n- Promotes shoulder mobility and circulation.\n- Easy to perform in warm-ups or light cardio.",
   ),
 ];
-
-void showExerciseInfo(BuildContext mCtx, ExcerciseDataModel dataModel) {
-  showDialog(
-    context: mCtx,
-    barrierDismissible: false,
-    builder: (context) {
-      final screenWidth = MediaQuery.of(context).size.width;
-      return Dialog(
-        shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-        insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 80),
-        child: SizedBox(
-          width: screenWidth * 0.8,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Top bar
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8,
-                  vertical: 12,
-                ),
-                child: Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    dataModel.title,
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
+//  ======= AlertDialog Extension =======
+extension AlertDialogExtensions on BuildContext {
+  void showAlertDialog({
+    required String message,
+    String title = AppStrings.appName,
+    String okButtonText = 'OK',
+    String cancelButtonText = 'Cancel',
+    bool showCancelButton = true,
+    VoidCallback? onOkPressed,
+    VoidCallback? onCancelPressed,
+  }) {
+    showDialog(
+      context: this,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: <Widget>[
+            if (showCancelButton)
+              TextButton(
+                onPressed: () {
+                  Get.back();
+                  if (onCancelPressed != null) {
+                    onCancelPressed();
+                  }
+                },
+                child: Text(cancelButtonText),
               ),
-
-              // Scrollable content
-              Flexible(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Align(
-                        alignment: Alignment.topCenter,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.asset(
-                            dataModel.startPosition,
-                            fit: BoxFit.scaleDown,
-                            height: 200,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Description',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        dataModel.description,
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Pose Tips',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        dataModel.poseTip,
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Advantages',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        dataModel.advantage,
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              // Fixed OK button at bottom
-              Container(
-                alignment: Alignment.centerRight,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 10,
-                ),
-                child: TextButton(
-                  onPressed: () => Navigator.of(mCtx).pop(),
-                  child: const Text('OK'),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    },
-  );
+            TextButton(
+              onPressed: () {
+                Get.back();
+                if (onOkPressed != null) {
+                  onOkPressed();
+                }
+              },
+              child: Text(okButtonText, style: TextStyle(color: Colors.black)),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

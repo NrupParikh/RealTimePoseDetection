@@ -129,7 +129,7 @@ class ExerciseDetectors {
     final rw = landmarks[PoseLandmarkType.rightWrist];
 
     if ([lh, rh, ls, rs, la, ra, lw, rw].contains(null)) {
-      debugPrint(">> One or more landmarks are null");
+      debugPrint("TAG_One or more landmarks are null");
       return;
     }
 
@@ -139,7 +139,7 @@ class ExerciseDetectors {
     final wristY = (lw!.y + rw!.y) / 2;
 
     debugPrint(
-      '>> hipY: $hipY, shoulderY: $shoulderY, ankleY: $ankleY, wristY: $wristY',
+      'TAG_hipY: $hipY, shoulderY: $shoulderY, ankleY: $ankleY, wristY: $wristY',
     );
 
     final isPlank =
@@ -150,14 +150,14 @@ class ExerciseDetectors {
     final isDownwardDog = (hipY < shoulderY - 60) && (ankleY > hipY + 50);
 
     debugPrint(
-      '>> [DD] isPlank: $isPlank | isDownwardDog: $isDownwardDog | wasPlank: ${getWasPlank()}',
+      'TAG_[DD] isPlank: $isPlank | isDownwardDog: $isDownwardDog | wasPlank: ${getWasPlank()}',
     );
 
     if (isPlank && !getWasPlank()) {
-      debugPrint('>> [DD] Entered plank position');
+      debugPrint('TAG_[DD] Entered plank position');
       updateWasPlank(true);
     } else if (isDownwardDog && getWasPlank()) {
-      debugPrint('>> [DD] Detected transition to Downward Dog');
+      debugPrint('TAG_[DD] Detected transition to Downward Dog');
       onTransitionCount();
       onRepDetected();
       updateWasPlank(false);
