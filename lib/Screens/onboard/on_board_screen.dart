@@ -3,12 +3,8 @@ import 'package:get/get.dart';
 import 'package:pose_detection/Components/button_widget.dart';
 import 'package:pose_detection/Components/frosted_glass_effect.dart';
 import 'package:pose_detection/Constants/app_colors.dart';
-import 'package:pose_detection/Constants/app_constants.dart';
 import 'package:pose_detection/Constants/app_string.dart';
-import 'package:pose_detection/Screens/login/login_binding.dart';
-import 'package:pose_detection/Screens/login/login_screen.dart';
-import 'package:pose_detection/Screens/register/register_binding.dart';
-import 'package:pose_detection/Screens/register/register_screen.dart';
+import 'package:pose_detection/Constants/page_name.dart';
 
 class OnBoardScreen extends StatefulWidget {
   const OnBoardScreen({super.key});
@@ -55,14 +51,15 @@ class OnBoardScreenState extends State<OnBoardScreen> {
                           ColorConstants.endColor, // End purple-ish
                         ],
                         onPressed: () {
-                          Get.to(
-                            () => LoginScreen(),
-                            transition: Transition.rightToLeft,
-                            duration: Duration(
-                              milliseconds: AppConstants.navigationDurationTime,
-                            ),
-                            binding: LoginBinding(),
-                          );
+                          // Get.to(
+                          //   () => LoginScreen(),
+                          //   transition: Transition.rightToLeft,
+                          //   duration: Duration(
+                          //     milliseconds: AppConstants.navigationDurationTime,
+                          //   ),
+                          //   binding: LoginBinding(),
+                          // ); 
+                          Get.toNamed(PageName.login);
                         },
                       ),
 
@@ -75,14 +72,15 @@ class OnBoardScreenState extends State<OnBoardScreen> {
                           ColorConstants.endColor,
                         ],
                         onPressed: () {
-                          Get.to(
-                            () => RegisterScreen(),
-                            transition: Transition.rightToLeft,
-                            duration: Duration(
-                              milliseconds: AppConstants.navigationDurationTime,
-                            ),
-                            binding: RegisterBinding(),
-                          );
+                          // Get.to(
+                          //   () => RegisterScreen(),
+                          //   transition: Transition.rightToLeft,
+                          //   duration: Duration(
+                          //     milliseconds: AppConstants.navigationDurationTime,
+                          //   ),
+                          //   binding: RegisterBinding(),
+                          // );
+                          Get.toNamed(PageName.register);
                         },
                       ),
                     ],

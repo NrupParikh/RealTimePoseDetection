@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pose_detection/Components/frosted_glass_effect.dart';
-import 'package:pose_detection/Constants/app_constants.dart';
+import 'package:pose_detection/Constants/page_name.dart';
 import 'package:pose_detection/Screens/login/login_bottom_sheet.dart';
 import 'package:pose_detection/Constants/app_colors.dart';
-import 'package:pose_detection/Screens/onboard/on_board_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -68,10 +67,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void goToOnBoardScreen() {
-    Get.offAll(
-      () => OnBoardScreen(),
-      transition: Transition.leftToRight,
-      duration: Duration(milliseconds: AppConstants.navigationDurationTime),
-    );
+    // Get.offAll(
+    //   () => OnBoardScreen(),
+    //   transition: Transition.leftToRight,
+    //   duration: Duration(milliseconds: AppConstants.navigationDurationTime),
+    // );
+
+    Get.offAllNamed(PageName.onboard);
   }
-}
+} 

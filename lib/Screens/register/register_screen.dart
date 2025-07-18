@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pose_detection/Components/frosted_glass_effect.dart';
 import 'package:pose_detection/Constants/app_colors.dart';
-import 'package:pose_detection/Constants/app_constants.dart';
-import 'package:pose_detection/Screens/onboard/on_board_screen.dart';
+import 'package:pose_detection/Constants/page_name.dart';
 import 'package:pose_detection/Screens/register/register_bottom_sheet.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -68,10 +67,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void goToOnBoardScreen() {
-    Get.offAll(
-      () => OnBoardScreen(),
-      transition: Transition.leftToRight,
-      duration: Duration(milliseconds: AppConstants.navigationDurationTime),
-    );
+    // Get.offAll(
+    //   () => OnBoardScreen(),
+    //   transition: Transition.leftToRight,
+    //   duration: Duration(milliseconds: AppConstants.navigationDurationTime),
+    // );
+    Get.offAllNamed(PageName.onboard);
   }
 }

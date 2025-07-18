@@ -46,4 +46,19 @@ class SecureStorageSingleton {
     return _prefs.getBool(AppKey.keyIsLoggedIn);
   }
 
+
+    void storeUserDataSavedFlag(bool isSaved) {
+    if (!_initialized) {
+      throw Exception("SecureStorageSingleton not initialized.");
+    }
+    _prefs.setBool(AppKey.keyIsUserDataSaved, isSaved);
+  }
+
+  bool? isUserDataSaved() {
+    if (!_initialized) {
+      throw Exception("SecureStorageSingleton not initialized.");
+    }
+    return _prefs.getBool(AppKey.keyIsUserDataSaved);
+  }
+
 }

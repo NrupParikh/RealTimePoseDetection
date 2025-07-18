@@ -3,9 +3,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pose_detection/Components/fancy_alert_dialog.dart';
+import 'package:pose_detection/Constants/page_name.dart';
 import 'package:pose_detection/Models/excercise_data_model.dart';
-import 'package:pose_detection/Screens/detection/detection_binding.dart';
-import 'package:pose_detection/Screens/detection/detection_screen.dart';
 
 class PermissionService {
   static Future<void> requestAllPermissionsAndNavigate(
@@ -46,10 +45,11 @@ class PermissionService {
       // 4. Check final status and navigate/show dialog
       if (cameraPermissionStatus.isGranted && microphonePermissionStatus.isGranted) {
         debugPrint('TAG_Both permissions granted. Navigating to DetectionScreen.');
-        Get.to(
-          () => DetectionScreen(dataModel: item),
-          binding: DetectionBinding(item),
-        );
+        // Get.to(
+        //   () => DetectionScreen(),
+        //   binding: DetectionBinding(item),
+        // ); 
+        Get.toNamed(PageName.detection,arguments: item);
       } else {
         // At least one permission is NOT granted
         if (context.mounted) {
