@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-android:
-    name: Build Android APK
+    name: Android Lint, Analyze, Format & Build
     runs-on: ubuntu-latest
 
     steps:
@@ -17,12 +17,34 @@ jobs:
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.32.6'  # Replace with your Flutter version
+          flutter-version: '3.32.6'
 
-      - name: Install dependencies
+      - name: Install Flutter dependencies
         run: flutter pub get
 
-      - name: Build APK
+      - name: Run Flutter Analyze
+        run: flutter analyze
+
+      - name: Run Dart Format Check (Dry Run)
+        run: dart format . --set-exit-if-changed
+
+      - name: Run Android Lint
+        run: |
+          cd android
+          ./gradlew lintDebug
+
+      - name: Upload Android Lint Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-lint-report
+          path: android/app/build/reports/lint-results-debug.html
+
+      - name: Run ktlint Check (Kotlin Format Check)
+        run: |
+          curl -sSLO https://github.com/pinterest/ktlint/releases/download/1.2.1/ktlint && chmod +x ktlint
+          ./ktlint "android/**/*.kt" --reporter=plain
+
+      - name: Build Android APK
         run: flutter build apk --release
 
       - name: Upload APK Artifact
