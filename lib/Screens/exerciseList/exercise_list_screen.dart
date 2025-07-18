@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pose_detection/Components/fancy_alert_dialog.dart';
@@ -7,9 +5,9 @@ import 'package:pose_detection/Components/frosted_glass_effect.dart';
 import 'package:pose_detection/Components/permission_service.dart';
 import 'package:pose_detection/Constants/app_colors.dart';
 import 'package:pose_detection/Constants/app_string.dart';
+import 'package:pose_detection/Constants/page_name.dart';
 import 'package:pose_detection/Models/excercise_data_model.dart';
 import 'package:pose_detection/Screens/exerciseList/exercise_list_item.dart';
-import 'package:pose_detection/Screens/onboard/on_board_screen.dart';
 import 'package:pose_detection/Utility/utility.dart';
 import 'package:pose_detection/main.dart';
 
@@ -44,26 +42,19 @@ class ExcerciseListScreen extends StatelessWidget {
       ),
       body: Stack(
         children: [
-          // Positioned.fill(
-          //       child: Image.asset(
-          //         "assets/images/bg_gym_woman.png",
-          //         fit: BoxFit.cover,
-          //       ),
-          //     ),
-
-                      Positioned.fill(
-                child: Image.asset(
-                  "assets/images/login_bg.jpg",
-                  fit: BoxFit.cover,
-                ),
-              ),
+          Positioned.fill(
+            child: Image.asset("assets/images/login_bg.jpg", fit: BoxFit.cover),
+          ),
 
           Positioned.fill(
             child: FrostedGlass(
               applyFilter: false,
               borderRadius: BorderRadius.zero,
-              // gradientColors: [Color.fromRGBO(0, 0, 0, 0.2),Color.fromRGBO(0, 0, 0, 0.2)],     
-              gradientColors: [ColorConstants.startColor.withValues(alpha: 0.8),ColorConstants.endColor.withValues(alpha: 0.8)],        
+              // gradientColors: [Color.fromRGBO(0, 0, 0, 0.2),Color.fromRGBO(0, 0, 0, 0.2)],
+              gradientColors: [
+                ColorConstants.startColor.withValues(alpha: 0.8),
+                ColorConstants.endColor.withValues(alpha: 0.8),
+              ],
               child: SizedBox.expand(),
             ),
           ),
@@ -122,8 +113,8 @@ class ExcerciseListScreen extends StatelessWidget {
         message: "Are you sure you want to logout ?",
         onOkPressed: () {
           Get.back();
-          secureStorage.storeLoginStatus(false);
-          Get.offAll(() => const OnBoardScreen());
+          secureStorage.clearSharedPreference();
+          Get.offAllNamed(PageName.onboard);
         },
         onCancelPressed: () {
           Get.back();

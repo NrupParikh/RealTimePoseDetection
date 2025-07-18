@@ -7,12 +7,9 @@ import 'package:pose_detection/Components/gradiant_text.dart';
 import 'package:pose_detection/Components/text_field_widget.dart';
 import 'package:pose_detection/Components/text_widget.dart';
 import 'package:pose_detection/Constants/app_colors.dart';
-import 'package:pose_detection/Constants/app_constants.dart';
 import 'package:pose_detection/Constants/app_string.dart';
-import 'package:pose_detection/Screens/exerciseList/exercise_list_screen.dart';
+import 'package:pose_detection/Constants/page_name.dart';
 import 'package:pose_detection/Screens/login/login_controller.dart';
-import 'package:pose_detection/Screens/register/register_binding.dart';
-import 'package:pose_detection/Screens/register/register_screen.dart';
 import 'package:pose_detection/main.dart';
 
 class LoginBottomSheet extends StatefulWidget {
@@ -70,7 +67,14 @@ class LoginBottomSheetState extends State<LoginBottomSheet> {
                       final result = controller.handleLogin();
                       if (result.item1) {
                         secureStorage.storeLoginStatus(true);
-                        Get.offAll(() => ExcerciseListScreen());
+                        // Get.offAllNamed(PageName.exerciseList);
+                        final isUserDataSaved = secureStorage.isUserDataSaved() ?? false;
+                        if(isUserDataSaved){
+                           Get.offAllNamed(PageName.exerciseList);
+                        }else {
+                           Get.offAllNamed(PageName.chat);
+                        }
+                       
                       } else {
                        FancyAlertDialog.showFancyAlertDialog(
                           context: context,
@@ -89,14 +93,15 @@ class LoginBottomSheetState extends State<LoginBottomSheet> {
                     title: AppStrings.registerTitle,
                     titleMsg: AppStrings.signupTitle,
                     onTap: () {
-                      Get.off(
-                        () => RegisterScreen(),
-                        transition: Transition.rightToLeft,
-                        duration: Duration(
-                          milliseconds: AppConstants.navigationDurationTime,
-                        ),
-                        binding: RegisterBinding(),
-                      );
+                      // Get.off(
+                      //   () => RegisterScreen(),
+                      //   transition: Transition.rightToLeft,
+                      //   duration: Duration(
+                      //     milliseconds: AppConstants.navigationDurationTime,
+                      //   ),
+                      //   binding: RegisterBinding(),
+                      // );
+                      Get.offAllNamed(PageName.register);
                     },
                   ),
                 ],

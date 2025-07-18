@@ -4,6 +4,6 @@ import 'package:pose_detection/Screens/register/register_controller.dart';
 class RegisterBinding extends Bindings {
   @override
   void dependencies() {
-    Get.put(RegisterController());
+    Get.lazyPut<RegisterController>(() => RegisterController());
   }
 }

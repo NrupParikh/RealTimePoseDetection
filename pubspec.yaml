@@ -40,6 +40,16 @@ dependencies:
   permission_handler: ^12.0.1
   shared_preferences: ^2.5.3
   tuple: ^2.0.2
+  video_player: ^2.10.0
+  # Firebase Core: The foundation for all Firebase services
+  firebase_core: ^3.15.1
+  # Firebase AI: For Gemini API integration (Firebase AI Logic)
+  firebase_ai: ^2.2.1
+  # Cloud Firestore: For database storage of user data
+  cloud_firestore: ^5.6.11
+  # Firebase Remote Config: For dynamic questions
+  firebase_remote_config: ^5.4.7
+
 
 dev_dependencies:
   flutter_test:
@@ -51,6 +61,12 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
+
+  # Required for `flutterfire configure` to generate firebase_options.dart
+  build_runner: ^2.5.4
+  # These platform interfaces are often transitive dependencies, but sometimes explicitly listed for compatibility.
+  firebase_crashlytics_platform_interface: ^3.8.9
+  firebase_auth_platform_interface: ^7.7.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -79,7 +95,9 @@ flutter:
     - assets/myGif/start_over_head_clap.jpg
 
     - assets/images/login_bg.jpg
-    - assets/images/bg_gym_woman.png    
+    - assets/images/bg_gym_woman.png
+    - assets/videos/bg_gym.mp4
+    - assets/service_account.json    
     
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg

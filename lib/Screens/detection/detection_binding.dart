@@ -10,7 +10,7 @@ class DetectionBinding extends Bindings {
 
   @override
   void dependencies() {
-    Get.put(DetectionController(dataModel));
+    Get.lazyPut<DetectionController>(() => DetectionController(dataModel));
   }
 }
 
