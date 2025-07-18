@@ -5,19 +5,22 @@ import 'package:pose_detection/Components/exercise_info_dialog.dart';
 import 'package:pose_detection/Components/frosted_glass_effect.dart';
 import 'package:pose_detection/Constants/app_colors.dart';
 import 'package:pose_detection/Screens/detection/detection_controller.dart';
-import 'package:pose_detection/Models/excercise_data_model.dart';
 import 'package:pose_detection/Utility/pose_painter.dart';
 
-class DetectionScreen extends StatelessWidget {
-  final ExcerciseDataModel dataModel;
-  const DetectionScreen({super.key, required this.dataModel});
+class DetectionScreen extends StatefulWidget {
+  // final ExcerciseDataModel dataModel;
+  const DetectionScreen({super.key});
 
+  @override
+  State<DetectionScreen> createState() => _DetectionScreenState();
+}
+
+class _DetectionScreenState extends State<DetectionScreen> {
+  final DetectionController controller = Get.find<DetectionController>();
   @override
   Widget build(BuildContext context) {
     debugPrint("TAG_DetectionScreen build() called");
-    final DetectionController controller = Get.put(
-      DetectionController(dataModel),
-    );
+  
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -25,7 +28,7 @@ class DetectionScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         title: Text(
-          dataModel.title,
+          controller.dataModel.title,
           style: const TextStyle(color: Colors.white),
         ),
         centerTitle: true,
@@ -39,7 +42,7 @@ class DetectionScreen extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.info_outline, color: Colors.white),
             onPressed:
-                () => ExerciseInfoDialog.showExerciseInfo(context, dataModel),
+                () => ExerciseInfoDialog.showExerciseInfo(context, controller.dataModel),
           ),
         ],
       ),

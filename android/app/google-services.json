@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "910552505630",
+    "project_id": "aichatbotapp-a34d8",
+    "storage_bucket": "aichatbotapp-a34d8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:910552505630:android:846f74f80ffc1f9d327d0f",
+        "android_client_info": {
+          "package_name": "com.example.pose_detection"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyALN2ktxWUtclvsLjXHPrjtdGfJAGr22D4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

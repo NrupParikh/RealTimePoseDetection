@@ -20,6 +20,7 @@ class ExerciseListItem extends StatelessWidget {
       child: FrostedGlass(
         borderRadius: BorderRadius.all(Radius.circular(20)),
         applyFilter: false,
+        gradientColors: [Colors.black.withValues(alpha: 0.2),Colors.black.withValues(alpha: 0.2)],
         child: Row(
           children: [
             Image.asset(

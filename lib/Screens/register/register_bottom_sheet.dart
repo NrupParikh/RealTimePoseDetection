@@ -7,10 +7,8 @@ import 'package:pose_detection/Components/gradiant_text.dart';
 import 'package:pose_detection/Components/text_field_widget.dart';
 import 'package:pose_detection/Components/text_widget.dart';
 import 'package:pose_detection/Constants/app_colors.dart';
-import 'package:pose_detection/Constants/app_constants.dart';
 import 'package:pose_detection/Constants/app_string.dart';
-import 'package:pose_detection/Screens/login/login_binding.dart';
-import 'package:pose_detection/Screens/login/login_screen.dart';
+import 'package:pose_detection/Constants/page_name.dart';
 import 'package:pose_detection/Screens/register/register_controller.dart';
 
 class RegisterBottomSheet extends StatefulWidget {
@@ -90,14 +88,15 @@ class RegisterBottomSheetState extends State<RegisterBottomSheet> {
                     title: AppStrings.loginTitleButton,
                     titleMsg: AppStrings.loginButtonTitle,
                     onTap: () {
-                      Get.off(
-                        () => LoginScreen(),
-                        transition: Transition.rightToLeft,
-                        duration: Duration(
-                          milliseconds: AppConstants.navigationDurationTime,
-                        ),
-                        binding: LoginBinding(),
-                      );
+                      // Get.off(
+                      //   () => LoginScreen(),
+                      //   transition: Transition.rightToLeft,
+                      //   duration: Duration(
+                      //     milliseconds: AppConstants.navigationDurationTime,
+                      //   ),
+                      //   binding: LoginBinding(),
+                      // );
+                      Get.offAllNamed(PageName.login);
                     },
                   ),
                 ],
@@ -110,13 +109,14 @@ class RegisterBottomSheetState extends State<RegisterBottomSheet> {
   }
 
   void goToLoginScreenAfterRegisterSuccess() {
-    Get.offAll(
-      () => LoginScreen(),
-      transition: Transition.leftToRight,
-      duration: const Duration(
-        milliseconds: AppConstants.navigationDurationTime,
-      ),
-      binding: LoginBinding(),
-    );
+    // Get.offAll(
+    //   () => LoginScreen(),
+    //   transition: Transition.leftToRight,
+    //   duration: const Duration(
+    //     milliseconds: AppConstants.navigationDurationTime,
+    //   ),
+    //   binding: LoginBinding(),
+    // );
+    Get.offAllNamed(PageName.login);
   }
 }
