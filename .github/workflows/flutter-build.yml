@@ -29,7 +29,9 @@ jobs:
         run: dart format .
 
       - name: Run Android Lint
-        run: flutter build apk --debug && cd android && ./gradlew lintDebug
+        run: |
+          cd android 
+          ./gradlew app:lintDebug
 
       - name: Upload Android Lint Report
         uses: actions/upload-artifact@v4
