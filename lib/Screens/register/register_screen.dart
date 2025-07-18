@@ -67,11 +67,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void goToOnBoardScreen() {
-    // Get.offAll(
-    //   () => OnBoardScreen(),
-    //   transition: Transition.leftToRight,
-    //   duration: Duration(milliseconds: AppConstants.navigationDurationTime),
-    // );
     Get.offAllNamed(PageName.onboard);
   }
 }

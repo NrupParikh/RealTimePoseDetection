@@ -109,11 +109,11 @@ class ChatController extends GetxController {
   void _startChat() {
     _addBotMessage("Welcome to the registration! Let's get started.");
       // ========== Testing only
-      //  isUserDataSaved.value = true;
-      // secureStorage.storeUserDataSavedFlag(true);
+       isUserDataSaved.value = true;
+      secureStorage.storeUserDataSavedFlag(true);
       // ======= End of Testing only
 
-    _askNextQuestion();
+    // _askNextQuestion();
   }
 
   void _addBotMessage(String message) {

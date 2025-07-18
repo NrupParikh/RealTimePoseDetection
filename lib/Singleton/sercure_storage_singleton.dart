@@ -61,4 +61,18 @@ class SecureStorageSingleton {
     return _prefs.getBool(AppKey.keyIsUserDataSaved);
   }
 
+    void storeToken(String token) {
+    if (!_initialized) {
+      throw Exception("SecureStorageSingleton not initialized.");
+    }
+    _prefs.setString(AppKey.keyToken, token);
+  }
+
+  String? getToken() {
+    if (!_initialized) {
+      throw Exception("SecureStorageSingleton not initialized.");
+    }
+    return _prefs.getString(AppKey.keyToken);
+  }
+
 }

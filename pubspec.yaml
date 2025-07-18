@@ -49,6 +49,8 @@ dependencies:
   cloud_firestore: ^5.6.11
   # Firebase Remote Config: For dynamic questions
   firebase_remote_config: ^5.4.7
+  dio: ^5.8.0+1
+  pretty_dio_logger: ^1.4.0
 
 
 dev_dependencies:
