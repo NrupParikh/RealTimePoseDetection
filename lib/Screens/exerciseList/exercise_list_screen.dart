@@ -9,10 +9,31 @@ import 'package:pose_detection/Constants/page_name.dart';
 import 'package:pose_detection/Models/excercise_data_model.dart';
 import 'package:pose_detection/Screens/exerciseList/exercise_list_item.dart';
 import 'package:pose_detection/Utility/utility.dart';
+import 'package:pose_detection/api/apiModels/user.dart';
 import 'package:pose_detection/main.dart';
 
-class ExcerciseListScreen extends StatelessWidget {
+class ExcerciseListScreen extends StatefulWidget {
   const ExcerciseListScreen({super.key});
+
+  @override
+  State<ExcerciseListScreen> createState() => _ExcerciseListScreenState();
+}
+
+class _ExcerciseListScreenState extends State<ExcerciseListScreen> {
+  @override
+  void initState() {
+    super.initState();
+    final User? user = secureStorage.getUserData();
+    final String? token = secureStorage.getToken();
+    if (user != null) {
+      debugPrint("Tag_email ${user.email}");
+      debugPrint("Tag_id ${user.id}");
+      debugPrint("Tag_isProfileDataAvailable ${user.isProfileDataAvailable}");
+    }
+    if (token != null) {
+      debugPrint("Tag_token $token");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

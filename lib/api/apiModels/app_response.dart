@@ -8,7 +8,7 @@ class AppResponse {
     this.result = 0,
     this.statusCode = 0,
     this.message = "",
-    this.data, // Changed data to be dynamic, can be null
+    this.data, 
   });
 
   factory AppResponse.fromJson(Map<String, dynamic> json) {
@@ -23,7 +23,7 @@ class AppResponse {
   factory AppResponse.userFromJson(dynamic str) {
     return AppResponse.fromJson(
       str,
-    ); // Simplified since 'data' is already handled in fromJson
+    ); 
   }
 }
 

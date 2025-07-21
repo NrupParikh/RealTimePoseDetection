@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pose_detection/Constants/app_string.dart';
 import 'package:pose_detection/Singleton/api_service_singleton.dart';
-import 'package:pose_detection/api/apiModels/register_response.dart';
+import 'package:pose_detection/api/apiModels/auth_response.dart';
 import 'package:pose_detection/api/api_service.dart';
+import 'package:pose_detection/main.dart';
 import 'package:tuple/tuple.dart';
 
 class RegisterController extends GetxController {
@@ -35,9 +36,12 @@ class RegisterController extends GetxController {
           isLoading.value = false;
           if (appResponse.data is Map<String, dynamic>) {
             try {
-              final RegisterData data = RegisterData.fromJson(appResponse.data);
-              print("Tag_data ${data.email}");
-              // secureStorage.storeUserData(data.user);
+              final AuthResponse data = AuthResponse.fromJson(appResponse.data);
+              debugPrint("Tag_data ${data.user}");
+              secureStorage.storeUserData(data.user);
+              if (data.token != null) {
+                secureStorage.storeToken(data.token!);
+              }
               return Tuple2(true, appResponse.message.toString());
             } catch (e) {
               isLoading.value = false;

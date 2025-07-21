@@ -1,4 +1,8 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
 import 'package:pose_detection/Constants/app_key.dart';
+import 'package:pose_detection/api/apiModels/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SecureStorageSingleton {
@@ -47,19 +51,19 @@ class SecureStorageSingleton {
   }
 
 
-    void storeUserDataSavedFlag(bool isSaved) {
-    if (!_initialized) {
-      throw Exception("SecureStorageSingleton not initialized.");
-    }
-    _prefs.setBool(AppKey.keyIsUserDataSaved, isSaved);
-  }
+  //   void storeUserDataSavedFlag(bool isSaved) {
+  //   if (!_initialized) {
+  //     throw Exception("SecureStorageSingleton not initialized.");
+  //   }
+  //   _prefs.setBool(AppKey.keyIsUserDataSaved, isSaved);
+  // }
 
-  bool? isUserDataSaved() {
-    if (!_initialized) {
-      throw Exception("SecureStorageSingleton not initialized.");
-    }
-    return _prefs.getBool(AppKey.keyIsUserDataSaved);
-  }
+  // bool? isUserDataSaved() {
+  //   if (!_initialized) {
+  //     throw Exception("SecureStorageSingleton not initialized.");
+  //   }
+  //   return _prefs.getBool(AppKey.keyIsUserDataSaved);
+  // }
 
     void storeToken(String token) {
     if (!_initialized) {
@@ -73,6 +77,36 @@ class SecureStorageSingleton {
       throw Exception("SecureStorageSingleton not initialized.");
     }
     return _prefs.getString(AppKey.keyToken);
+  }
+
+  void storeUserData(User user) {
+    if (!_initialized) {
+      throw Exception("SecureStorageSingleton not initialized.");
+    }
+    final String userObject = jsonEncode(user.toJson());
+    _prefs.setString(AppKey.keyUserObject, userObject);
+  }
+
+  User? getUserData() {
+    if (!_initialized) {
+      throw Exception("SecureStorageSingleton not initialized.");
+    }
+    final String? userDataJson = _prefs.getString(AppKey.keyUserObject);
+    if (userDataJson == null) {
+      if (kDebugMode) {
+        print('No LoginData found in SharedPreferences.');
+      }
+      return null;
+    }
+    try {
+      final Map<String, dynamic> userDataMap = jsonDecode(userDataJson);
+      return User.fromJson(userDataMap);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error decoding LoginData: $e');
+      }
+      return null;
+    }
   }
 
 }

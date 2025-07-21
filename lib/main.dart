@@ -15,6 +15,7 @@ import 'package:pose_detection/Screens/onboard/on_board_screen.dart';
 import 'package:pose_detection/Screens/register/register_binding.dart';
 import 'package:pose_detection/Screens/register/register_screen.dart';
 import 'package:pose_detection/Singleton/sercure_storage_singleton.dart';
+import 'package:pose_detection/api/apiModels/user.dart';
 
 import 'Constants/page_name.dart';
 late SecureStorageSingleton secureStorage;
@@ -26,55 +27,56 @@ void main() async {
   await secureStorage.init();
   cameras = await availableCameras();
   final isLoggedIn = secureStorage.getLoginStatus() ?? false;
-  final isUserDataSaved = secureStorage.isUserDataSaved() ?? false;
+  final userData = secureStorage.getUserData() ;
+
   await Firebase.initializeApp(
     name: "AIChatBotApp",
     options: DefaultFirebaseOptions.currentPlatform);
-  runApp(MyApp(isLoggedIn: isLoggedIn,isUserDataSaved: isUserDataSaved,));
+  runApp(MyApp(isLoggedIn: isLoggedIn,userData: userData,));
 }
 
 class MyApp extends StatelessWidget {
   final bool isLoggedIn;
-  final bool isUserDataSaved;
-  const MyApp({super.key, required this.isLoggedIn,required this.isUserDataSaved});
+  final User? userData;
+  const MyApp({super.key, required this.isLoggedIn,required this.userData});
 
   @override
   Widget build(BuildContext context) {  
     return GetMaterialApp(
       title: 'Pose Detection',
       debugShowCheckedModeBanner: false,
-      // home: isLoggedIn ? ExerciseListScreen() : OnBoardScreen(), // Original code
-      // Use GetX routes and bindings for proper controller management
       initialRoute:
-          isLoggedIn
-              ? isUserDataSaved?PageName.exerciseList:PageName.chat
-              : PageName.onboard, // Set initial route
+          // isLoggedIn
+          //     ? isUserDataSaved?PageName.exerciseList:PageName.chat
+          //     : PageName.onboard,
+           isLoggedIn
+              ? userData?.isProfileDataAvailable==true?PageName.exerciseList:PageName.chat
+              : PageName.onboard,
       getPages: [
         GetPage(name: PageName.onboard, page: () => OnBoardScreen()),
         GetPage(
           name: PageName.login, 
           page: () => LoginScreen(),
-          binding: LoginBinding(), // Bind LoginController to LoginScreen
+          binding: LoginBinding(),
            transition: Transition.rightToLeft    
         ),
         GetPage(
           name: PageName.register,
           page: () => RegisterScreen(),
           binding:
-              RegisterBinding(), // Bind RegisterController to RegisterScreen
+              RegisterBinding(),
           transition: Transition.rightToLeft    
         ),
         GetPage(
           name: PageName.chat,
           page: () => FirebaseChatScreen(),
-          binding: ChatBinding(), // Bind ChatController to FirebaseChatScreen
+          binding: ChatBinding(),
         ),
         GetPage(name: PageName.exerciseList, page: () => ExcerciseListScreen()),
         GetPage(
           name: PageName.detection,
           page: () => DetectionScreen(),
-          binding: BindingsBuilder(() {
-            // Get.arguments will contain the dataModel passed during navigation
+          binding: BindingsBuilder(() {          
             final ExcerciseDataModel dataModel =
                 Get.arguments as ExcerciseDataModel;
             Get.lazyPut<DetectionController>(

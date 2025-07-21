@@ -4,7 +4,7 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart'; // For TextEditingController, ScrollController, etc.
 import 'dart:convert';
 import 'package:get/get.dart';
-import 'package:pose_detection/main.dart'; // Import GetX
+import 'package:pose_detection/main.dart';
 
 class ChatController extends GetxController {
   // Reactive variables for UI updates
@@ -109,11 +109,17 @@ class ChatController extends GetxController {
   void _startChat() {
     _addBotMessage("Welcome to the registration! Let's get started.");
       // ========== Testing only
-       isUserDataSaved.value = true;
-      secureStorage.storeUserDataSavedFlag(true);
+      //  isUserDataSaved.value = true;
+      // secureStorage.storeUserDataSavedFlag(true);
       // ======= End of Testing only
 
     // _askNextQuestion();
+    final userData = secureStorage.getUserData();
+    if(userData!=null){
+      userData.profileDataAvailable = true;
+      secureStorage.storeUserData(userData);
+      isUserDataSaved.value = true;
+    }  
   }
 
   void _addBotMessage(String message) {
@@ -281,12 +287,12 @@ class ChatController extends GetxController {
         "Your details have been successfully saved to our records!",
       );
       debugPrint("User data saved to Firestore for ID: $userId");
-      secureStorage.storeUserDataSavedFlag(true);
-      isUserDataSaved.value = true;
+      // secureStorage.storeUserDataSavedFlag(true);
+      // isUserDataSaved.value = true;
      
     } catch (e) {
-      secureStorage.storeUserDataSavedFlag(false);
-      isUserDataSaved.value = false;
+      // secureStorage.storeUserDataSavedFlag(false);
+      // isUserDataSaved.value = false;
    
       _addBotMessage(
         "Failed to save your details. Please check your internet connection and try again later.",
