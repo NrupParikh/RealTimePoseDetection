@@ -43,3 +43,9 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Un-ignore gradlew and wrapper directory
+!android/gradlew
+!android/gradlew.bat
+!android/gradle/wrapper/gradle-wrapper.properties
+
