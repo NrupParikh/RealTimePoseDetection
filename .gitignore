@@ -33,6 +33,11 @@ migrate_working_dir/
 .pub/
 /build/
 
+# EXCEPT allow app lint reports
+!build/app/
+!build/app/reports/
+!build/app/reports/lint-results-debug.html
+
 # Symbolication related
 app.*.symbols
 
