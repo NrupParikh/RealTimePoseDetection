@@ -43,23 +43,23 @@ class DetectionController extends GetxController {
   RxInt squatCount = 0.obs;
   bool isSquatting = false;
 
-  DateTime? lastRepTime;
-  bool warningShown = false;
-  Timer? inactivityTimer;
-  RxString warningMessage = ''.obs;
+  // DateTime? lastRepTime;
+  // bool warningShown = false;
+  // Timer? inactivityTimer;
+  // RxString warningMessage = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
     debugPrint('TAG_DetectionController initialized for: ${dataModel.title}');
     startCountdown();
-    startInactivityWatcher();
+    // startInactivityWatcher();
   }
 
-  void markExerciseStarted() {
-    lastRepTime = DateTime.now();
-    debugPrint('TAG_Exercise started');
-  }
+  // void markExerciseStarted() {
+  //   lastRepTime = DateTime.now();
+  //   debugPrint('TAG_Exercise started');
+  // }
 
   void startCountdown() async {
     debugPrint('TAG_Starting countdown');
@@ -222,25 +222,25 @@ class DetectionController extends GetxController {
     isBusy = false;
   }
 
-  void startInactivityWatcher() {
-    inactivityTimer = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (showCountdown.value || lastRepTime == null) return;
-      final elapsed = DateTime.now().difference(lastRepTime!).inSeconds;
-      if (elapsed >= 3 && !warningShown) {
-        warningMessage.value = "Please do ${dataModel.title} properly";
-        warningShown = true;
-        debugPrint('TAG_Showing inactivity warning');
-      }
-    });
-  }
+  // void startInactivityWatcher() {
+  //   inactivityTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+  //     if (showCountdown.value || lastRepTime == null) return;
+  //     final elapsed = DateTime.now().difference(lastRepTime!).inSeconds;
+  //     if (elapsed >= 3 && !warningShown) {
+  //       warningMessage.value = "Please do ${dataModel.title} properly";
+  //       warningShown = true;
+  //       debugPrint('TAG_Showing inactivity warning');
+  //     }
+  //   });
+  // }
 
   void showWarningOnScreen() {
-    lastRepTime = DateTime.now();
-    if (warningShown) {
-      warningShown = false;
-      warningMessage.value = '';
-      debugPrint('TAG_Hiding warning');
-    }
+    // lastRepTime = DateTime.now();
+    // if (warningShown) {
+    //   warningShown = false;
+    //   warningMessage.value = '';
+    //   debugPrint('TAG_Hiding warning');
+    // }
   }
 
   InputImage? _inputImageFromCameraImage() {
@@ -313,7 +313,7 @@ class DetectionController extends GetxController {
     controller.value?.stopImageStream();
     controller.value?.dispose();
     poseDetector.close();
-    inactivityTimer?.cancel();
+    // inactivityTimer?.cancel();
     debugPrint('TAG_DetectionController disposed');
     super.onClose();
   }

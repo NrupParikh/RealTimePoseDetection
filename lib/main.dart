@@ -6,6 +6,7 @@ import 'package:pose_detection/Components/default_firebase_options.dart';
 import 'package:pose_detection/Models/excercise_data_model.dart';
 import 'package:pose_detection/Screens/detection/detection_controller.dart';
 import 'package:pose_detection/Screens/detection/detection_screen.dart';
+import 'package:pose_detection/Screens/exerciseList/exercise_list_binding.dart';
 import 'package:pose_detection/Screens/exerciseList/exercise_list_screen.dart';
 import 'package:pose_detection/Screens/firebase_chat_boat/chat_binding.dart';
 import 'package:pose_detection/Screens/firebase_chat_boat/firebase_chat_screen.dart';
@@ -18,6 +19,7 @@ import 'package:pose_detection/Singleton/sercure_storage_singleton.dart';
 import 'package:pose_detection/api/apiModels/user.dart';
 
 import 'Constants/page_name.dart';
+
 late SecureStorageSingleton secureStorage;
 late List<CameraDescription> cameras;
 
@@ -27,21 +29,22 @@ void main() async {
   await secureStorage.init();
   cameras = await availableCameras();
   final isLoggedIn = secureStorage.getLoginStatus() ?? false;
-  final userData = secureStorage.getUserData() ;
+  final userData = secureStorage.getUserData();
 
   await Firebase.initializeApp(
     name: "AIChatBotApp",
-    options: DefaultFirebaseOptions.currentPlatform);
-  runApp(MyApp(isLoggedIn: isLoggedIn,userData: userData,));
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  runApp(MyApp(isLoggedIn: isLoggedIn, userData: userData));
 }
 
 class MyApp extends StatelessWidget {
   final bool isLoggedIn;
   final User? userData;
-  const MyApp({super.key, required this.isLoggedIn,required this.userData});
+  const MyApp({super.key, required this.isLoggedIn, required this.userData});
 
   @override
-  Widget build(BuildContext context) {  
+  Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Pose Detection',
       debugShowCheckedModeBanner: false,
@@ -49,34 +52,39 @@ class MyApp extends StatelessWidget {
           // isLoggedIn
           //     ? isUserDataSaved?PageName.exerciseList:PageName.chat
           //     : PageName.onboard,
-           isLoggedIn
-              ? userData?.isProfileDataAvailable==true?PageName.exerciseList:PageName.chat
+          isLoggedIn
+              ? userData?.isProfileDataAvailable == true
+                  ? PageName.exerciseList
+                  : PageName.chat
               : PageName.onboard,
       getPages: [
         GetPage(name: PageName.onboard, page: () => OnBoardScreen()),
         GetPage(
-          name: PageName.login, 
+          name: PageName.login,
           page: () => LoginScreen(),
           binding: LoginBinding(),
-           transition: Transition.rightToLeft    
+          transition: Transition.rightToLeft,
         ),
         GetPage(
           name: PageName.register,
           page: () => RegisterScreen(),
-          binding:
-              RegisterBinding(),
-          transition: Transition.rightToLeft    
+          binding: RegisterBinding(),
+          transition: Transition.rightToLeft,
         ),
         GetPage(
           name: PageName.chat,
           page: () => FirebaseChatScreen(),
           binding: ChatBinding(),
         ),
-        GetPage(name: PageName.exerciseList, page: () => ExcerciseListScreen()),
+        GetPage(
+          name: PageName.exerciseList,
+          page: () => ExcerciseListScreen(),
+          binding: ExerciseListBinding(),
+        ),
         GetPage(
           name: PageName.detection,
           page: () => DetectionScreen(),
-          binding: BindingsBuilder(() {          
+          binding: BindingsBuilder(() {
             final ExcerciseDataModel dataModel =
                 Get.arguments as ExcerciseDataModel;
             Get.lazyPut<DetectionController>(

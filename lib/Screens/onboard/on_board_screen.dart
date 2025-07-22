@@ -31,15 +31,14 @@ class OnBoardScreenState extends State<OnBoardScreen> {
                 fit: BoxFit.cover,
               ),
             ),
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: FrostedGlass(
-                applyFilter: true,
-                blurSigmaX: 10,
-                blurSigmaY: 10,
-                height: 240,
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
+            SafeArea(
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: FrostedGlass(
+                  applyFilter: true,  
+                  blurSigmaX: 10,
+                  blurSigmaY: 10,
+                  height: 240,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -62,7 +61,7 @@ class OnBoardScreenState extends State<OnBoardScreen> {
                           Get.toNamed(PageName.login);
                         },
                       ),
-
+                        
                       const SizedBox(height: 30),
                       Buttonwidget(
                         width: 250,

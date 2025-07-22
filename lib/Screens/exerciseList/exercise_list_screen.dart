@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pose_detection/Components/fancy_alert_dialog.dart';
@@ -7,8 +8,10 @@ import 'package:pose_detection/Constants/app_colors.dart';
 import 'package:pose_detection/Constants/app_string.dart';
 import 'package:pose_detection/Constants/page_name.dart';
 import 'package:pose_detection/Models/excercise_data_model.dart';
+import 'package:pose_detection/Screens/exerciseList/exercise_list_controller.dart';
 import 'package:pose_detection/Screens/exerciseList/exercise_list_item.dart';
 import 'package:pose_detection/Utility/utility.dart';
+import 'package:pose_detection/api/apiModels/profile.dart';
 import 'package:pose_detection/api/apiModels/user.dart';
 import 'package:pose_detection/main.dart';
 
@@ -20,18 +23,35 @@ class ExcerciseListScreen extends StatefulWidget {
 }
 
 class _ExcerciseListScreenState extends State<ExcerciseListScreen> {
+  final exerciseListController = Get.find<ExerciseListController>();
   @override
   void initState() {
     super.initState();
-    final User? user = secureStorage.getUserData();
-    final String? token = secureStorage.getToken();
-    if (user != null) {
-      debugPrint("Tag_email ${user.email}");
-      debugPrint("Tag_id ${user.id}");
-      debugPrint("Tag_isProfileDataAvailable ${user.isProfileDataAvailable}");
-    }
-    if (token != null) {
-      debugPrint("Tag_token $token");
+    try {
+      final User? user = secureStorage.getUserData();
+      final String? token = secureStorage.getToken();
+      final Profile? profile = secureStorage.getProfileData();
+
+      if (user != null) {
+        if (kDebugMode) {
+          print("Tag_User ${user.toString()}");
+        }
+      }
+      if (token != null) {
+        if (kDebugMode) {
+          print("Tag_token $token");
+        }
+      }
+
+      if (profile != null) {
+        if (kDebugMode) {
+          print("Tag_profile ${profile.toString()}");
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Tag_e ${e.toString()}");
+      }
     }
   }
 
@@ -132,10 +152,34 @@ class _ExcerciseListScreenState extends State<ExcerciseListScreen> {
         context: ctx,
         title: AppStrings.appName,
         message: "Are you sure you want to logout ?",
-        onOkPressed: () {
+        onOkPressed: () async {
           Get.back();
-          secureStorage.clearSharedPreference();
-          Get.offAllNamed(PageName.onboard);
+          showDialog(
+            context: ctx,
+            barrierDismissible: false,
+            builder: (BuildContext dialogContext) {
+              return const Center(child: CircularProgressIndicator());
+            },
+          );
+
+          final result = await exerciseListController.logout();
+
+          // Dismiss the loader
+          Get.back(); // This will pop the loader dialog
+
+          if (result.item1) {
+            secureStorage.clearSharedPreference();
+            Get.offAllNamed(PageName.onboard);
+          } else {
+            // Handle logout failure, e.g., show a snackbar or another dialog
+            if (ctx.mounted) {
+              ScaffoldMessenger.of(ctx).showSnackBar(
+                const SnackBar(
+                  content: Text("Logout failed. Please try again."),
+                ),
+              );
+            }
+          }
         },
         onCancelPressed: () {
           Get.back();

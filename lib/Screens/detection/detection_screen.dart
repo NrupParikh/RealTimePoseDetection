@@ -19,8 +19,7 @@ class _DetectionScreenState extends State<DetectionScreen> {
   final DetectionController controller = Get.find<DetectionController>();
   @override
   Widget build(BuildContext context) {
-    debugPrint("TAG_DetectionScreen build() called");
-  
+    debugPrint("TAG_DetectionScreen build() called"); 
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -85,78 +84,78 @@ class _DetectionScreenState extends State<DetectionScreen> {
           debugPrint("TAG_Camera controller not initialized");
         }
 
-        if (controller.warningMessage.value.isNotEmpty) {
-          debugPrint(
-            "TAG_Warning message shown: ${controller.warningMessage.value}",
-          );
-          children.add(
-            Align(
-              alignment: Alignment.bottomCenter,
-              child: Container(
-                margin: const EdgeInsets.only(bottom: 100),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  controller.warningMessage.value,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }
+        // if (controller.warningMessage.value.isNotEmpty) {
+        //   debugPrint(
+        //     "TAG_Warning message shown: ${controller.warningMessage.value}",
+        //   );
+        //   children.add(
+        //     Align(
+        //       alignment: Alignment.bottomCenter,
+        //       child: Container(
+        //         margin: const EdgeInsets.only(bottom: 100),
+        //         padding: const EdgeInsets.symmetric(
+        //           horizontal: 20,
+        //           vertical: 10,
+        //         ),
+        //         decoration: BoxDecoration(
+        //           color: Colors.white.withValues(alpha: 0.2),
+        //           borderRadius: BorderRadius.circular(12),
+        //         ),
+        //         child: Text(
+        //           controller.warningMessage.value,
+        //           style: const TextStyle(
+        //             color: Colors.white,
+        //             fontSize: 18,
+        //             fontWeight: FontWeight.w600,
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //   );
+        // }
 
-        if (controller.distanceFeedback.value.isNotEmpty) {
-          debugPrint(
-            "TAG_Distance feedback: ${controller.distanceFeedback.value}",
-          );
-          children.add(
-            Positioned(
-              top: 20,
-              left: 20,
-              right: 20,
-              child: Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.red.withValues(alpha: 0.6),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  controller.distanceFeedback.value,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }
+        // if (controller.distanceFeedback.value.isNotEmpty) {
+        //   debugPrint(
+        //     "TAG_Distance feedback: ${controller.distanceFeedback.value}",
+        //   );
+        //   children.add(
+        //     Positioned(
+        //       top: 20,
+        //       left: 20,
+        //       right: 20,
+        //       child: Container(
+        //         padding: const EdgeInsets.all(10),
+        //         decoration: BoxDecoration(
+        //           color: Colors.red.withValues(alpha: 0.6),
+        //           borderRadius: BorderRadius.circular(10),
+        //         ),
+        //         child: Text(
+        //           controller.distanceFeedback.value,
+        //           textAlign: TextAlign.center,
+        //           style: const TextStyle(
+        //             color: Colors.white,
+        //             fontSize: 16,
+        //             fontWeight: FontWeight.bold,
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //   );
+        // }
 
-        debugPrint(
-          "TAG_Current Distance Ratio: ${controller.distanceRatio.value.toStringAsFixed(2)}",
-        );
-        children.add(
-          Positioned(
-            top: 60,
-            left: 20,
-            child: Text(
-              'Distance Ratio: ${controller.distanceRatio.value.toStringAsFixed(2)}',
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-        );
+        // debugPrint(
+        //   "TAG_Current Distance Ratio: ${controller.distanceRatio.value.toStringAsFixed(2)}",
+        // );
+        // children.add(
+        //   Positioned(
+        //     top: 60,
+        //     left: 20,
+        //     child: Text(
+        //       'Distance Ratio: ${controller.distanceRatio.value.toStringAsFixed(2)}',
+        //       style: const TextStyle(color: Colors.white),
+        //     ),
+        //   ),
+        // );
 
         debugPrint("TAG_Current Count: ${controller.getCount()}");
         children.add(

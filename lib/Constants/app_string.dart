@@ -1,5 +1,5 @@
 class AppStrings {
-  static const appName = "Real Time Pose Detection";
+  static const appName = "Pose Detection";
 
   static const login = "LOGIN";
   static const register = "SIGN UP";

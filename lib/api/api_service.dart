@@ -50,4 +50,55 @@ class ApiService {
       rethrow;
     }
   }
+
+  // ============================= Update profile
+  Future<AppResponse> updateUserProfile({
+    required int id,
+    required String name,
+    required int age,
+    required double height,
+    required double weight,
+    required String gender,
+    required String goal,
+  }) async {
+    Map<String, dynamic> data = {
+      'name': name,
+      'age': age,
+      'height': height,
+      'weight': weight,
+      'gender': gender,
+      'goal': goal,
+    };
+
+    try {
+      final response = await _networkService.put(
+        url: "${ApiConstants.profile}/$id",
+        data: data,
+        showProgressBar: false,
+      );
+      return _networkService.handleException(response);
+    } catch (e) {
+      if (kDebugMode) {
+        print("TAG Exception: $e");
+      }
+      rethrow;
+    }
+  }
+
+
+  // ============================= Logout
+  Future<AppResponse> logout() async {  
+    try {
+      final response = await _networkService.post(
+        url: ApiConstants.logout,
+        showProgressBar: false,
+      );
+      return _networkService.handleException(response);
+    } catch (e) {
+      if (kDebugMode) {
+        print("TAG Exception: $e");
+      }
+      rethrow;
+    }
+  }  
 }

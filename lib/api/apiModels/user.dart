@@ -21,15 +21,12 @@ class User {
   // Getter method (optional, but good practice if you have a custom setter)
   bool get profileDataAvailable => isProfileDataAvailable;
 
-
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       id: json['id'],
-      name: SafeParser.toStringVal(
-        json['name'],
-      ),
+      name: SafeParser.toStringVal(json['name']),
       email: json['email'],
-      isProfileDataAvailable: json['isProfileDataAvailable'] ?? false, // Added null-check with default
+      isProfileDataAvailable: json['isProfileDataAvailable'] ?? false,
     );
   }
 
@@ -41,5 +38,9 @@ class User {
       'isProfileDataAvailable': isProfileDataAvailable,
     };
   }
-}
 
+  @override
+  String toString() {
+    return 'USER(id: $id, name: $name, email: $email, isProfileDataAvailable: $isProfileDataAvailable)';
+  }
+}

@@ -10,6 +10,7 @@ import 'package:pose_detection/Constants/app_colors.dart';
 import 'package:pose_detection/Constants/app_string.dart';
 import 'package:pose_detection/Constants/page_name.dart';
 import 'package:pose_detection/Screens/register/register_controller.dart';
+import 'package:pose_detection/main.dart';
 
 class RegisterBottomSheet extends StatefulWidget {
   const RegisterBottomSheet({super.key});
@@ -21,14 +22,19 @@ class RegisterBottomSheet extends StatefulWidget {
 class RegisterBottomSheetState extends State<RegisterBottomSheet> {
   final controller = Get.find<RegisterController>();
 
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-
   void handleRegister() async {
     final result = await controller.handleRegister();
     if (!mounted) return;
     if (result.item1) {
-      Get.offAllNamed(PageName.chat);
+      secureStorage.storeLoginStatus(true);
+      final userData = secureStorage.getUserData();
+      if (userData != null) {
+        if (userData.isProfileDataAvailable) {
+          Get.offAllNamed(PageName.exerciseList);
+        } else {
+          Get.offAllNamed(PageName.chat);
+        }
+      }
     } else {
       FancyAlertDialog.showFancyAlertDialog(
         context: context,

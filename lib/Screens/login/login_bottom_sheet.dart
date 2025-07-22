@@ -22,6 +22,32 @@ class LoginBottomSheet extends StatefulWidget {
 class LoginBottomSheetState extends State<LoginBottomSheet> {
   final controller = Get.find<LoginController>();
 
+  void handlelogin() async {
+    final result = await controller.handleLogin();
+    if (!mounted) return;
+    if (result.item1) {
+      secureStorage.storeLoginStatus(true);
+      final userData = secureStorage.getUserData();
+      if (userData != null) {
+        if (userData.isProfileDataAvailable) {
+          Get.offAllNamed(PageName.exerciseList);
+        } else {
+          Get.offAllNamed(PageName.chat);
+        }
+      }
+    } else {
+      FancyAlertDialog.showFancyAlertDialog(
+        context: context,
+        title: AppStrings.appName,
+        message: result.item2.toString(),
+        onOkPressed: () {
+          Get.back();
+        },
+        onCancelPressed: null,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Align(
@@ -70,40 +96,7 @@ class LoginBottomSheetState extends State<LoginBottomSheet> {
                                 ColorConstants.startColor,
                                 ColorConstants.endColor,
                               ],
-                              onPressed: () async {
-                                final result = await controller.handleLogin();
-                                if (result.item1) {
-                                  secureStorage.storeLoginStatus(true);
-                                  // Get.offAllNamed(PageName.exerciseList);
-                                  // final isUserDataSaved =
-                                  //     secureStorage.isUserDataSaved() ?? false;
-
-                                  final userData = secureStorage.getUserData();
-                                  if(userData!=null){
-                                    if(userData.isProfileDataAvailable){
-                                      Get.offAllNamed(PageName.exerciseList);
-                                    }else {
-                                        Get.offAllNamed(PageName.chat);
-                                    }
-                                  }    
-                                      
-                                  // if (isUserDataSaved) {
-                                  //   Get.offAllNamed(PageName.exerciseList);
-                                  // } else {
-                                  //   Get.offAllNamed(PageName.chat);
-                                  // }
-                                } else {
-                                  FancyAlertDialog.showFancyAlertDialog(
-                                    context: context,
-                                    title: AppStrings.appName,
-                                    message: result.item2.toString(),
-                                    onOkPressed: () {
-                                      Get.back();
-                                    },
-                                    onCancelPressed: null,
-                                  );
-                                }
-                              },
+                              onPressed: handlelogin,
                             ),
                             SizedBox(height: 15),
                             GradientTextExample(
@@ -129,7 +122,7 @@ class LoginBottomSheetState extends State<LoginBottomSheet> {
                 ),
               ),
             ),
-             Obx(
+            Obx(
               () =>
                   controller.isLoading.value
                       ? Center(child: CircularProgressIndicator())

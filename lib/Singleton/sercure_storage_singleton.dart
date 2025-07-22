@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:pose_detection/Constants/app_key.dart';
+import 'package:pose_detection/api/apiModels/profile.dart';
 import 'package:pose_detection/api/apiModels/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -50,22 +51,7 @@ class SecureStorageSingleton {
     return _prefs.getBool(AppKey.keyIsLoggedIn);
   }
 
-
-  //   void storeUserDataSavedFlag(bool isSaved) {
-  //   if (!_initialized) {
-  //     throw Exception("SecureStorageSingleton not initialized.");
-  //   }
-  //   _prefs.setBool(AppKey.keyIsUserDataSaved, isSaved);
-  // }
-
-  // bool? isUserDataSaved() {
-  //   if (!_initialized) {
-  //     throw Exception("SecureStorageSingleton not initialized.");
-  //   }
-  //   return _prefs.getBool(AppKey.keyIsUserDataSaved);
-  // }
-
-    void storeToken(String token) {
+  void storeToken(String token) {
     if (!_initialized) {
       throw Exception("SecureStorageSingleton not initialized.");
     }
@@ -109,4 +95,34 @@ class SecureStorageSingleton {
     }
   }
 
+
+  void storeProfileData(Profile profile) {
+    if (!_initialized) {
+      throw Exception("SecureStorageSingleton not initialized.");
+    }
+    final String profileObject = jsonEncode(profile.toJson());
+    _prefs.setString(AppKey.keyProfileObject, profileObject);
+  }
+
+  Profile? getProfileData() {
+    if (!_initialized) {
+      throw Exception("SecureStorageSingleton not initialized.");
+    }
+    final String? profileDataJson = _prefs.getString(AppKey.keyProfileObject);
+    if (profileDataJson == null) {
+      if (kDebugMode) {
+        print('No LoginData found in SharedPreferences.');
+      }
+      return null;
+    }
+    try {
+      final Map<String, dynamic> profileDataMap = jsonDecode(profileDataJson);
+      return Profile.fromJson(profileDataMap);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error decoding LoginData: $e');
+      }
+      return null;
+    }
+  }
 }

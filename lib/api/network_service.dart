@@ -78,6 +78,33 @@ class NetworkService {
       ),
     );
   }
+ // ===================== put
+   Future<AppResponse> put({
+    String? url,
+    dynamic data,
+    Function(int, int)? onReceiveProgress,
+    Function(int, int)? onSendProgress,
+    ResponseType? responseType,
+    bool showProgressBar = false,
+  }) async {
+    if (kDebugMode) {
+      print("TAG_Request ${data.toString()}");
+    }
+    return await _safeFetch(
+      showProgressBar,
+      () async => dio.put(
+        url!,
+        data: data,
+        onReceiveProgress: onReceiveProgress,
+        onSendProgress: onSendProgress,
+        options: Options(
+          validateStatus: (_) => true,
+          headers: await headersRequest(),
+          responseType: responseType,
+        ),
+      ),
+    );
+  }
 
   Future<AppResponse> postWithMultipartFormData({
     String? url,
