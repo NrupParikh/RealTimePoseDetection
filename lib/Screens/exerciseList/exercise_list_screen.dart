@@ -181,6 +181,7 @@ class _ExcerciseListScreenState extends State<ExcerciseListScreen> {
                 ),
               );
             }
+            
           }
         },
         onCancelPressed: () {
