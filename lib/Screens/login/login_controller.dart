@@ -11,9 +11,12 @@ class LoginController extends GetxController {
   final ApiService _apiService = ApiServiceSingleton().apiService;
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
+  final focusNodeEmail = FocusNode();
+  final focusNodePassword = FocusNode();
   final RxBool isLoading = false.obs;
 
-   Future<Tuple2<bool, String?>> handleLogin() async {
+  Future<Tuple2<bool, String?>> handleLogin() async {
     final email = emailController.text;
     final password = passwordController.text;
     if (GetUtils.isNullOrBlank(email) == true) {
@@ -60,6 +63,13 @@ class LoginController extends GetxController {
       }
     }
   }
+
+  @override
+  void onClose() {
+    focusNodeEmail.dispose();
+    focusNodePassword.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    super.onClose();
+  }
 }
-
-

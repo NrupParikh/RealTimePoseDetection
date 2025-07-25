@@ -15,6 +15,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
+    final isAndroid = Theme.of(context).platform == TargetPlatform.android;
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
@@ -58,7 +59,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
 
-              LoginBottomSheet(),
+              isAndroid
+                  ? SafeArea(child: LoginBottomSheet())
+                  : LoginBottomSheet(),
             ],
           ),
         ),
@@ -75,4 +78,4 @@ class _LoginScreenState extends State<LoginScreen> {
 
     Get.offAllNamed(PageName.onboard);
   }
-} 
+}

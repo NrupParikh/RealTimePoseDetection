@@ -76,11 +76,13 @@ class _ExcerciseListScreenState extends State<ExcerciseListScreen> {
             icon: const Icon(Icons.logout, color: Colors.white),
             tooltip: 'Logout',
             onPressed: () {
-              logout(context);
+              // logout(context);
+              exerciseListController.handleLogout();
             },
           ),
         ],
       ),
+      // drawer: MyNavigationDrawer(),
       body: Stack(
         children: [
           Positioned.fill(
@@ -186,5 +188,62 @@ class _ExcerciseListScreenState extends State<ExcerciseListScreen> {
         },
       );
     }
+  }
+}
+
+class MyNavigationDrawer extends StatefulWidget {
+  const MyNavigationDrawer({super.key});
+
+  @override
+  State<MyNavigationDrawer> createState() => _MyNavigationDrawerState();
+}
+
+class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
+  final exerciseListController = Get.find<ExerciseListController>();
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            children: [
+              ListTile(
+                leading: Icon(Icons.home_outlined),
+                title: Text("Home"),
+                onTap: () {
+                  // Close the drawer first
+                  Navigator.pop(context);
+                  // If already on the home screen (ExcerciseListScreen), do nothing or ensure it's the only route
+                  if (Get.currentRoute != PageName.exerciseList) {
+                    Get.offAllNamed(
+                      PageName.exerciseList,
+                    ); // Clears stack and goes to home
+                  }
+                },
+              ),
+              Divider(color: ColorConstants.startColor),
+              ListTile(
+                leading: Icon(Icons.person_outline),
+                title: Text("Profile"),
+                onTap: () {
+                  Navigator.pop(context);
+                },
+              ),
+              Divider(color: ColorConstants.startColor),
+              ListTile(
+                leading: Icon(Icons.logout_outlined),
+                title: Text("Logout"),
+                onTap: () {
+                  Navigator.pop(context);
+                  exerciseListController.handleLogout();
+                },
+              ),
+              Divider(color: ColorConstants.startColor),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

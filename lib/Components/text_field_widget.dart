@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+
 class TextWidget extends StatefulWidget {
   final String hintTitle;
   final IconData rightIcon;
   final bool hideIcon;
   final TextInputType keyboardType;
   final TextEditingController controller;
-  
+  final TextInputAction? textInputAction;
+  final ValueChanged<String>? onSubmitted;
+  final FocusNode? focusNode;
+
   const TextWidget({
     super.key,
     required this.hintTitle,
@@ -13,6 +17,9 @@ class TextWidget extends StatefulWidget {
     required this.hideIcon,
     required this.keyboardType,
     required this.controller,
+    this.textInputAction,
+    this.onSubmitted,
+    this.focusNode, 
   });
 
   @override
@@ -25,7 +32,6 @@ class _TextWidgetState extends State<TextWidget> {
   void togglePasswordVisibility() {
     setState(() {
       obscureText = !obscureText;
-      
     });
   }
 
@@ -34,11 +40,14 @@ class _TextWidgetState extends State<TextWidget> {
     return TextField(
       controller: widget.controller,
       keyboardType: widget.keyboardType,
-       obscureText:widget.hideIcon ? obscureText : false,
+      obscureText: widget.hideIcon ? obscureText : false,
+      textInputAction: widget.textInputAction,
+      onSubmitted: widget.onSubmitted,
+      focusNode: widget.focusNode, 
       decoration: InputDecoration(
         prefixIcon: Icon(
           widget.rightIcon,
-        ), //Icon(Icons.email), // Change icon as needed
+        ),
         suffixIcon: widget.hideIcon
             ? IconButton(
                 icon: Icon(
@@ -47,13 +56,12 @@ class _TextWidgetState extends State<TextWidget> {
                 onPressed: togglePasswordVisibility,
               )
             : null,
-        hintText: widget.hintTitle, //'Email',
+        hintText: widget.hintTitle,
         filled: true,
         fillColor: const Color.fromARGB(115, 229, 226, 226),
-       
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(30.0), // Corner radius
-          borderSide: BorderSide.none, // No border line
+          borderRadius: BorderRadius.circular(30.0),
+          borderSide: BorderSide.none,
         ),
       ),
     );

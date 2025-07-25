@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="splash_gradient_start">#FF2BA3CB</color>
+    <color name="splash_gradient_end">#FFB886D5</color>
+    <color name="my_background_color">#FFFFFF</color>
+    <color name="splash_background_color">#FF2BA3CB</color> 
+</resources>    

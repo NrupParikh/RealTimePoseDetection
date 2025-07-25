@@ -23,6 +23,7 @@ class RegisterBottomSheetState extends State<RegisterBottomSheet> {
   final controller = Get.find<RegisterController>();
 
   void handleRegister() async {
+    FocusScope.of(context).unfocus();
     final result = await controller.handleRegister();
     if (!mounted) return;
     if (result.item1) {
@@ -56,7 +57,7 @@ class RegisterBottomSheetState extends State<RegisterBottomSheet> {
         applyFilter: true,
         blurSigmaX: 10,
         blurSigmaY: 10,
-        height: 400,
+        height: 350,
         child: Stack(
           children: [
             Obx(
@@ -78,6 +79,11 @@ class RegisterBottomSheetState extends State<RegisterBottomSheet> {
                               hideIcon: false,
                               keyboardType: TextInputType.emailAddress,
                               controller: controller.emailController,
+                              textInputAction: TextInputAction.next,
+                              onSubmitted: (value) {
+                                controller.focusNodePassword.requestFocus();
+                              },
+                              focusNode: controller.focusNodeEmail,
                             ),
                             SizedBox(height: 15),
                             TextWidget(
@@ -86,6 +92,11 @@ class RegisterBottomSheetState extends State<RegisterBottomSheet> {
                               hideIcon: true,
                               keyboardType: TextInputType.visiblePassword,
                               controller: controller.passwordController,
+                              textInputAction: TextInputAction.done,
+                              onSubmitted: (value) {
+                                handleRegister();
+                              },
+                              focusNode: controller.focusNodePassword,
                             ),
                             SizedBox(height: 30),
                             Buttonwidget(

@@ -1,4 +1,4 @@
-import 'dart:ui'; // Import for ImageFilter
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
@@ -50,6 +50,9 @@ class FrostedGlass extends StatelessWidget {
               child: buildGlassContainer(),
             )
           : buildGlassContainer(), // If no filter, just build the container
+
+          // For Emulator only
+        //  child: buildGlassContainer(), // If no filter, just build the container
     );
   }
 

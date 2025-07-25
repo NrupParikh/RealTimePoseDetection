@@ -23,6 +23,7 @@ class LoginBottomSheetState extends State<LoginBottomSheet> {
   final controller = Get.find<LoginController>();
 
   void handlelogin() async {
+    FocusScope.of(context).unfocus();
     final result = await controller.handleLogin();
     if (!mounted) return;
     if (result.item1) {
@@ -57,7 +58,7 @@ class LoginBottomSheetState extends State<LoginBottomSheet> {
         blurSigmaY: 10,
         applyFilter: true,
 
-        height: 400,
+        height: 350,
         child: Stack(
           children: [
             Obx(
@@ -79,6 +80,11 @@ class LoginBottomSheetState extends State<LoginBottomSheet> {
                               hideIcon: false,
                               keyboardType: TextInputType.emailAddress,
                               controller: controller.emailController,
+                              textInputAction: TextInputAction.next,
+                              onSubmitted: (value) {
+                                controller.focusNodePassword.requestFocus();
+                              },
+                              focusNode: controller.focusNodeEmail,
                             ),
                             SizedBox(height: 15),
                             TextWidget(
@@ -87,6 +93,11 @@ class LoginBottomSheetState extends State<LoginBottomSheet> {
                               hideIcon: true,
                               keyboardType: TextInputType.visiblePassword,
                               controller: controller.passwordController,
+                              textInputAction: TextInputAction.done,
+                              onSubmitted: (value) {
+                                handlelogin();
+                              },
+                              focusNode: controller.focusNodePassword,
                             ),
                             SizedBox(height: 30),
                             Buttonwidget(
@@ -103,14 +114,6 @@ class LoginBottomSheetState extends State<LoginBottomSheet> {
                               title: AppStrings.registerTitle,
                               titleMsg: AppStrings.signupTitle,
                               onTap: () {
-                                // Get.off(
-                                //   () => RegisterScreen(),
-                                //   transition: Transition.rightToLeft,
-                                //   duration: Duration(
-                                //     milliseconds: AppConstants.navigationDurationTime,
-                                //   ),
-                                //   binding: RegisterBinding(),
-                                // );
                                 Get.offAllNamed(PageName.register);
                               },
                             ),

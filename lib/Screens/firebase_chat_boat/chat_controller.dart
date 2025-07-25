@@ -35,7 +35,7 @@ class ChatController extends GetxController {
 
   final ApiService _apiService = ApiServiceSingleton().apiService;
   RxBool isLoading = false.obs;
-
+    
   @override
   void onInit() {
     super.onInit();

@@ -11,6 +11,9 @@ class RegisterController extends GetxController {
   final ApiService _apiService = ApiServiceSingleton().apiService;
   final RxBool isLoading = false.obs;
 
+  final focusNodeEmail = FocusNode();
+  final focusNodePassword = FocusNode();
+
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
@@ -60,5 +63,15 @@ class RegisterController extends GetxController {
         return Tuple2(false, "$ex");
       }
     }
+  }
+
+  
+  @override
+  void onClose() {
+    focusNodeEmail.dispose();
+    focusNodePassword.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    super.onClose();
   }
 }

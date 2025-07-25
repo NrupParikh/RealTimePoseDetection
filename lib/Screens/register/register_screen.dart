@@ -15,6 +15,7 @@ class RegisterScreen extends StatefulWidget {
 class _RegisterScreenState extends State<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
+     final isAndroid = Theme.of(context).platform == TargetPlatform.android;
     return PopScope(
       canPop: false,
       onPopInvokedWithResult: (didPop, result) {
@@ -58,7 +59,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
               ),
 
-              RegisterBottomSheet(),
+              isAndroid
+                ? SafeArea(child: RegisterBottomSheet())
+                : RegisterBottomSheet(), 
+
             ],
           ),
         ),
