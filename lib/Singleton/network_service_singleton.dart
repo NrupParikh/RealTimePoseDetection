@@ -1,4 +1,4 @@
-import 'package:pose_detection/API/network_service.dart';
+import 'package:pose_detection/api/network_service.dart';
 
 class NetworkServiceSingleton {
   static final NetworkServiceSingleton _instance =

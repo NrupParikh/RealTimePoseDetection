@@ -1,12 +1,12 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:pose_detection/Components/progress_dialog_utils.dart';
 import 'package:pose_detection/Constants/app_api_constants.dart';
 import 'package:pose_detection/Constants/app_string.dart' show AppStrings;
+import 'package:pose_detection/api/apiModels/app_response.dart';
 import 'package:pose_detection/main.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
-import '../Components/progress_dialog_utils.dart';
-import 'apiModels/app_response.dart';
 
 class NetworkService {
   static const int requestTimeOut = 60;

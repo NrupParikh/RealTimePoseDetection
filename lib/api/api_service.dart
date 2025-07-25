@@ -1,9 +1,7 @@
 import 'package:flutter/foundation.dart';
-
-import 'package:pose_detection/API/network_service.dart';
 import 'package:pose_detection/Constants/app_api_constants.dart';
-
-import 'apiModels/app_response.dart';
+import 'package:pose_detection/api/apiModels/app_response.dart';
+import 'package:pose_detection/api/network_service.dart';
 
 class ApiService {
   final NetworkService _networkService;
