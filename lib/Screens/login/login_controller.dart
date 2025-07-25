@@ -1,14 +1,22 @@
-// import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pose_detection/Constants/app_string.dart';
+import 'package:pose_detection/Singleton/api_service_singleton.dart';
+import 'package:pose_detection/api/apiModels/auth_response.dart';
+import 'package:pose_detection/api/api_service.dart';
+import 'package:pose_detection/main.dart';
 import 'package:tuple/tuple.dart';
 
 class LoginController extends GetxController {
+  final ApiService _apiService = ApiServiceSingleton().apiService;
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  Tuple2<bool, String?> handleLogin() {
+  final focusNodeEmail = FocusNode();
+  final focusNodePassword = FocusNode();
+  final RxBool isLoading = false.obs;
+
+  Future<Tuple2<bool, String?>> handleLogin() async {
     final email = emailController.text;
     final password = passwordController.text;
     if (GetUtils.isNullOrBlank(email) == true) {
@@ -20,9 +28,48 @@ class LoginController extends GetxController {
     } else if (password.length < 6) {
       return Tuple2(false, AppStrings.valEnterValidPassword);
     } else {
-      return Tuple2(true, null);
+      isLoading.value = true;
+      try {
+        var appResponse = await _apiService.login(
+          email: email,
+          password: password,
+        );
+        if (appResponse.statusCode == 200) {
+          isLoading.value = false;
+          if (appResponse.data is Map<String, dynamic>) {
+            try {
+              final AuthResponse data = AuthResponse.fromJson(appResponse.data);
+              debugPrint("Tag_data ${data.user}");
+              secureStorage.storeUserData(data.user);
+              if (data.token != null) {
+                secureStorage.storeToken(data.token!);
+              }
+              return Tuple2(true, appResponse.message.toString());
+            } catch (e) {
+              isLoading.value = false;
+              return Tuple2(false, "Error parsing ApiResponse");
+            }
+          } else {
+            isLoading.value = false;
+            return Tuple2(false, "appResponse.data is not a Map");
+          }
+        } else {
+          isLoading.value = false;
+          return Tuple2(false, appResponse.message.toString());
+        }
+      } catch (ex) {
+        isLoading.value = false;
+        return Tuple2(false, "$ex");
+      }
     }
   }
+
+  @override
+  void onClose() {
+    focusNodeEmail.dispose();
+    focusNodePassword.dispose();
+    emailController.dispose();
+    passwordController.dispose();
+    super.onClose();
+  }
 }
-
-

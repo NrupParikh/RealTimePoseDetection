@@ -1,4 +1,9 @@
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
 import 'package:pose_detection/Constants/app_key.dart';
+import 'package:pose_detection/api/apiModels/profile.dart';
+import 'package:pose_detection/api/apiModels/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SecureStorageSingleton {
@@ -46,19 +51,78 @@ class SecureStorageSingleton {
     return _prefs.getBool(AppKey.keyIsLoggedIn);
   }
 
-
-    void storeUserDataSavedFlag(bool isSaved) {
+  void storeToken(String token) {
     if (!_initialized) {
       throw Exception("SecureStorageSingleton not initialized.");
     }
-    _prefs.setBool(AppKey.keyIsUserDataSaved, isSaved);
+    _prefs.setString(AppKey.keyToken, token);
   }
 
-  bool? isUserDataSaved() {
+  String? getToken() {
     if (!_initialized) {
       throw Exception("SecureStorageSingleton not initialized.");
     }
-    return _prefs.getBool(AppKey.keyIsUserDataSaved);
+    return _prefs.getString(AppKey.keyToken);
   }
 
+  void storeUserData(User user) {
+    if (!_initialized) {
+      throw Exception("SecureStorageSingleton not initialized.");
+    }
+    final String userObject = jsonEncode(user.toJson());
+    _prefs.setString(AppKey.keyUserObject, userObject);
+  }
+
+  User? getUserData() {
+    if (!_initialized) {
+      throw Exception("SecureStorageSingleton not initialized.");
+    }
+    final String? userDataJson = _prefs.getString(AppKey.keyUserObject);
+    if (userDataJson == null) {
+      if (kDebugMode) {
+        print('No LoginData found in SharedPreferences.');
+      }
+      return null;
+    }
+    try {
+      final Map<String, dynamic> userDataMap = jsonDecode(userDataJson);
+      return User.fromJson(userDataMap);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error decoding LoginData: $e');
+      }
+      return null;
+    }
+  }
+
+
+  void storeProfileData(Profile profile) {
+    if (!_initialized) {
+      throw Exception("SecureStorageSingleton not initialized.");
+    }
+    final String profileObject = jsonEncode(profile.toJson());
+    _prefs.setString(AppKey.keyProfileObject, profileObject);
+  }
+
+  Profile? getProfileData() {
+    if (!_initialized) {
+      throw Exception("SecureStorageSingleton not initialized.");
+    }
+    final String? profileDataJson = _prefs.getString(AppKey.keyProfileObject);
+    if (profileDataJson == null) {
+      if (kDebugMode) {
+        print('No LoginData found in SharedPreferences.');
+      }
+      return null;
+    }
+    try {
+      final Map<String, dynamic> profileDataMap = jsonDecode(profileDataJson);
+      return Profile.fromJson(profileDataMap);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error decoding LoginData: $e');
+      }
+      return null;
+    }
+  }
 }

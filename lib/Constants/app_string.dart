@@ -1,5 +1,5 @@
 class AppStrings {
-  static const appName = "Real Time Pose Detection";
+  static const appName = "Pose Detection";
 
   static const login = "LOGIN";
   static const register = "SIGN UP";
@@ -22,4 +22,11 @@ class AppStrings {
   static const valEnterPassword = "Please enter password";
   static const valEnterValidEmail = "Please enter valid email";
   static const valEnterValidPassword = "Password must be more than 6 character long";
+
+
+  static const msgConnectInternet = "Please connect Internet";
+  static const msgConnectionTimeOut = "Connection Timeout Exception";
+  static const msgCanceled = "Canceled";
+  static const msgNetworkErr = 'Network Error';
+  static const msgSomethingWentWrong = "Something went wrong";   
 }

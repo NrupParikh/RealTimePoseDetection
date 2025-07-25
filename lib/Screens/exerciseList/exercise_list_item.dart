@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:pose_detection/Components/exercise_info_dialog.dart';
 import 'package:pose_detection/Components/frosted_glass_effect.dart';
@@ -16,7 +18,11 @@ class ExerciseListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () => onRequestPermissionsAndNavigate(item),
+      onTap: () {
+        if(Platform.isAndroid){
+           onRequestPermissionsAndNavigate(item);
+        }
+      },
       child: FrostedGlass(
         borderRadius: BorderRadius.all(Radius.circular(20)),
         applyFilter: false,

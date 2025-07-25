@@ -4,7 +4,11 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart'; // For TextEditingController, ScrollController, etc.
 import 'dart:convert';
 import 'package:get/get.dart';
-import 'package:pose_detection/main.dart'; // Import GetX
+import 'package:pose_detection/Singleton/api_service_singleton.dart';
+import 'package:pose_detection/api/apiModels/profile_response.dart';
+import 'package:pose_detection/api/api_service.dart';
+import 'package:pose_detection/main.dart';
+import 'package:tuple/tuple.dart';
 
 class ChatController extends GetxController {
   // Reactive variables for UI updates
@@ -29,6 +33,9 @@ class ChatController extends GetxController {
   final RxList<String> questions =
       <String>[].obs; // Reactive list for questions
 
+  final ApiService _apiService = ApiServiceSingleton().apiService;
+  RxBool isLoading = false.obs;
+    
   @override
   void onInit() {
     super.onInit();
@@ -108,12 +115,16 @@ class ChatController extends GetxController {
 
   void _startChat() {
     _addBotMessage("Welcome to the registration! Let's get started.");
-      // ========== Testing only
-      //  isUserDataSaved.value = true;
-      // secureStorage.storeUserDataSavedFlag(true);
-      // ======= End of Testing only
-
     _askNextQuestion();
+  }
+
+  void updateProfileStatus() {
+    final userData = secureStorage.getUserData();
+    if (userData != null) {
+      userData.profileDataAvailable = true;
+      secureStorage.storeUserData(userData);
+      isUserDataSaved.value = true;
+    }
   }
 
   void _addBotMessage(String message) {
@@ -281,13 +292,11 @@ class ChatController extends GetxController {
         "Your details have been successfully saved to our records!",
       );
       debugPrint("User data saved to Firestore for ID: $userId");
-      secureStorage.storeUserDataSavedFlag(true);
-      isUserDataSaved.value = true;
-     
+
+      updateUserProfile();
     } catch (e) {
-      secureStorage.storeUserDataSavedFlag(false);
       isUserDataSaved.value = false;
-   
+
       _addBotMessage(
         "Failed to save your details. Please check your internet connection and try again later.",
       );
@@ -309,5 +318,52 @@ class ChatController extends GetxController {
     _saveUserDataToFirestore();
   }
 
+  Future<Tuple2<bool, String?>> updateUserProfile() async {
+    final name = userName.value;
+    final age = userAge.value;
+    final height = userHeight.value;
+    final weight = userWeight.value;
+    final gender = userGender.value;
+    final goal = userGoal.value;
+    final userId = secureStorage.getUserData()?.id;
 
+    try {
+      isLoading.value = true;
+      var appResponse = await _apiService.updateUserProfile(
+        id: userId ?? 0,
+        name: name,
+        age: age ?? 0,
+        height: height ?? 0.0,
+        weight: weight ?? 0.0,
+        gender: gender,
+        goal: goal,
+      );    
+      if (appResponse.statusCode == 200) {
+        isLoading.value = false;
+        if (appResponse.data is Map<String, dynamic>) {
+          try {
+            final ProfileResponse data = ProfileResponse.fromJson(
+              appResponse.data,
+            );
+            debugPrint("Tag_data ${data.profile}");
+            secureStorage.storeProfileData(data.profile);
+            updateProfileStatus();
+            return Tuple2(true, appResponse.message.toString());
+          } catch (e) {
+            isLoading.value = false;
+            return Tuple2(false, "Error parsing ApiResponse");
+          }
+        } else {
+          isLoading.value = false;
+          return Tuple2(false, "appResponse.data is not a Map");
+        }
+      } else {
+        isLoading.value = false;
+        return Tuple2(false, appResponse.message.toString());
+      }
+    } catch (ex) {
+      isLoading.value = false;
+      return Tuple2(false, "$ex");
+    }
+  }
 }

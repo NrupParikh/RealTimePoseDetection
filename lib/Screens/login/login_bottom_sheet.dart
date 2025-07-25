@@ -22,6 +22,33 @@ class LoginBottomSheet extends StatefulWidget {
 class LoginBottomSheetState extends State<LoginBottomSheet> {
   final controller = Get.find<LoginController>();
 
+  void handlelogin() async {
+    FocusScope.of(context).unfocus();
+    final result = await controller.handleLogin();
+    if (!mounted) return;
+    if (result.item1) {
+      secureStorage.storeLoginStatus(true);
+      final userData = secureStorage.getUserData();
+      if (userData != null) {
+        if (userData.isProfileDataAvailable) {
+          Get.offAllNamed(PageName.exerciseList);
+        } else {
+          Get.offAllNamed(PageName.chat);
+        }
+      }
+    } else {
+      FancyAlertDialog.showFancyAlertDialog(
+        context: context,
+        title: AppStrings.appName,
+        message: result.item2.toString(),
+        onOkPressed: () {
+          Get.back();
+        },
+        onCancelPressed: null,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Align(
@@ -31,81 +58,78 @@ class LoginBottomSheetState extends State<LoginBottomSheet> {
         blurSigmaY: 10,
         applyFilter: true,
 
-        height: 400,
-        child: Column(
+        height: 350,
+        child: Stack(
           children: [
-            SizedBox(height: 30),
-            TitleWidget(titleText: AppStrings.loginMsg),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Column(
-                children: [
-                  TextWidget(
-                    hintTitle: AppStrings.email,
-                    rightIcon: Icons.email,
-                    hideIcon: false,
-                    keyboardType: TextInputType.emailAddress,
-                    controller: controller.emailController,
-                  ),
-                  SizedBox(height: 15),
-                  TextWidget(
-                    hintTitle: AppStrings.password,
-                    rightIcon: Icons.lock,
-                    hideIcon: true,
-                    keyboardType: TextInputType.visiblePassword,
-                    controller: controller.passwordController,
-                  ),
-                  SizedBox(height: 30),
-                  Buttonwidget(
-                    width: 250,
-                    buttontitle: AppStrings.login,
-                    gradientColors: [
-                      ColorConstants.startColor,
-                      ColorConstants.endColor,
+            Obx(
+              () => IgnorePointer(
+                ignoring: controller.isLoading.value,
+                child: Opacity(
+                  opacity: controller.isLoading.value ? 0.5 : 1.0,
+                  child: Column(
+                    children: [
+                      SizedBox(height: 30),
+                      TitleWidget(titleText: AppStrings.loginMsg),
+                      Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Column(
+                          children: [
+                            TextWidget(
+                              hintTitle: AppStrings.email,
+                              rightIcon: Icons.email,
+                              hideIcon: false,
+                              keyboardType: TextInputType.emailAddress,
+                              controller: controller.emailController,
+                              textInputAction: TextInputAction.next,
+                              onSubmitted: (value) {
+                                controller.focusNodePassword.requestFocus();
+                              },
+                              focusNode: controller.focusNodeEmail,
+                            ),
+                            SizedBox(height: 15),
+                            TextWidget(
+                              hintTitle: AppStrings.password,
+                              rightIcon: Icons.lock,
+                              hideIcon: true,
+                              keyboardType: TextInputType.visiblePassword,
+                              controller: controller.passwordController,
+                              textInputAction: TextInputAction.done,
+                              onSubmitted: (value) {
+                                handlelogin();
+                              },
+                              focusNode: controller.focusNodePassword,
+                            ),
+                            SizedBox(height: 30),
+                            Buttonwidget(
+                              width: 250,
+                              buttontitle: AppStrings.login,
+                              gradientColors: [
+                                ColorConstants.startColor,
+                                ColorConstants.endColor,
+                              ],
+                              onPressed: handlelogin,
+                            ),
+                            SizedBox(height: 15),
+                            GradientTextExample(
+                              title: AppStrings.registerTitle,
+                              titleMsg: AppStrings.signupTitle,
+                              onTap: () {
+                                Get.offAllNamed(PageName.register);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
                     ],
-                    onPressed: () {
-                      final result = controller.handleLogin();
-                      if (result.item1) {
-                        secureStorage.storeLoginStatus(true);
-                        // Get.offAllNamed(PageName.exerciseList);
-                        final isUserDataSaved = secureStorage.isUserDataSaved() ?? false;
-                        if(isUserDataSaved){
-                           Get.offAllNamed(PageName.exerciseList);
-                        }else {
-                           Get.offAllNamed(PageName.chat);
-                        }
-                       
-                      } else {
-                       FancyAlertDialog.showFancyAlertDialog(
-                          context: context,
-                          title: AppStrings.appName,
-                          message: result.item2.toString(),
-                          onOkPressed:  () {
-                            Get.back();
-                          },
-                          onCancelPressed: null
-                        );
-                      }
-                    },
                   ),
-                  SizedBox(height: 15),
-                  GradientTextExample(
-                    title: AppStrings.registerTitle,
-                    titleMsg: AppStrings.signupTitle,
-                    onTap: () {
-                      // Get.off(
-                      //   () => RegisterScreen(),
-                      //   transition: Transition.rightToLeft,
-                      //   duration: Duration(
-                      //     milliseconds: AppConstants.navigationDurationTime,
-                      //   ),
-                      //   binding: RegisterBinding(),
-                      // );
-                      Get.offAllNamed(PageName.register);
-                    },
-                  ),
-                ],
+                ),
               ),
+            ),
+            Obx(
+              () =>
+                  controller.isLoading.value
+                      ? Center(child: CircularProgressIndicator())
+                      : SizedBox.shrink(),
             ),
           ],
         ),
