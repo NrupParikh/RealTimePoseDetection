@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pose_detection/Components/fancy_alert_dialog.dart';
 import 'package:pose_detection/Components/session_expire_controller.dart';
 import 'package:pose_detection/Constants/app_string.dart';
 import 'package:pose_detection/Singleton/api_service_singleton.dart';
@@ -68,13 +69,22 @@ class ProfileController extends GetxController {
           );
         }
       } else {
-        // Handle error
-        debugPrint("Error fetching profile data: ${result.item2}");
+        if (Get.context != null && !Get.isDialogOpen!) {
+          FancyAlertDialog.showFancyAlertDialog(
+            context: Get.context!,
+            title: AppStrings.appName,
+            message: result.item2.toString(),
+            onOkPressed: () {
+              Get.back();
+            },
+            onCancelPressed: null,
+          );
+        }
       }
     });
   }
 
-  Future<Tuple2<bool, String?>> handleUpdateProfile() async {
+  Future<Tuple3<bool, String?, int>> handleUpdateProfile() async {
     final name = nameController.text;
     final age = int.tryParse(ageController.text);
     final height = double.tryParse(heightController.text);
@@ -91,24 +101,25 @@ class ProfileController extends GetxController {
         gender == initialGender &&
         goal == initialGoal) {
       isEdit.value = true;
-      return Tuple2(
+      return Tuple3(
         false,
         AppStrings.noChangesMade,
+        0,
       ); // Assuming you have a string constant for this
     }
 
     if (GetUtils.isNullOrBlank(name) == true) {
-      return Tuple2(false, AppStrings.valEnterUserName);
+      return Tuple3(false, AppStrings.valEnterUserName, 0);
     } else if (age == null || age <= 0 || age >= 120) {
-      return Tuple2(false, AppStrings.valEnterValidAge);
+      return Tuple3(false, AppStrings.valEnterValidAge, 0);
     } else if (height == null || height <= 50 || height > 250) {
-      return Tuple2(false, AppStrings.valEnterValidHeight);
+      return Tuple3(false, AppStrings.valEnterValidHeight, 0);
     } else if (weight == null || weight <= 20 || weight > 200) {
-      return Tuple2(false, AppStrings.valEnterValidWeight);
+      return Tuple3(false, AppStrings.valEnterValidWeight, 0);
     } else if (['male', 'female', 'other'].contains(gender) == false) {
-      return Tuple2(false, AppStrings.valEnterValidGender);
+      return Tuple3(false, AppStrings.valEnterValidGender, 0);
     } else if (GetUtils.isNullOrBlank(goal) == true) {
-      return Tuple2(false, AppStrings.valEnterGoal);
+      return Tuple3(false, AppStrings.valEnterGoal, 0);
     } else {
       try {
         isEdit.value = true;
@@ -138,22 +149,38 @@ class ProfileController extends GetxController {
               initialWeight = weight.toString();
               initialGender = gender;
               initialGoal = goal;
-              return Tuple2(true, appResponse.message.toString());
+              return Tuple3(
+                true,
+                appResponse.message.toString(),
+                appResponse.statusCode.toInt(),
+              );
             } catch (e) {
               isLoading.value = false;
-              return Tuple2(false, "Error parsing ApiResponse");
+              return Tuple3(
+                false,
+                "Error parsing ApiResponse",
+                appResponse.statusCode.toInt(),
+              );
             }
           } else {
             isLoading.value = false;
-            return Tuple2(false, "appResponse.data is not a Map");
+            return Tuple3(
+              false,
+              "appResponse.data is not a Map",
+              appResponse.statusCode.toInt(),
+            );
           }
         } else {
           isLoading.value = false;
-          return Tuple2(false, appResponse.message.toString());
+          return Tuple3(
+            false,
+            appResponse.message.toString(),
+            appResponse.statusCode.toInt(),
+          );
         }
       } catch (ex) {
         isLoading.value = false;
-        return Tuple2(false, "$ex");
+        return Tuple3(false, "$ex", 0);
       }
     }
   }
