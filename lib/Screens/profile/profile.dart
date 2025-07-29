@@ -166,15 +166,34 @@ class _ProfileState extends State<Profile> {
   void updateProfile() {
     FocusScope.of(context).unfocus();
     controller.handleUpdateProfile().then((result) {
-      FancyAlertDialog.showFancyAlertDialog(
-        context: context,
-        title: AppStrings.appName,
-        message: result.item2.toString(),
-        onOkPressed: () {
-          Get.back();
-        },
-        onCancelPressed: null,
-      );
+      if (result.item1) {
+        FancyAlertDialog.showFancyAlertDialog(
+          context: context,
+          title: AppStrings.appName,
+          message: result.item2.toString(),
+          onOkPressed: () {
+            Get.back();
+          },
+          onCancelPressed: null,
+        );
+      } else if (result.item3 == 401) {
+        if (Get.context != null && !Get.isDialogOpen!) {
+          controller.sessionController.showSessionExpiredDialog(
+            Get.context!,
+            result.item2.toString(),
+          );
+        }
+      }else {
+         FancyAlertDialog.showFancyAlertDialog(
+          context: context,
+          title: AppStrings.appName,
+          message: result.item2.toString(),
+          onOkPressed: () {
+            Get.back();
+          },
+          onCancelPressed: null,
+        );
+      }
     });
   }
 }
