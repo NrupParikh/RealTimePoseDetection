@@ -147,7 +147,7 @@ class ChatController extends GetxController {
       if (scrollController.hasClients) {
         scrollController.animateTo(
           scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
+          duration: const Duration(milliseconds: 30),
           curve: Curves.easeOut,
         );
       }
@@ -155,7 +155,7 @@ class ChatController extends GetxController {
   }
 
   void _askNextQuestion() {
-    Future.delayed(const Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 50), () {
       if (questionIndex.value < questions.length) {
         _addBotMessage(questions[questionIndex.value]);
       } else if (questionIndex.value == questions.length) {
