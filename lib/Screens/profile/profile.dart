@@ -29,18 +29,18 @@ class _ProfileState extends State<Profile> {
           actions: [
             controller.isEdit.value
                 ? IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () {
-                    controller.isEdit.value = false;
-                  },
-                )
+                    icon: Icon(Icons.edit),
+                    onPressed: () {
+                      controller.isEdit.value = false;
+                    },
+                  )
                 : IconButton(
-                  icon: Icon(Icons.done),
-                  onPressed: () {
-                    FocusScope.of(context).unfocus();
-                    updateProfile();
-                  },
-                ),
+                    icon: Icon(Icons.done),
+                    onPressed: () {
+                      FocusScope.of(context).unfocus();
+                      updateProfile();
+                    },
+                  ),
           ],
         ),
         drawer: MyNavigationDrawer(),
@@ -54,7 +54,6 @@ class _ProfileState extends State<Profile> {
                   fit: BoxFit.cover,
                 ),
               ),
-
               Positioned.fill(
                 child: FrostedGlass(
                   applyFilter: false,
@@ -67,91 +66,109 @@ class _ProfileState extends State<Profile> {
                 ),
               ),
               SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      TextWidget(
-                        hintTitle: AppStrings.name,
-                        rightIcon: Icons.person,
-                        hideIcon: false,
-                        keyboardType: TextInputType.name,
-                        controller: controller.nameController,
-                        textInputAction: TextInputAction.next,
-                        isEnabled: !controller.isEdit.value,
-                        onSubmitted: (value) {
-                          controller.focusNodeAge.requestFocus();
-                        },
-                        focusNode: controller.focusNodeName,
+                // Use LayoutBuilder to get the maximum height available to the SafeArea child
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      // Constrain the child of SingleChildScrollView to ensure it's at least as tall as the available space
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: constraints.maxHeight, // This is the key line
+                        ),
+                        // IntrinsicHeight allows the Column to measure its children (including Spacer) correctly
+                        child: IntrinsicHeight(
+                          child: Padding(
+                            padding: const EdgeInsets.all(20.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                TextWidget(
+                                  hintTitle: AppStrings.name,
+                                  rightIcon: Icons.person,
+                                  hideIcon: false,
+                                  keyboardType: TextInputType.name,
+                                  controller: controller.nameController,
+                                  textInputAction: TextInputAction.next,
+                                  isEnabled: !controller.isEdit.value,
+                                  onSubmitted: (value) {
+                                    controller.focusNodeAge.requestFocus();
+                                  },
+                                  focusNode: controller.focusNodeName,
+                                ),
+                                SizedBox(height: 15),
+                                TextWidget(
+                                  hintTitle: AppStrings.age,
+                                  rightIcon: Icons.numbers,
+                                  hideIcon: false,
+                                  keyboardType: TextInputType.number,
+                                  controller: controller.ageController,
+                                  textInputAction: TextInputAction.next,
+                                  isEnabled: !controller.isEdit.value,
+                                ),
+                                SizedBox(height: 15),
+                                TextWidget(
+                                  hintTitle: AppStrings.height,
+                                  rightIcon: Icons.height,
+                                  hideIcon: false,
+                                  keyboardType: TextInputType.number,
+                                  controller: controller.heightController,
+                                  textInputAction: TextInputAction.next,
+                                  isEnabled: !controller.isEdit.value,
+                                  onSubmitted: (value) {
+                                    controller.focusNodeWeight.requestFocus();
+                                  },
+                                  focusNode: controller.focusNodeHeight,
+                                ),
+                                SizedBox(height: 15),
+                                TextWidget(
+                                  hintTitle: AppStrings.weight,
+                                  rightIcon: Icons.line_weight,
+                                  hideIcon: false,
+                                  keyboardType: TextInputType.number,
+                                  controller: controller.weightController,
+                                  textInputAction: TextInputAction.next,
+                                  isEnabled: !controller.isEdit.value,
+                                  onSubmitted: (value) {
+                                    controller.focusNodeGender.requestFocus();
+                                  },
+                                  focusNode: controller.focusNodeWeight,
+                                ),
+                                SizedBox(height: 15),
+                                TextWidget(
+                                  hintTitle: AppStrings.gender,
+                                  rightIcon: Icons.male,
+                                  hideIcon: false,
+                                  keyboardType: TextInputType.text,
+                                  controller: controller.genderController,
+                                  textInputAction: TextInputAction.next,
+                                  isEnabled: !controller.isEdit.value,
+                                  onSubmitted: (value) {
+                                    controller.focusNodeGoal.requestFocus();
+                                  },
+                                  focusNode: controller.focusNodeGender,
+                                ),
+                                SizedBox(height: 15),
+                                TextWidget(
+                                  hintTitle: AppStrings.goal,
+                                  rightIcon: Icons.center_focus_strong,
+                                  hideIcon: false,
+                                  keyboardType: TextInputType.text,
+                                  controller: controller.goalController,
+                                  textInputAction: TextInputAction.done,
+                                  isEnabled: !controller.isEdit.value,
+                                  onSubmitted: (value) {
+                                    updateProfile();
+                                  },
+                                ),
+                                // Spacer pushes the content up and fills any remaining vertical space
+                                Spacer(),
+                              ],
+                            ),
+                          ),
+                        ),
                       ),
-                      SizedBox(height: 15),
-                      TextWidget(
-                        hintTitle: AppStrings.age,
-                        rightIcon: Icons.numbers,
-                        hideIcon: false,
-                        keyboardType: TextInputType.number,
-                        controller: controller.ageController,
-                        textInputAction: TextInputAction.next,
-                        isEnabled: !controller.isEdit.value,
-                      ),
-                      SizedBox(height: 15),
-                      TextWidget(
-                        hintTitle: AppStrings.height,
-                        rightIcon: Icons.height,
-                        hideIcon: false,
-                        keyboardType: TextInputType.number,
-                        controller: controller.heightController,
-                        textInputAction: TextInputAction.next,
-                        isEnabled: !controller.isEdit.value,
-                        onSubmitted: (value) {
-                          controller.focusNodeWeight.requestFocus();
-                        },
-                        focusNode: controller.focusNodeHeight,
-                      ),
-                      SizedBox(height: 15),
-                      TextWidget(
-                        hintTitle: AppStrings.weight,
-                        rightIcon: Icons.line_weight,
-                        hideIcon: false,
-                        keyboardType: TextInputType.number,
-                        controller: controller.weightController,
-                        textInputAction: TextInputAction.next,
-                        isEnabled: !controller.isEdit.value,
-                        onSubmitted: (value) {
-                          controller.focusNodeGender.requestFocus();
-                        },
-                        focusNode: controller.focusNodeWeight,
-                      ),
-                      SizedBox(height: 15),
-                      TextWidget(
-                        hintTitle: AppStrings.gender,
-                        rightIcon: Icons.male,
-                        hideIcon: false,
-                        keyboardType: TextInputType.number,
-                        controller: controller.genderController,
-                        textInputAction: TextInputAction.next,
-                        isEnabled: !controller.isEdit.value,
-                        onSubmitted: (value) {
-                          controller.focusNodeGoal.requestFocus();
-                        },
-                        focusNode: controller.focusNodeGender,
-                      ),
-                      SizedBox(height: 15),
-                      TextWidget(
-                        hintTitle: AppStrings.goal,
-                        rightIcon: Icons.center_focus_strong,
-                        hideIcon: false,
-                        keyboardType: TextInputType.text,
-                        controller: controller.goalController,
-                        textInputAction: TextInputAction.done,
-                        isEnabled: !controller.isEdit.value,
-                        onSubmitted: (value) {
-                          updateProfile();
-                        },
-                      ),
-                    ],
-                  ),
+                    );
+                  },
                 ),
               ),
               if (controller.isLoading.value)
@@ -183,8 +200,8 @@ class _ProfileState extends State<Profile> {
             result.item2.toString(),
           );
         }
-      }else {
-         FancyAlertDialog.showFancyAlertDialog(
+      } else {
+        FancyAlertDialog.showFancyAlertDialog(
           context: context,
           title: AppStrings.appName,
           message: result.item2.toString(),
