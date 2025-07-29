@@ -1,15 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:pose_detection/Components/fancy_alert_dialog.dart';
 import 'package:pose_detection/Components/frosted_glass_effect.dart';
 import 'package:pose_detection/Components/permission_service.dart';
 import 'package:pose_detection/Constants/app_colors.dart';
-import 'package:pose_detection/Constants/app_string.dart';
-import 'package:pose_detection/Constants/page_name.dart';
 import 'package:pose_detection/Models/excercise_data_model.dart';
-import 'package:pose_detection/Screens/exerciseList/exercise_list_controller.dart';
 import 'package:pose_detection/Screens/exerciseList/exercise_list_item.dart';
+import 'package:pose_detection/Screens/exerciseList/navigationDrawer/my_navigation_drawer.dart';
 import 'package:pose_detection/Utility/utility.dart';
 import 'package:pose_detection/api/apiModels/profile.dart';
 import 'package:pose_detection/api/apiModels/user.dart';
@@ -23,7 +19,6 @@ class ExcerciseListScreen extends StatefulWidget {
 }
 
 class _ExcerciseListScreenState extends State<ExcerciseListScreen> {
-  final exerciseListController = Get.find<ExerciseListController>();
   @override
   void initState() {
     super.initState();
@@ -61,28 +56,19 @@ class _ExcerciseListScreenState extends State<ExcerciseListScreen> {
       // This is the key property
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        automaticallyImplyLeading: false,
+        // automaticallyImplyLeading: false,
         title: const Text(
           'Exercise List',
           style: TextStyle(color: Colors.white),
         ),
         centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
         // Make app bar transparent
         backgroundColor: Colors.transparent,
         // Remove shadow
         elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
-            tooltip: 'Logout',
-            onPressed: () {
-              // logout(context);
-              exerciseListController.handleLogout();
-            },
-          ),
-        ],
       ),
-      // drawer: MyNavigationDrawer(),
+      drawer: MyNavigationDrawer(),
       body: Stack(
         children: [
           Positioned.fill(
@@ -144,106 +130,6 @@ class _ExcerciseListScreenState extends State<ExcerciseListScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  void logout(BuildContext ctx) {
-    if (ctx.mounted) {
-      FancyAlertDialog.showFancyAlertDialog(
-        context: ctx,
-        title: AppStrings.appName,
-        message: "Are you sure you want to logout ?",
-        onOkPressed: () async {
-          Get.back();
-          showDialog(
-            context: ctx,
-            barrierDismissible: false,
-            builder: (BuildContext dialogContext) {
-              return const Center(child: CircularProgressIndicator());
-            },
-          );
-
-          final result = await exerciseListController.logout();
-
-          // Dismiss the loader
-          Get.back(); // This will pop the loader dialog
-
-          if (result.item1) {
-            secureStorage.clearSharedPreference();
-            Get.offAllNamed(PageName.onboard);
-          } else {
-            // Handle logout failure, e.g., show a snackbar or another dialog
-            if (ctx.mounted) {
-              ScaffoldMessenger.of(ctx).showSnackBar(
-                const SnackBar(
-                  content: Text("Logout failed. Please try again."),
-                ),
-              );
-            }
-            
-          }
-        },
-        onCancelPressed: () {
-          Get.back();
-        },
-      );
-    }
-  }
-}
-
-class MyNavigationDrawer extends StatefulWidget {
-  const MyNavigationDrawer({super.key});
-
-  @override
-  State<MyNavigationDrawer> createState() => _MyNavigationDrawerState();
-}
-
-class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
-  final exerciseListController = Get.find<ExerciseListController>();
-  @override
-  Widget build(BuildContext context) {
-    return Drawer(
-      child: SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            children: [
-              ListTile(
-                leading: Icon(Icons.home_outlined),
-                title: Text("Home"),
-                onTap: () {
-                  // Close the drawer first
-                  Navigator.pop(context);
-                  // If already on the home screen (ExcerciseListScreen), do nothing or ensure it's the only route
-                  if (Get.currentRoute != PageName.exerciseList) {
-                    Get.offAllNamed(
-                      PageName.exerciseList,
-                    ); // Clears stack and goes to home
-                  }
-                },
-              ),
-              Divider(color: ColorConstants.startColor),
-              ListTile(
-                leading: Icon(Icons.person_outline),
-                title: Text("Profile"),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              Divider(color: ColorConstants.startColor),
-              ListTile(
-                leading: Icon(Icons.logout_outlined),
-                title: Text("Logout"),
-                onTap: () {
-                  Navigator.pop(context);
-                  exerciseListController.handleLogout();
-                },
-              ),
-              Divider(color: ColorConstants.startColor),
-            ],
-          ),
-        ),
       ),
     );
   }

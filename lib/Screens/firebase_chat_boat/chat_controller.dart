@@ -4,6 +4,8 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart'; // For TextEditingController, ScrollController, etc.
 import 'dart:convert';
 import 'package:get/get.dart';
+import 'package:pose_detection/Components/session_expire_controller.dart';
+import 'package:pose_detection/Constants/app_string.dart';
 import 'package:pose_detection/Singleton/api_service_singleton.dart';
 import 'package:pose_detection/api/apiModels/profile_response.dart';
 import 'package:pose_detection/api/api_service.dart';
@@ -35,7 +37,10 @@ class ChatController extends GetxController {
 
   final ApiService _apiService = ApiServiceSingleton().apiService;
   RxBool isLoading = false.obs;
-    
+
+  final SessionExpireController sessionController =
+      Get.find<SessionExpireController>();
+
   @override
   void onInit() {
     super.onInit();
@@ -216,7 +221,7 @@ class ChatController extends GetxController {
           case 1: // Age
             final age = int.tryParse(extractedValue);
             if (age == null || age <= 0 || age > 120) {
-              _addBotMessage("Please enter a valid age (e.g., 30).");
+              _addBotMessage(AppStrings.valEnterValidAge);
               proceedToNextQuestion = false;
             } else {
               userAge.value = age;
@@ -225,7 +230,7 @@ class ChatController extends GetxController {
           case 2: // Height
             final height = double.tryParse(extractedValue);
             if (height == null || height <= 50 || height > 250) {
-              _addBotMessage("Please enter a valid height in cm (e.g., 175).");
+              _addBotMessage(AppStrings.valEnterValidHeight);
               proceedToNextQuestion = false;
             } else {
               userHeight.value = height;
@@ -234,7 +239,7 @@ class ChatController extends GetxController {
           case 3: // Weight
             final weight = double.tryParse(extractedValue);
             if (weight == null || weight <= 20 || weight > 200) {
-              _addBotMessage("Please enter a valid weight in kg (e.g., 70).");
+              _addBotMessage(AppStrings.valEnterValidHeight);
               proceedToNextQuestion = false;
             } else {
               userWeight.value = weight;
@@ -248,9 +253,7 @@ class ChatController extends GetxController {
                 normalizedGender[0].toUpperCase(),
               );
             } else {
-              _addBotMessage(
-                "Please specify your gender as Male, Female, or Other.",
-              );
+              _addBotMessage(AppStrings.valEnterValidGender);
               proceedToNextQuestion = false;
             }
             break;
@@ -293,7 +296,13 @@ class ChatController extends GetxController {
       );
       debugPrint("User data saved to Firestore for ID: $userId");
 
-      updateUserProfile();
+      await updateUserProfile().then((result) {
+        if (result.item3 == 401) {
+          if (Get.context != null && !Get.isDialogOpen!) {
+           sessionController.showSessionExpiredDialog(Get.context!, result.item2.toString());
+          }
+        }
+      });
     } catch (e) {
       isUserDataSaved.value = false;
 
@@ -318,7 +327,7 @@ class ChatController extends GetxController {
     _saveUserDataToFirestore();
   }
 
-  Future<Tuple2<bool, String?>> updateUserProfile() async {
+  Future<Tuple3<bool, String?, int>> updateUserProfile() async {
     final name = userName.value;
     final age = userAge.value;
     final height = userHeight.value;
@@ -337,7 +346,7 @@ class ChatController extends GetxController {
         weight: weight ?? 0.0,
         gender: gender,
         goal: goal,
-      );    
+      );
       if (appResponse.statusCode == 200) {
         isLoading.value = false;
         if (appResponse.data is Map<String, dynamic>) {
@@ -348,22 +357,38 @@ class ChatController extends GetxController {
             debugPrint("Tag_data ${data.profile}");
             secureStorage.storeProfileData(data.profile);
             updateProfileStatus();
-            return Tuple2(true, appResponse.message.toString());
+            return Tuple3(
+              true,
+              appResponse.message.toString(),
+              appResponse.statusCode.toInt(),
+            );
           } catch (e) {
             isLoading.value = false;
-            return Tuple2(false, "Error parsing ApiResponse");
+            return Tuple3(
+              false,
+              "Error parsing ApiResponse",
+              appResponse.statusCode.toInt(),
+            );
           }
         } else {
           isLoading.value = false;
-          return Tuple2(false, "appResponse.data is not a Map");
+          return Tuple3(
+            false,
+            "appResponse.data is not a Map",
+            appResponse.statusCode.toInt(),
+          );
         }
       } else {
         isLoading.value = false;
-        return Tuple2(false, appResponse.message.toString());
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
       }
     } catch (ex) {
       isLoading.value = false;
-      return Tuple2(false, "$ex");
+      return Tuple3(false, "$ex", 0);
     }
   }
 }

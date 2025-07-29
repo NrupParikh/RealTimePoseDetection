@@ -3,16 +3,19 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pose_detection/Components/default_firebase_options.dart';
+import 'package:pose_detection/Components/session_expire_controller.dart';
 import 'package:pose_detection/Models/excercise_data_model.dart';
 import 'package:pose_detection/Screens/detection/detection_controller.dart';
 import 'package:pose_detection/Screens/detection/detection_screen.dart';
-import 'package:pose_detection/Screens/exerciseList/exercise_list_binding.dart';
+import 'package:pose_detection/Screens/exerciseList/navigationDrawer/nav_drawer_binding.dart';
 import 'package:pose_detection/Screens/exerciseList/exercise_list_screen.dart';
 import 'package:pose_detection/Screens/firebase_chat_boat/chat_binding.dart';
 import 'package:pose_detection/Screens/firebase_chat_boat/firebase_chat_screen.dart';
 import 'package:pose_detection/Screens/login/login_binding.dart';
 import 'package:pose_detection/Screens/login/login_screen.dart';
 import 'package:pose_detection/Screens/onboard/on_board_screen.dart';
+import 'package:pose_detection/Screens/profile/profile.dart';
+import 'package:pose_detection/Screens/profile/profile_binding.dart';
 import 'package:pose_detection/Screens/register/register_binding.dart';
 import 'package:pose_detection/Screens/register/register_screen.dart';
 import 'package:pose_detection/Singleton/sercure_storage_singleton.dart';
@@ -27,6 +30,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   secureStorage = SecureStorageSingleton();
   await secureStorage.init();
+  Get.put(SessionExpireController(secureStorage));
   cameras = await availableCameras();
   final isLoggedIn = secureStorage.getLoginStatus() ?? false;
   final userData = secureStorage.getUserData();
@@ -45,6 +49,7 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+  
     return GetMaterialApp(
       title: 'Pose Detection',
       debugShowCheckedModeBanner: false,
@@ -79,7 +84,9 @@ class MyApp extends StatelessWidget {
         GetPage(
           name: PageName.exerciseList,
           page: () => ExcerciseListScreen(),
-          binding: ExerciseListBinding(),
+          binding: NavDrawerBinding(),
+          transition: Transition.noTransition,
+          transitionDuration: Duration.zero,
         ),
         GetPage(
           name: PageName.detection,
@@ -92,7 +99,15 @@ class MyApp extends StatelessWidget {
             );
           }),
         ),
+        GetPage(
+          name: PageName.profile,
+          page: () => Profile(),
+          bindings: [NavDrawerBinding(), ProfileBinding()],
+          transition: Transition.noTransition,
+          transitionDuration: Duration.zero,
+        ),
       ],
     );
   }
+
 }

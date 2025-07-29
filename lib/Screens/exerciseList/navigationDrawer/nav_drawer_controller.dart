@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pose_detection/Components/fancy_alert_dialog.dart';
+import 'package:pose_detection/Components/session_expire_controller.dart';
 import 'package:pose_detection/Constants/app_string.dart';
 import 'package:pose_detection/Constants/page_name.dart';
 import 'package:pose_detection/Singleton/api_service_singleton.dart';
@@ -8,19 +9,29 @@ import 'package:pose_detection/api/api_service.dart';
 import 'package:pose_detection/main.dart';
 import 'package:tuple/tuple.dart';
 
-class ExerciseListController extends GetxController {
+class NavDrawerController extends GetxController {
   final ApiService _apiService = ApiServiceSingleton().apiService;
+  final SessionExpireController sessionController =
+      Get.find<SessionExpireController>();
 
-  Future<Tuple2<bool, String?>> logout() async {
+  Future<Tuple3<bool, String?, int>> logout() async {
     try {
       var appResponse = await _apiService.logout();
       if (appResponse.statusCode == 200) {
-        return Tuple2(true, appResponse.message.toString());
+        return Tuple3(
+          true,
+          appResponse.message.toString(),
+          appResponse.statusCode,
+        );
       } else {
-        return Tuple2(false, appResponse.message.toString());
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode,
+        );
       }
     } catch (ex) {
-      return Tuple2(false, "$ex");
+      return Tuple3(false, "$ex", 0);
     }
   }
 
@@ -44,6 +55,13 @@ class ExerciseListController extends GetxController {
         if (result.item1) {
           secureStorage.clearSharedPreference();
           Get.offAllNamed(PageName.onboard);
+        } else if (result.item3 == 401) {
+          if (Get.context != null && !Get.isDialogOpen!) {
+            sessionController.showSessionExpiredDialog(
+              Get.context!,
+              result.item2.toString(),
+            );
+          }
         } else {
           // Handle logout failure, e.g., show a snackbar or another dialog
           Get.snackbar(

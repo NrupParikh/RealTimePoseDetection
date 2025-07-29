@@ -47,6 +47,7 @@ class LoginBottomSheetState extends State<LoginBottomSheet> {
         onCancelPressed: null,
       );
     }
+    //  Get.offAllNamed(PageName.exerciseList);
   }
 
   @override

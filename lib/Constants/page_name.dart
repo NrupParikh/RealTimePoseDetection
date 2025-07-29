@@ -5,4 +5,5 @@ class PageName {
   static const chat = "/chat";
   static const exerciseList = "/exercise_list_screen";
   static const detection = "/detection";
+  static const profile = "/profile";
 }
