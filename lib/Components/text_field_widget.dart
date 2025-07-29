@@ -9,6 +9,7 @@ class TextWidget extends StatefulWidget {
   final TextInputAction? textInputAction;
   final ValueChanged<String>? onSubmitted;
   final FocusNode? focusNode;
+  final bool? isEnabled; // New property for enable/disable
 
   const TextWidget({
     super.key,
@@ -19,7 +20,8 @@ class TextWidget extends StatefulWidget {
     required this.controller,
     this.textInputAction,
     this.onSubmitted,
-    this.focusNode, 
+    this.focusNode,
+    this.isEnabled = true, // Default to true (enabled)
   });
 
   @override
@@ -43,7 +45,8 @@ class _TextWidgetState extends State<TextWidget> {
       obscureText: widget.hideIcon ? obscureText : false,
       textInputAction: widget.textInputAction,
       onSubmitted: widget.onSubmitted,
-      focusNode: widget.focusNode, 
+      focusNode: widget.focusNode,
+      enabled: widget.isEnabled,
       decoration: InputDecoration(
         prefixIcon: Icon(
           widget.rightIcon,
@@ -53,7 +56,7 @@ class _TextWidgetState extends State<TextWidget> {
                 icon: Icon(
                   obscureText ? Icons.visibility_off : Icons.visibility,
                 ),
-                onPressed: togglePasswordVisibility,
+                onPressed: (widget.isEnabled ?? false) ? togglePasswordVisibility : null, 
               )
             : null,
         hintText: widget.hintTitle,

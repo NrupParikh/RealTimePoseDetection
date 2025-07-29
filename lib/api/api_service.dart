@@ -85,9 +85,24 @@ class ApiService {
     }
   }
 
+  // ============================= Get Profile
+  Future<AppResponse> getProfile({required int id}) async {
+    try {
+      final response = await _networkService.get(
+        url: "${ApiConstants.profile}/$id",
+        showProgressBar: false,
+      );
+      return _networkService.handleException(response);
+    } catch (e) {
+      if (kDebugMode) {
+        print("TAG Exception: $e");
+      }
+      rethrow;
+    }
+  }
 
   // ============================= Logout
-  Future<AppResponse> logout() async {  
+  Future<AppResponse> logout() async {
     try {
       final response = await _networkService.post(
         url: ApiConstants.logout,
@@ -100,5 +115,5 @@ class ApiService {
       }
       rethrow;
     }
-  }  
+  }
 }

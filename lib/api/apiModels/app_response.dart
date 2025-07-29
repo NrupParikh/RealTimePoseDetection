@@ -25,5 +25,9 @@ class AppResponse {
       str,
     ); 
   }
+   @override
+  String toString() {
+    return 'AppResponse(result: $result, statusCode: $statusCode, message: $message)';
+  }
 }
 
