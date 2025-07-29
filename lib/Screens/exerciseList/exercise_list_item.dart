@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pose_detection/Components/exercise_info_dialog.dart';
 import 'package:pose_detection/Components/frosted_glass_effect.dart';
+import 'package:pose_detection/Constants/page_name.dart';
 import 'package:pose_detection/Models/excercise_data_model.dart';
 
 class ExerciseListItem extends StatelessWidget {
@@ -21,6 +23,9 @@ class ExerciseListItem extends StatelessWidget {
       onTap: () {
         if(Platform.isAndroid){
            onRequestPermissionsAndNavigate(item);
+        }else if(Platform.isIOS){
+              Get.toNamed(PageName.detection,arguments: item);
+
         }
       },
       child: FrostedGlass(
