@@ -7,6 +7,7 @@
 ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
 ![Firestore](https://img.shields.io/badge/Firestore-FF6F00?style=for-the-badge&logo=firebase&logoColor=white)
 ![Dio](https://img.shields.io/badge/Dio-1976D2?style=for-the-badge&logo=codeigniter&logoColor=white)
+![GitHub Actions](https://img.shields.io/badge/GitHub%20Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
 
 This is a robust and feature-rich mobile application developed with Flutter, designed to provide real-time pose detection for fitness and exercise, complemented by an integrated AI-powered chatbot for enhanced user interaction. The application is built with a focus on performance, scalability, and a great user experience, adhering to modern architectural best practices.
 
@@ -83,6 +84,18 @@ The following Flutter plugins are integral to the application's functionality:
 
 ---
 
+## 🚀 CI/CD Pipeline with GitHub Actions
+
+This project implements an automated Continuous Integration/Continuous Delivery (CI/CD) pipeline using **GitHub Actions**. This pipeline is configured to:
+
+* **Automate Mobile Builds:** Automatically generates release-ready builds for both Android (`.apk` and/or `.aab`) and iOS (`.ipa` - with proper Apple Developer account setup) platforms whenever changes are pushed to specific branches (e.g., `main` or `release`).
+* **Ensure Code Quality:** Can be extended to run tests, linting, and code analysis checks.
+* **Streamline Development:** Reduces manual effort, ensures consistent build processes, and accelerates the delivery of new features and updates.
+
+The workflow files for these automated processes can be found in the `.github/workflows/` directory of this repository.
+
+---
+
 ## 🏗️ Architecture
 
 The application is built following the **MVVM (Model-View-ViewModel)** architectural pattern. This approach promotes a clear separation of concerns, leading to a more modular, testable, and maintainable codebase.
@@ -92,4 +105,3 @@ The application is built following the **MVVM (Model-View-ViewModel)** architect
 * **ViewModel:** Acts as an intermediary between the Model and View, handling UI logic and data preparation.
 
 ---
-
