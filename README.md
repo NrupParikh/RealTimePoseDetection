@@ -108,20 +108,20 @@ The application is built following the **MVVM (Model-View-ViewModel)** architect
 ---
 ## 📸 Screenshot
 
-<img width="300" height="600" alt="0_splash" src="https://github.com/user-attachments/assets/d9192de0-1c51-46ad-a895-5ca807f91d50" />
-<img width="300" height="600" alt="1_on_board" src="https://github.com/user-attachments/assets/49664109-1db9-430d-aee3-b0e4e02fe14c" />
-<img width="300" height="600" alt="2_login" src="https://github.com/user-attachments/assets/1a579a1e-0cae-4044-b039-267fb02cb752" />
-<img width="300" height="600" alt="3_create_account" src="https://github.com/user-attachments/assets/da7b8281-c9f6-4cd6-aaa6-1ecfdb608542" />
-<img width="300" height="600" alt="4_ex_list" src="https://github.com/user-attachments/assets/04570713-155a-44a6-abea-496868f991b7" />
-<img width="300" height="600" alt="6_drawer" src="https://github.com/user-attachments/assets/e5452030-f0a4-4865-ae64-731696659cb2" />
-<img width="300" height="600" alt="3_1_chat_bot" src="https://github.com/user-attachments/assets/666ab244-e1bd-48e5-a31a-8084143d3888" />
-<img width="300" height="600" alt="3_2_chat_bot" src="https://github.com/user-attachments/assets/3e2a30ba-412a-4faa-94e9-fd377bc66e86" />
-<img width="300" height="600" alt="4_1_pushup" src="https://github.com/user-attachments/assets/4b5dbb95-45b1-46ff-8162-053e4b1cc0dd" />
-<img width="300" height="600" alt="4_2_squat" src="https://github.com/user-attachments/assets/a5d9c5ba-4d80-44b1-bf6d-e8bdfccf1ac4" />
-<img width="300" height="600" alt="4_3_jumping_jack" src="https://github.com/user-attachments/assets/9b045017-6052-4df8-b209-1a3fea05e472" />
-<img width="300" height="600" alt="4_4_plank_to_downward_dog" src="https://github.com/user-attachments/assets/e1ab62ca-d607-4cf4-bc51-ff8a3e9f229d" />
-<img width="300" height="600" alt="4_5_over_head_clap" src="https://github.com/user-attachments/assets/f5f18554-761e-48df-a5a1-76b4c7245f23" />
-<img width="300" height="600" alt="7_logout" src="https://github.com/user-attachments/assets/685169a8-0f05-4319-aa8f-32a281c10341" />
+<img width="300" height="500" alt="0_splash" src="https://github.com/user-attachments/assets/d9192de0-1c51-46ad-a895-5ca807f91d50" />
+<img width="300" height="500" alt="1_on_board" src="https://github.com/user-attachments/assets/49664109-1db9-430d-aee3-b0e4e02fe14c" />
+<img width="300" height="500" alt="2_login" src="https://github.com/user-attachments/assets/1a579a1e-0cae-4044-b039-267fb02cb752" />
+<img width="300" height="500" alt="3_create_account" src="https://github.com/user-attachments/assets/da7b8281-c9f6-4cd6-aaa6-1ecfdb608542" />
+<img width="300" height="500" alt="4_ex_list" src="https://github.com/user-attachments/assets/04570713-155a-44a6-abea-496868f991b7" />
+<img width="300" height="500" alt="6_drawer" src="https://github.com/user-attachments/assets/e5452030-f0a4-4865-ae64-731696659cb2" />
+<img width="300" height="500" alt="3_1_chat_bot" src="https://github.com/user-attachments/assets/666ab244-e1bd-48e5-a31a-8084143d3888" />
+<img width="300" height="500" alt="3_2_chat_bot" src="https://github.com/user-attachments/assets/3e2a30ba-412a-4faa-94e9-fd377bc66e86" />
+<img width="300" height="500" alt="4_1_pushup" src="https://github.com/user-attachments/assets/4b5dbb95-45b1-46ff-8162-053e4b1cc0dd" />
+<img width="300" height="500" alt="4_2_squat" src="https://github.com/user-attachments/assets/a5d9c5ba-4d80-44b1-bf6d-e8bdfccf1ac4" />
+<img width="300" height="500" alt="4_3_jumping_jack" src="https://github.com/user-attachments/assets/9b045017-6052-4df8-b209-1a3fea05e472" />
+<img width="300" height="500" alt="4_4_plank_to_downward_dog" src="https://github.com/user-attachments/assets/e1ab62ca-d607-4cf4-bc51-ff8a3e9f229d" />
+<img width="300" height="500" alt="4_5_over_head_clap" src="https://github.com/user-attachments/assets/f5f18554-761e-48df-a5a1-76b4c7245f23" />
+<img width="300" height="500" alt="7_logout" src="https://github.com/user-attachments/assets/685169a8-0f05-4319-aa8f-32a281c10341" />
 
 ---
 
