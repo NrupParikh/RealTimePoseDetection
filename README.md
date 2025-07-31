@@ -104,8 +104,6 @@ The application is built following the **MVVM (Model-View-ViewModel)** architect
 * **View:** The UI layer responsible for displaying information and capturing user input.
 * **ViewModel:** Acts as an intermediary between the Model and View, handling UI logic and data preparation.
 ---
-
----
 ## 📸 Screenshot
 
 <img width="150" height="400" alt="0_splash" src="https://github.com/user-attachments/assets/d9192de0-1c51-46ad-a895-5ca807f91d50" />
