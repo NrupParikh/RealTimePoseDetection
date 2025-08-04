@@ -5,6 +5,8 @@ import 'package:get/get.dart';
 import 'package:pose_detection/Components/default_firebase_options.dart';
 import 'package:pose_detection/Components/session_expire_controller.dart';
 import 'package:pose_detection/Models/excercise_data_model.dart';
+import 'package:pose_detection/Screens/bmi_calc/bmi_calc_binding.dart';
+import 'package:pose_detection/Screens/bmi_calc/bmi_calc_screen.dart';
 import 'package:pose_detection/Screens/detection/detection_controller.dart';
 import 'package:pose_detection/Screens/detection/detection_screen.dart';
 import 'package:pose_detection/Screens/exerciseList/navigationDrawer/nav_drawer_binding.dart';
@@ -103,6 +105,13 @@ class MyApp extends StatelessWidget {
           name: PageName.profile,
           page: () => Profile(),
           bindings: [NavDrawerBinding(), ProfileBinding()],
+          transition: Transition.noTransition,
+          transitionDuration: Duration.zero,
+        ),
+        GetPage(
+          name: PageName.bmiCalcScreen,
+          page: () => BMICalcScreen(),
+          bindings: [NavDrawerBinding(), BmiCalcBinding()],
           transition: Transition.noTransition,
           transitionDuration: Duration.zero,
         ),
