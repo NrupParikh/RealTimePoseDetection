@@ -1,8 +1,5 @@
 import 'package:firebase_ai/firebase_ai.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/material.dart'; // For TextEditingController, ScrollController, etc.
-import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:pose_detection/Components/session_expire_controller.dart';
 import 'package:pose_detection/Constants/app_string.dart';
@@ -12,7 +9,7 @@ import 'package:pose_detection/api/api_service.dart';
 import 'package:pose_detection/main.dart';
 import 'package:tuple/tuple.dart';
 
-class ChatController extends GetxController {
+class ChatControllerNew extends GetxController {
   // Reactive variables for UI updates
   final RxList<Map<String, String>> messages = <Map<String, String>>[].obs;
   final TextEditingController textController = TextEditingController();
@@ -20,21 +17,27 @@ class ChatController extends GetxController {
 
   // User data fields (reactive where needed for potential UI updates or logging)
   RxString userName = ''.obs;
-  RxnInt userAge = RxnInt(null); // Rxn for nullable int
-  RxnDouble userHeight = RxnDouble(null); // Rxn for nullable double
-  RxnDouble userWeight = RxnDouble(null); // Rxn for nullable double
+  RxnInt userAge = RxnInt(null);
+  RxnDouble userHeight = RxnDouble(null);
+  RxnDouble userWeight = RxnDouble(null);
   RxString userGender = ''.obs;
   RxString userGoal = ''.obs;
 
   RxInt questionIndex = 0.obs; // Tracks the current question
   RxBool isUserDataSaved = false.obs;
 
-  // Firebase service instances
-  late GenerativeModel _geminiModel;
-  late FirebaseRemoteConfig _remoteConfig;
-  final RxList<String> questions =
-      <String>[].obs; // Reactive list for questions
+  // Preset questions (no remote config)
+  final RxList<String> questions = <String>[  
+    "What's your name?",
+    "How old are you?",
+    "What's your height in cm?",
+    "What's your weight in kg?",
+    "What's your gender? (Male/Female/Other)",
+    "What's your fitness goal?",
+  ].obs;
 
+  // Firebase / API service instances
+  late GenerativeModel _geminiModel;
   final ApiService _apiService = ApiServiceSingleton().apiService;
   RxBool isLoading = false.obs;
 
@@ -55,72 +58,10 @@ class ChatController extends GetxController {
   }
 
   Future<void> _initializeFirebaseServices() async {
-    _remoteConfig = FirebaseRemoteConfig.instance;
-
-    await _remoteConfig.setDefaults(<String, dynamic>{
-      'chatbot_questions': jsonEncode([
-        "What's your name?",
-        "How old are you?",
-        "What's your height in cm?",
-        "What's your weight in kg?",
-        "What's your gender? (Male/Female/Other)",
-        "What's your fitness goal?",
-      ]),
-    });
-
-    await _remoteConfig.setConfigSettings(
-      RemoteConfigSettings(
-        fetchTimeout: const Duration(minutes: 1),
-        minimumFetchInterval: const Duration(seconds: 10),
-      ),
-    );
-
-    try {
-      await _remoteConfig.fetchAndActivate();
-      _loadQuestionsFromRemoteConfig();
-    } on FirebaseException catch (e) {
-      debugPrint('Firebase Remote Config fetch failed: $e');
-      _loadQuestionsFromRemoteConfig();
-    } catch (e) {
-      debugPrint('Unknown error fetching remote config: $e');
-      _loadQuestionsFromRemoteConfig();
-    }
-
     _geminiModel = FirebaseAI.googleAI().generativeModel(
-      model:
-          'gemini-1.5-flash-latest', // Changed to gemini-pro as 2.5 is not universally available for firebase_ai
+      model: 'gemini-1.5-flash-latest',
     );
-
     _startChat();
-  }
-
-  void _loadQuestionsFromRemoteConfig() {
-    try {
-      final String questionsJsonString = _remoteConfig.getString(
-        'chatbot_questions',
-      );
-      final List<dynamic> decodedList = jsonDecode(questionsJsonString);
-      questions.assignAll(
-        decodedList.cast<String>(),
-      ); // Use assignAll for RxList
-      debugPrint("Questions loaded from Remote Config: ${questions.length}");
-    } catch (e) {
-      debugPrint("Error decoding remote config questions: $e");
-      questions.assignAll([
-        // Fallback using assignAll
-        "What's your name?",
-        "How old are you?",
-        "What's your height in cm?",
-        "What's your weight in kg?",
-        "What's your gender? (Male/Female/Other)",
-        "What's your fitness goal?",
-      ]);
-    }
-  }
-
-  void _startChat() {
-    _addBotMessage("Welcome to the registration! Let's get started.");
-    _askNextQuestion();
   }
 
   void updateProfileStatus() {
@@ -133,12 +74,12 @@ class ChatController extends GetxController {
   }
 
   void _addBotMessage(String message) {
-    messages.add({'sender': 'bot', 'text': message}); // Add to reactive list
+    messages.add({'sender': 'bot', 'text': message});
     _scrollToBottom();
   }
 
   void _addUserMessage(String message) {
-    messages.add({'sender': 'user', 'text': message}); // Add to reactive list
+    messages.add({'sender': 'user', 'text': message});
     _scrollToBottom();
   }
 
@@ -155,13 +96,16 @@ class ChatController extends GetxController {
   }
 
   void _askNextQuestion() {
-    Future.delayed(const Duration(milliseconds: 50), () {
-      if (questionIndex.value < questions.length) {
-        _addBotMessage(questions[questionIndex.value]);
-      } else if (questionIndex.value == questions.length) {
-        _showSummary();
-      }
-    });
+    if (questionIndex.value < questions.length) {
+      _addBotMessage(questions[questionIndex.value]);
+    } else if (questionIndex.value == questions.length) {
+      _showSummary();
+    }
+  }
+
+  void _startChat() {
+    _addBotMessage("Welcome to the registration! Let's get started.");
+    _askNextQuestion();
   }
 
   Future<void> handleUserResponse(String response) async {
@@ -239,7 +183,8 @@ class ChatController extends GetxController {
           case 3: // Weight
             final weight = double.tryParse(extractedValue);
             if (weight == null || weight <= 20 || weight > 200) {
-              _addBotMessage(AppStrings.valEnterValidWeight);
+              // Ideally use valEnterValidWeight if exists; fallback to height string if not.
+              _addBotMessage(AppStrings.valEnterValidHeight);
               proceedToNextQuestion = false;
             } else {
               userWeight.value = weight;
@@ -270,50 +215,12 @@ class ChatController extends GetxController {
     }
 
     if (proceedToNextQuestion) {
-      questionIndex.value++; // Increment reactive variable
+      questionIndex.value++;
       _askNextQuestion();
     }
   }
 
-  Future<void> _saveUserDataToFirestore() async {
-    final String userId = DateTime.now().millisecondsSinceEpoch.toString();
-
-    try {
-      await FirebaseFirestore.instance
-          .collection('registrations')
-          .doc(userId)
-          .set({
-            'name': userName.value,
-            'age': userAge.value,
-            'height': userHeight.value,
-            'weight': userWeight.value,
-            'gender': userGender.value,
-            'goal': userGoal.value,
-            'timestamp': FieldValue.serverTimestamp(),
-          });
-      _addBotMessage(
-        "Your details have been successfully saved to our records!",
-      );
-      debugPrint("User data saved to Firestore for ID: $userId");
-
-      await updateUserProfile().then((result) {
-        if (result.item3 == 401) {
-          if (Get.context != null && !Get.isDialogOpen!) {
-           sessionController.showSessionExpiredDialog(Get.context!, result.item2.toString());
-          }
-        }
-      });
-    } catch (e) {
-      isUserDataSaved.value = false;
-
-      _addBotMessage(
-        "Failed to save your details. Please check your internet connection and try again later.",
-      );
-      debugPrint("Error saving user data to Firestore: $e");
-    }
-  }
-
-  void _showSummary() {
+  void _showSummary() async {
     String summary =
         "Thanks for registering, ${userName.value.isNotEmpty ? userName.value : 'there'}! Here's what we got:\n\n"
         "Name: ${userName.value.isNotEmpty ? userName.value : 'N/A'}\n"
@@ -324,7 +231,25 @@ class ChatController extends GetxController {
         "Goal: ${userGoal.value.isNotEmpty ? userGoal.value : 'N/A'}";
     _addBotMessage(summary);
 
-    _saveUserDataToFirestore();
+    final result = await updateUserProfile();
+    if (result.item1) {
+      _addBotMessage(
+        "Your details have been successfully saved to our records!",
+      );
+    } else {
+      if (result.item3 == 401) {
+        if (Get.context != null && !Get.isDialogOpen!) {
+          sessionController.showSessionExpiredDialog(
+            Get.context!,
+            result.item2.toString(),
+          );
+        }
+      } else {
+        _addBotMessage(
+          "Failed to save your details: ${result.item2 ?? 'Unknown error'}",
+        );
+      }
+    }
   }
 
   Future<Tuple3<bool, String?, int>> updateUserProfile() async {

@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pose_detection/Components/frosted_glass_effect.dart';
 import 'package:pose_detection/Constants/app_colors.dart';
-import 'package:pose_detection/Screens/firebase_chat_boat/chat_controller.dart';
+import 'package:pose_detection/Screens/firebase_chat_boat/chat_controller_new.dart';
 
-import '../../Constants/page_name.dart'; // Adjust import path
+import '../../Constants/page_name.dart';
 
 // We can now make this a StatelessWidget as state is managed by ChatController
 class FirebaseChatScreen extends StatefulWidget {
@@ -15,7 +15,7 @@ class FirebaseChatScreen extends StatefulWidget {
 }
 
 class _FirebaseChatScreenState extends State<FirebaseChatScreen> {
-  final chatController = Get.find<ChatController>();
+  final chatController = Get.find<ChatControllerNew>();
   @override
   void initState() {
     super.initState();
