@@ -112,7 +112,7 @@ class _BMICalcScreenState extends State<BMICalcScreen> {
                                       "${controller.age.value} years",
                                       style: const TextStyle(
                                         color: Colors.white,
-                                        fontSize: 16, 
+                                        fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                       ),
                                     ),
@@ -266,59 +266,105 @@ class _BMICalcScreenState extends State<BMICalcScreen> {
                                 ),
                               ),
                             ),
-                            Container(height: 250,
-                            padding: EdgeInsets.symmetric(horizontal: 10),child: 
-                            SfRadialGauge(
-                              axes: [
-                                RadialAxis(
-                                  minimum: 0,
-                                  maximum: 40,
-                                  ranges: [
-                                    GaugeRange(
-                                      startValue: 0,
-                                      endValue: 18.5,
-                                      color: Colors.blue,
-                                      // label: 'Underweight',
-                                    ),
-                                    GaugeRange(
-                                      startValue: 18.5,
-                                      endValue: 24.9,
-                                      color: Colors.green,
-                                      // label: 'Normal',
-                                    ),
-                                    GaugeRange(
-                                      startValue: 25,
-                                      endValue: 29.9,
-                                      color: Colors.yellow,
-                                      // label: 'Overweight',
-                                    ),
-                                    GaugeRange(
-                                      startValue: 30,
-                                      endValue: 40,
-                                      color: Colors.red,
-                                      // label: 'Obese',
-                                    ),
-                                  ],
-                                  pointers: [
-                                    NeedlePointer(
-                                      value: controller.calculateBMI(),
-                                      needleColor: Colors.black,
-                                      knobStyle:
-                                          KnobStyle(color: Colors.black),
-                                    ),
-                                  ],
-                                  annotations: [
-                                    GaugeAnnotation(
-                                        widget: Text(
-                                          '${controller.calculateBMI().toStringAsFixed(2)}',
-                                          style: TextStyle(
-                                              fontSize: 25, color: Colors.black),
+                            Container(
+                              height: 250,
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              child: Obx(
+                                () => SfRadialGauge(
+                                  axes: [
+                                    RadialAxis(
+                                      minimum: 0,
+                                      maximum: 40,
+                                      showLabels: false,
+                                      showTicks: false,
+                                      axisLabelStyle: GaugeTextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                      ),
+                                      ranges: [
+                                        GaugeRange(
+                                          startWidth: 30,
+                                          endWidth: 30,
+                                          startValue: 0,
+                                          endValue: 18.5,
+                                          color: Colors.blue,
+                                          label: 'Underweight',
+                                          labelStyle: GaugeTextStyle(
+                                            fontSize: 12,
+                                            color: Colors.black,
+                                          ),
                                         ),
-                                        angle: 90, positionFactor: 0.5)
+                                        GaugeRange(
+                                          startWidth: 30,
+                                          endWidth: 30,
+                                          startValue: 18.5,
+                                          endValue: 24.9,
+                                          color: Colors.green,
+                                          label: 'Normal',
+                                          labelStyle: GaugeTextStyle(
+                                            fontSize: 12,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        GaugeRange(
+                                          startWidth: 30,
+                                          endWidth: 30,
+                                          startValue: 25,
+                                          endValue: 29.9,
+                                          color: Colors.yellow,
+                                          label: 'Overweight',
+                                          labelStyle: GaugeTextStyle(
+                                            fontSize: 12,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        GaugeRange(
+                                          startWidth: 30,
+                                          endWidth: 30,
+                                          startValue: 30,
+                                          endValue: 40,
+                                          color: Colors.red,
+                                          label: 'Obese',
+                                          labelStyle: GaugeTextStyle(
+                                            fontSize: 12,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                      pointers: [
+                                        NeedlePointer(
+                                          enableAnimation: true,
+                                          animationDuration: 1000,
+                                          animationType: AnimationType.ease,
+                                          value: controller.calculateBMI(),
+                                          needleColor: Colors.black,
+                                          needleLength: 0.9,
+                                          needleStartWidth: 1,
+                                          needleEndWidth: 5,
+                                          knobStyle: KnobStyle(
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                      annotations: [
+                                        GaugeAnnotation(
+                                          widget: Text(
+                                            '${controller.calculateBMI().toStringAsFixed(2)}',
+                                            style: TextStyle(
+                                              fontSize: 20,
+                                              color: Colors.white,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          angle: 90,
+                                          positionFactor: 0.5,
+                                        ),
+                                      ],
+                                    ),
                                   ],
-                                )
-                              ],
-                            ),),
+                                ),
+                              ),
+                            ),
                             const Spacer(),
                           ],
                         ),

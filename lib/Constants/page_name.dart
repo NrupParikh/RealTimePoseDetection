@@ -8,4 +8,5 @@ class PageName {
   static const detection = "/detection";
   static const profile = "/profile";
   static const bmiCalcScreen = "/bmi_calc_screen";
+   static const dashboard = "/dashboard";
 }

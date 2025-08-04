@@ -17,7 +17,8 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    bool isExerciseListSelected = Get.currentRoute == PageName.exerciseList;
+    final isDashboardSelected = Get.currentRoute == PageName.dashboard;
+    final isExerciseListSelected = Get.currentRoute == PageName.exerciseList;
     final isProfileSelected = Get.currentRoute == PageName.profile;
     final isBMISelected = Get.currentRoute == PageName.bmiCalcScreen;
     return Drawer(
@@ -35,6 +36,27 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
                 padding: EdgeInsets.all(16),
                 child: Column(
                   children: [
+                    Divider(color: ColorConstants.startColor),
+                    ListTile(
+                      selected: isDashboardSelected,
+                      selectedTileColor: Colors.black.withValues(alpha: 0.2),
+                      leading: Icon(Icons.person_outline, color: Colors.white),
+                      title: Text(
+                        "Dashboard",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      onTap: () {
+                        // Close the drawer first
+                        Get.back();
+                        if (Get.currentRoute != PageName.dashboard) {
+                          Get.offAllNamed(PageName.dashboard);
+                        }
+                      },
+                    ),
                     ListTile(
                       selected: isExerciseListSelected,
                       selectedTileColor: Colors.black.withValues(alpha: 0.2),
@@ -77,10 +99,13 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
                       },
                     ),
                     Divider(color: ColorConstants.startColor),
-                     ListTile(
+                    ListTile(
                       selected: isBMISelected,
                       selectedTileColor: Colors.black.withValues(alpha: 0.2),
-                      leading: Icon(Icons.calculate_outlined, color: Colors.white),
+                      leading: Icon(
+                        Icons.calculate_outlined,
+                        color: Colors.white,
+                      ),
                       title: Text(
                         "BMI Calculator",
                         style: TextStyle(
