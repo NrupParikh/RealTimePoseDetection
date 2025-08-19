@@ -1,16 +1,16 @@
-import 'package:firebase_ai/firebase_ai.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_remote_config/firebase_remote_config.dart';
-import 'package:flutter/material.dart'; // For TextEditingController, ScrollController, etc.
-import 'dart:convert';
-import 'package:get/get.dart';
-import 'package:pose_detection/Components/session_expire_controller.dart';
-import 'package:pose_detection/Constants/app_string.dart';
-import 'package:pose_detection/Singleton/api_service_singleton.dart';
-import 'package:pose_detection/api/apiModels/profile_response.dart';
-import 'package:pose_detection/api/api_service.dart';
-import 'package:pose_detection/main.dart';
-import 'package:tuple/tuple.dart';
+// import 'package:firebase_ai/firebase_ai.dart';
+// import 'package:cloud_firestore/cloud_firestore.dart';
+// import 'package:firebase_remote_config/firebase_remote_config.dart';
+// import 'package:flutter/material.dart'; // For TextEditingController, ScrollController, etc.
+// import 'dart:convert';
+// import 'package:get/get.dart';
+// import 'package:pose_detection/Components/session_expire_controller.dart';
+// import 'package:pose_detection/Constants/app_string.dart';
+// import 'package:pose_detection/Singleton/api_service_singleton.dart';
+// import 'package:pose_detection/api/apiModels/profile_response.dart';
+// import 'package:pose_detection/api/api_service.dart';
+// import 'package:pose_detection/main.dart';
+// import 'package:tuple/tuple.dart';
 
 // class ChatController extends GetxController {
 //   // Reactive variables for UI updates

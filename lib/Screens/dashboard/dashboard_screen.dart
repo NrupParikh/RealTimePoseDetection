@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:pose_detection/Constants/app_string.dart';
 import 'package:pose_detection/Screens/bmi_calc/bmi_info_dialog.dart';
 import 'package:pose_detection/Components/frosted_glass_effect.dart';

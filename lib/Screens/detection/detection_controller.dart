@@ -1,12 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
-import 'package:pose_detection/Constants/gemini_prompt.dart';
 import 'package:pose_detection/Models/excercise_data_model.dart';
 import 'package:pose_detection/Screens/dashboard/dashboard_controller.dart';
 import 'package:pose_detection/Utility/exercise_detectors.dart';

@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'package:dio/dio.dart';
 import 'package:get/get.dart';
 import 'package:pose_detection/Constants/app_string.dart';
 import 'package:pose_detection/Constants/gemini_prompt.dart';
-import 'package:pose_detection/Screens/dashboard/fitness_tips.dart';
 import 'package:pose_detection/api/apiModels/fitness_plan_response.dart';
 import 'package:pose_detection/api/apiModels/fitness_tips_response.dart';
 import 'package:pose_detection/api/gemini_api_service.dart';
