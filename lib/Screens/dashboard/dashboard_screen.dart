@@ -260,14 +260,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   .isNotEmpty)
                                 SizedBox(
                                   height: 20,
-                                  child: Center(
-                                    child: Text(
-                                      "Error: ${controller.errorMessageForFitnessPlan.value}",
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.white70,
-                                      ),
+                                  child: Text(
+                                    textAlign: TextAlign.start,
+                                    "Error: ${controller.errorMessageForFitnessPlan.value}",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white70,
                                     ),
                                   ),
                                 )
@@ -373,17 +372,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 Center(child: CircularProgressIndicator())
                               else if (controller
                                   .errorMessageForFitnessTips
-                                  .isNotEmpty)
+                                  .isNotEmpty)                                  
                                 SizedBox(
-                                  height: 200,
-                                  child: Center(
-                                    child: Text(
-                                      "Error: ${controller.errorMessageForFitnessTips.value}",
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.white70,
-                                      ),
+                                  height: 20,
+                                  child: Text(
+                                    textAlign: TextAlign.start,
+                                    "Error: ${controller.errorMessageForFitnessTips.value}",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                      color: Colors.white70,
                                     ),
                                   ),
                                 )

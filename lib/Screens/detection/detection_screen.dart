@@ -96,32 +96,32 @@ class _DetectionScreenState extends State<DetectionScreen> {
             debugPrint("TAG_Camera controller not initialized");
           }
 
-           if (controller.goalForExercies.value.isNotEmpty) {
-            children.add(
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 100),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 10,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    "Do ${controller.goalForExercies.value}",
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            );
-          }
+          //  if (controller.goalForExercies.value.isNotEmpty) {
+          //   children.add(
+          //     Align(
+          //       alignment: Alignment.bottomCenter,
+          //       child: Container(
+          //         margin: const EdgeInsets.only(bottom: 100),
+          //         padding: const EdgeInsets.symmetric(
+          //           horizontal: 20,
+          //           vertical: 10,
+          //         ),
+          //         decoration: BoxDecoration(
+          //           color: Colors.white.withValues(alpha: 0.2),
+          //           borderRadius: BorderRadius.circular(12),
+          //         ),
+          //         child: Text(
+          //           "Do ${controller.goalForExercies.value}",
+          //           style: const TextStyle(
+          //             color: Colors.white,
+          //             fontSize: 18,
+          //             fontWeight: FontWeight.w600,
+          //           ),
+          //         ),
+          //       ),
+          //     ),
+          //   );
+          // }
 
           // if (controller.warningMessage.value.isNotEmpty) {
           //   debugPrint(

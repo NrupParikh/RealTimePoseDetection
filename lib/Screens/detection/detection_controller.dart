@@ -64,7 +64,7 @@ class DetectionController extends GetxController {
     startCountdown();
     // startInactivityWatcher();
     print("Tag_current_type ${dataModel.type.name.toString()}");
-    showGoalForExercise();
+    // showGoalForExercise();
   }
 
   void showGoalForExercise() {

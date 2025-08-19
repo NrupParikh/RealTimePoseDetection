@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:get/get.dart';
 import 'package:pose_detection/Constants/app_string.dart';
 import 'package:pose_detection/Constants/gemini_prompt.dart';
@@ -37,11 +36,11 @@ class DashboardController extends GetxController {
 
     // Set initial height and weight from stored profile or use defaults
     if (profileData != null) {
-      height.value = (profileData?.height ?? 150).toInt();
-      weight.value = (profileData?.weight ?? 60).toInt();
+      height.value = (profileData?.height ?? 0).toInt();
+      weight.value = (profileData?.weight ?? 0).toInt();
     } else {
-      height.value = 150;
-      weight.value = 60;
+      height.value = 0;
+      weight.value = 0;
     }
     calculateBMI();
     loadFitnessPlan();
@@ -78,23 +77,23 @@ class DashboardController extends GetxController {
     // This logic uses the profile data if it exists, otherwise uses sensible defaults.
     if (profileData != null) {
       await getFitnessPlan(
-        age: profileData!.age ?? 25,
+        age: profileData!.age ?? 0,
         gender: profileData!.gender ?? 'male',
-        height: profileData!.height?.toInt() ?? 150,
-        weight: profileData!.weight?.toInt() ?? 60,
+        height: profileData!.height?.toInt() ?? 0,
+        weight: profileData!.weight?.toInt() ?? 0,
         goal: profileData!.goal ?? 'Lose weight',
       );
     } else {
-      // This path is taken if the user has no profile saved.
+      // This path is taken if the user has no profile saved.      
       errorMessageForFitnessPlan.value =
-          "Profile not found. Using default values for plan.";
-      await getFitnessPlan(
-        age: 25,
-        gender: 'male',
-        height: 150,
-        weight: 60, // Avoid sending 0 as weight
-        goal: 'Lose weight',
-      );
+          "No profile data found for recommanded exercise";
+      // await getFitnessPlan(
+      //   age: 25,
+      //   gender: 'male',
+      //   height: 150,
+      //   weight: 60, // Avoid sending 0 as weight
+      //   goal: 'Lose weight',
+      // );
     }
   }
 
@@ -102,58 +101,27 @@ class DashboardController extends GetxController {
     // This logic uses the profile data if it exists, otherwise uses sensible defaults.
     if (profileData != null) {
       await getFitnessTips(
-        age: profileData!.age ?? 25,
+        age: profileData!.age ?? 0,
         gender: profileData!.gender ?? 'male',
-        height: profileData!.height?.toInt() ?? 150,
-        weight: profileData!.weight?.toInt() ?? 60,
+        height: profileData!.height?.toInt() ?? 0,
+        weight: profileData!.weight?.toInt() ?? 0,
         goal: profileData!.goal ?? 'Lose weight',
       );
     } else {
       // This path is taken if the user has no profile saved.
       errorMessageForFitnessTips.value =
-          "Profile not found. Using default values for plan.";
-      await getFitnessTips(
-        age: 25,
-        gender: 'male',
-        height: 150,
-        weight: 60, // Avoid sending 0 as weight
-        goal: 'Lose weight',
-      );
+          "No profile data found for fitness tips";
+      // await getFitnessTips(
+      //   age: 25,
+      //   gender: 'male',
+      //   height: 150,
+      //   weight: 60, // Avoid sending 0 as weight
+      //   goal: 'Lose weight',
+      // );
     }
   }
 
   /// Fetches the fitness plan using a direct HTTP request to the Google AI API.
-  // Future<void> getFitnessPlan({
-  //   required int age,
-  //   required String gender,
-  //   required int height,
-  //   required int weight,
-  //   required String goal,
-  // }) async {
-  //   try {
-  //     isLoading.value = true;
-  //     errorMessageForFitnessPlan.value = '';
-  //     fitnessPlan.value = null;
-
-  //     final exercisePrompt = GeminiPrompt.buildFitnessPrompt(
-  //       age: age,
-  //       gender: gender,
-  //       height: height,
-  //       weight: weight,
-  //       goal: goal,
-  //       taskDescription: GeminiPrompt.taskDescForFitnessPlan,
-  //       jsonStructure: GeminiPrompt.jsonStructureForFitnessPlan,
-  //     );
-
-  //     final jsonMap = await geminiService.fetchJsonResponse(exercisePrompt);
-  //     fitnessPlan.value = FitnessPlanResponse.fromJson(jsonMap);
-  //   } catch (e) {
-  //     errorMessageForFitnessPlan.value = e.toString();
-  //   } finally {
-  //     isLoading.value = false;
-  //   }
-  // }
-
   Future<void> getFitnessPlan({
     required int age,
     required String gender,
@@ -161,46 +129,46 @@ class DashboardController extends GetxController {
     required int weight,
     required String goal,
   }) async {
-    isLoading.value = false;
-    errorMessageForFitnessPlan.value = '';
-    final Map<String, dynamic> jsonMap = json.decode(
-      GeminiPrompt.recommandedExerciseStaticResponse,
-    );
-    fitnessPlan.value = FitnessPlanResponse.fromJson(jsonMap);
+    try {
+      isLoading.value = true;
+      errorMessageForFitnessPlan.value = '';
+      fitnessPlan.value = null;
+
+      final exercisePrompt = GeminiPrompt.buildFitnessPrompt(
+        age: age,
+        gender: gender,
+        height: height,
+        weight: weight,
+        goal: goal,
+        taskDescription: GeminiPrompt.taskDescForFitnessPlan,
+        jsonStructure: GeminiPrompt.jsonStructureForFitnessPlan,
+      );
+
+      final jsonMap = await geminiService.fetchJsonResponse(exercisePrompt);
+      fitnessPlan.value = FitnessPlanResponse.fromJson(jsonMap);
+    } catch (e) {
+      errorMessageForFitnessPlan.value = e.toString();
+    } finally {
+      isLoading.value = false;
+    }
   }
 
-  // Fitness Tips
-  // Future<void> getFitnessTips({
+  // Future<void> getFitnessPlan({
   //   required int age,
   //   required String gender,
   //   required int height,
   //   required int weight,
   //   required String goal,
   // }) async {
-  //   try {
-  //     isLoadingForTips.value = true;
-  //     errorMessageForFitnessTips.value = '';
-  //     fitnessTipsDataModel.value = null;
-
-  //     final tipsPrompt = GeminiPrompt.buildFitnessPrompt(
-  //       age: age,
-  //       gender: gender,
-  //       height: height,
-  //       weight: weight,
-  //       goal: goal,
-  //       taskDescription: GeminiPrompt.taskDescForFitnessTips,
-  //       jsonStructure: GeminiPrompt.jsonStructureForFitnessTips,
-  //     );
-
-  //     final jsonMap = await geminiService.fetchJsonResponse(tipsPrompt);
-  //     fitnessTipsDataModel.value = FitnessTipsResponse.fromJson(jsonMap);
-  //   } catch (e) {
-  //     errorMessageForFitnessTips.value = e.toString();
-  //   } finally {
-  //     isLoadingForTips.value = false;
-  //   }
+  //   isLoading.value = false;
+  //   errorMessageForFitnessPlan.value = '';
+  //   final Map<String, dynamic> jsonMap = json.decode(
+  //     GeminiPrompt.recommandedExerciseStaticResponse,
+  //   );
+  //   fitnessPlan.value = FitnessPlanResponse.fromJson(jsonMap);
   // }
 
+  // Fitness Tips
   Future<void> getFitnessTips({
     required int age,
     required String gender,
@@ -208,12 +176,43 @@ class DashboardController extends GetxController {
     required int weight,
     required String goal,
   }) async {
-    isLoadingForTips.value = false;
-    errorMessageForFitnessTips.value = '';
-    final Map<String, dynamic> jsonMap = json.decode(
-      GeminiPrompt.fitnessTipsStaticResponse,
-    );
-    print("Tag_jsonMap ${jsonMap.toString()}");
-    fitnessTipsDataModel.value = FitnessTipsResponse.fromJson(jsonMap);
+    try {
+      isLoadingForTips.value = true;
+      errorMessageForFitnessTips.value = '';
+      fitnessTipsDataModel.value = null;
+
+      final tipsPrompt = GeminiPrompt.buildFitnessPrompt(
+        age: age,
+        gender: gender,
+        height: height,
+        weight: weight,
+        goal: goal,
+        taskDescription: GeminiPrompt.taskDescForFitnessTips,
+        jsonStructure: GeminiPrompt.jsonStructureForFitnessTips,
+      );
+
+      final jsonMap = await geminiService.fetchJsonResponse(tipsPrompt);
+      fitnessTipsDataModel.value = FitnessTipsResponse.fromJson(jsonMap);
+    } catch (e) {
+      errorMessageForFitnessTips.value = e.toString();
+    } finally {
+      isLoadingForTips.value = false;
+    }
   }
+
+  // Future<void> getFitnessTips({
+  //   required int age,
+  //   required String gender,
+  //   required int height,
+  //   required int weight,
+  //   required String goal,
+  // }) async {
+  //   isLoadingForTips.value = false;
+  //   errorMessageForFitnessTips.value = '';
+  //   final Map<String, dynamic> jsonMap = json.decode(
+  //     GeminiPrompt.fitnessTipsStaticResponse,
+  //   );
+  //   print("Tag_jsonMap ${jsonMap.toString()}");
+  //   fitnessTipsDataModel.value = FitnessTipsResponse.fromJson(jsonMap);
+  // }
 }

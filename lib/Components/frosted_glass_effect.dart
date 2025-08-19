@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
 /// A widget that creates a frosted glass effect with a gradient background.
@@ -42,15 +44,15 @@ class FrostedGlass extends StatelessWidget {
   Widget build(BuildContext context) {
     return ClipRRect(
       borderRadius: borderRadius,
-      // child: applyFilter
-      //     ? BackdropFilter( // Conditionally applies the blur effect to content behind
-      //         filter: ImageFilter.blur(sigmaX: blurSigmaX, sigmaY: blurSigmaY), // Use customizable blur intensity
-      //         child: buildGlassContainer(),
-      //       )
-      //     : buildGlassContainer(), // If no filter, just build the container
+      child: applyFilter
+          ? BackdropFilter( // Conditionally applies the blur effect to content behind
+              filter: ImageFilter.blur(sigmaX: blurSigmaX, sigmaY: blurSigmaY), // Use customizable blur intensity
+              child: buildGlassContainer(),
+            )
+          : buildGlassContainer(), // If no filter, just build the container
 
           // For Emulator only
-         child: buildGlassContainer(), // If no filter, just build the container
+        //  child: buildGlassContainer(), // If no filter, just build the container
     );
   }
 
