@@ -1,3 +1,4 @@
+
 class PageName {
   static const onboard = "/onboard";
   static const login = "/login";
@@ -6,4 +7,6 @@ class PageName {
   static const exerciseList = "/exercise_list_screen";
   static const detection = "/detection";
   static const profile = "/profile";
+  static const bmiCalcScreen = "/bmi_calc_screen";
+   static const dashboard = "/dashboard";
 }

@@ -40,12 +40,18 @@ The application guides users through a clear and intuitive flow, starting with a
 * **Login Screen:** Users can securely log in to their accounts.
 * **Registration Screen:** New users can easily create an account.
 
-### **After Login (Home Screen)**
+### **After Login (Dashboard)**
 
 Upon successful login, users are directed to the **Home Screen**, which features:
 
 * **AI Chatbot for User Information:** An integrated chatbot immediately engages the user to gather necessary information, personalize their experience, or answer fitness-related queries.
 * **Navigation Drawer:** A prominent navigation drawer provides easy access to key sections of the application:
+    * **Dashboard:** Provides a comprehensive overview of the user’s goals, BMI, and overall health status, along with personalized exercise recommendations and actionable fitness tips.
+        * **Burned Calories Status**
+        * **BMI and Health Status**
+        * **Recommanded Exercise**
+        * **Fitness Tips**
+
     * **Exercise List Screen:** Displays the complete list of exercises for users to explore.
     * **Profile Screen:** Allows users to view and edit their personal profile information.
     * **Logout Option:** Provides a secure way for users to end their session.
@@ -63,6 +69,7 @@ Upon successful login, users are directed to the **Home Screen**, which features
 * **Dio:** A powerful HTTP client for Dart, used for making API calls.
 * **Shared Preferences:** For lightweight local data storage of user preferences and session data.
 * **Permission Handler:** To manage and request necessary permissions, such as camera access.
+* **Marquee:** To display the multi-line fitness tips in marquee effect.
 
 ---
 
@@ -122,5 +129,100 @@ The application is built following the **MVVM (Model-View-ViewModel)** architect
 <img width="150" height="400" alt="7_logout" src="https://github.com/user-attachments/assets/685169a8-0f05-4319-aa8f-32a281c10341" />
 
 ---
+
+# 🏋️ MET Values & Calories Burned from Exercise
+
+## 💡 What is 1 MET?
+
+**1 MET** = Energy you burn at rest  
+(~1 kcal/kg/hour)
+
+So, **METs indicate how intense an activity is compared to resting**. Higher MET = higher energy expenditure.
+
+---
+
+## 📊 MET VALUES OF EXERCISE
+
+| Exercise                | MET Value | Source/Comment                                      |
+|------------------------|-----------|-----------------------------------------------------|
+| Push-ups               | 8.0       | High intensity strength activity                    |
+| Squats                 | 5.0       | Moderate strength training                          |
+| Jumping Jacks          | 8.0       | Comparable to calisthenics or vigorous aerobic      |
+| Plank to Downward Dog  | 4.0       | Light to moderate intensity (similar to yoga)       |
+| Overhead Arm Claps     | 6.0       | Moderate cardio/calisthenics                        |
+
+---
+
+## ✅ To Calculate Calories Burned, You Only Need:
+
+- **Weight** (in kg)  
+- **Exercise Duration** (in minutes)  
+- **Predefined MET Value**
+
+---
+
+## 🧮 Formula:
+
+```
+Calories Burned = MET × Weight (kg) × (Duration_minutes / 60) [Simple formula]
+Calories Burned = (MET × 3.5 × weightKg / 200) × durationMinutes [Scientific forumula]
+```
+
+---
+
+## 📌 Example:
+
+**Exercise:** Push-ups  
+**MET:** 8.0  
+**Weight:** 60 kg  
+**Duration:** 20 minutes
+
+```
+Calories Burned [Simple] = 8.0 × 60 × (20 / 60)
+                = ~160 kcal
+```
+or
+
+```
+Calories Burned [Scientific] = (8.0 × 3.5 × 60/200)*20
+                = ~168 kcal
+```
+
+---
+
+## ⚠️ Note:
+
+Actual calorie burn also depends on:
+- Weight
+- Duration
+- Intensity
+- Form
+
+These values provide an **estimate** useful for fitness tracking and goal planning.
+
+
+# BMI Gauge
+
+This component uses the `SfRadialGauge` from the Syncfusion Flutter Gauges package to visually display Body Mass Index (BMI) ranges with a color-coded scale and a needle pointer.
+
+---
+
+## Gauge Configuration
+
+**Axis Scale**
+- **Minimum:** `0`
+- **Maximum:** `40`
+- Units represent **BMI values**.
+
+---
+
+## BMI Range
+
+| Range Name    | Start Value | End Value | Meaning                               | Color          |
+|---------------|------------ |---------- |---------------------------------------|----------------|
+| Underweight   | 0           | 18.5      | BMI below 18.5                        | `Blue`         |
+| Normal        | 18.5        | 24.9      | BMI between 18.5 and 24.9             | `Green`        |
+| Overweight    | 25          | 29.9      | BMI between 25 and 29.9               | `Yellow`       |
+| Obese         | 30          | 40        | BMI 30 and above                      | `Red`          |
 
 

@@ -29,7 +29,7 @@ class ExerciseListItem extends StatelessWidget {
         }
       },
       child: FrostedGlass(
-        borderRadius: BorderRadius.all(Radius.circular(20)),
+        borderRadius: BorderRadius.all(Radius.circular(10)),
         applyFilter: false,
         gradientColors: [Colors.black.withValues(alpha: 0.2),Colors.black.withValues(alpha: 0.2)],
         child: Row(

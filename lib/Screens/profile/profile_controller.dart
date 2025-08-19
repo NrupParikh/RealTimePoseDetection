@@ -20,6 +20,7 @@ class ProfileController extends GetxController {
   final weightController = TextEditingController();
   final genderController = TextEditingController();
   final goalController = TextEditingController();
+  final goalDurationController = TextEditingController();
 
   final focusNodeName = FocusNode();
   final focusNodeAge = FocusNode();
@@ -27,6 +28,7 @@ class ProfileController extends GetxController {
   final focusNodeWeight = FocusNode();
   final focusNodeGender = FocusNode();
   final focusNodeGoal = FocusNode();
+  final focusNodeGoalDuration = FocusNode();
 
   RxBool isEdit = true.obs;
   final RxBool isLoading = false.obs;
@@ -38,6 +40,7 @@ class ProfileController extends GetxController {
   String initialWeight = '';
   String initialGender = '';
   String initialGoal = '';
+  String initialGoalDuration = '';
 
   @override
   void onInit() async {
@@ -52,6 +55,7 @@ class ProfileController extends GetxController {
           weightController.text = profileData.weight.toString();
           genderController.text = profileData.gender.toString();
           goalController.text = profileData.goal.toString();
+          goalDurationController.text = profileData.goalDuration.toString();
 
           // Store initial values
           initialName = profileData.name.toString();
@@ -60,6 +64,7 @@ class ProfileController extends GetxController {
           initialWeight = profileData.weight.toString();
           initialGender = profileData.gender.toString();
           initialGoal = profileData.goal.toString();
+          initialGoalDuration = profileData.goalDuration.toString();
         }
       } else if (result.item3 == 401) {
         if (Get.context != null && !Get.isDialogOpen!) {
@@ -91,6 +96,7 @@ class ProfileController extends GetxController {
     final weight = double.tryParse(weightController.text);
     final gender = genderController.text.toLowerCase();
     final goal = goalController.text;
+    final duration = int.tryParse(goalDurationController.text);
     final userId = secureStorage.getUserData()?.id ?? 0;
 
     // Check if any value has changed
@@ -99,7 +105,8 @@ class ProfileController extends GetxController {
         height.toString() == initialHeight &&
         weight.toString() == initialWeight &&
         gender == initialGender &&
-        goal == initialGoal) {
+        goal == initialGoal &&
+        duration.toString() == initialGoalDuration) {
       isEdit.value = true;
       return Tuple3(
         false,
@@ -120,6 +127,10 @@ class ProfileController extends GetxController {
       return Tuple3(false, AppStrings.valEnterValidGender, 0);
     } else if (GetUtils.isNullOrBlank(goal) == true) {
       return Tuple3(false, AppStrings.valEnterGoal, 0);
+    } else if (GetUtils.isNullOrBlank(duration) == true) {
+      return Tuple3(false, AppStrings.valEnterGoalDuration, 0);
+    } else if (duration == null || duration < 1 || duration > 52) {
+      return Tuple3(false, AppStrings.valEnterValidGoalDuration, 0);
     } else {
       try {
         isEdit.value = true;
@@ -132,6 +143,7 @@ class ProfileController extends GetxController {
           weight: weight,
           gender: gender,
           goal: goal,
+          goalDuration: duration,
         );
         if (appResponse.statusCode == 200) {
           isLoading.value = false;
@@ -149,6 +161,7 @@ class ProfileController extends GetxController {
               initialWeight = weight.toString();
               initialGender = gender;
               initialGoal = goal;
+              initialGoalDuration = duration.toString();
               return Tuple3(
                 true,
                 appResponse.message.toString(),
@@ -250,6 +263,7 @@ class ProfileController extends GetxController {
     weightController.dispose();
     genderController.dispose();
     goalController.dispose();
+    goalDurationController.dispose();
 
     focusNodeName.dispose();
     focusNodeAge.dispose();
@@ -257,6 +271,7 @@ class ProfileController extends GetxController {
     focusNodeWeight.dispose();
     focusNodeGender.dispose();
     focusNodeGoal.dispose();
+    focusNodeGoalDuration.dispose();
     super.onClose();
   }
 }

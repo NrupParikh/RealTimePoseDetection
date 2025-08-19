@@ -80,7 +80,7 @@ class SecureStorageSingleton {
     final String? userDataJson = _prefs.getString(AppKey.keyUserObject);
     if (userDataJson == null) {
       if (kDebugMode) {
-        print('No LoginData found in SharedPreferences.');
+        print('No UserData found in SharedPreferences.');
       }
       return null;
     }
@@ -111,7 +111,7 @@ class SecureStorageSingleton {
     final String? profileDataJson = _prefs.getString(AppKey.keyProfileObject);
     if (profileDataJson == null) {
       if (kDebugMode) {
-        print('No LoginData found in SharedPreferences.');
+        print('No ProfileData found in SharedPreferences.');
       }
       return null;
     }

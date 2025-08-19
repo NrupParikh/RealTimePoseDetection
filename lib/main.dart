@@ -5,6 +5,10 @@ import 'package:get/get.dart';
 import 'package:pose_detection/Components/default_firebase_options.dart';
 import 'package:pose_detection/Components/session_expire_controller.dart';
 import 'package:pose_detection/Models/excercise_data_model.dart';
+import 'package:pose_detection/Screens/bmi_calc/bmi_calc_binding.dart';
+import 'package:pose_detection/Screens/bmi_calc/bmi_calc_screen.dart';
+import 'package:pose_detection/Screens/dashboard/dashboard_binding.dart';
+import 'package:pose_detection/Screens/dashboard/dashboard_screen.dart';
 import 'package:pose_detection/Screens/detection/detection_controller.dart';
 import 'package:pose_detection/Screens/detection/detection_screen.dart';
 import 'package:pose_detection/Screens/exerciseList/navigationDrawer/nav_drawer_binding.dart';
@@ -49,7 +53,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  
     return GetMaterialApp(
       title: 'Pose Detection',
       debugShowCheckedModeBanner: false,
@@ -59,7 +62,7 @@ class MyApp extends StatelessWidget {
           //     : PageName.onboard,
           isLoggedIn
               ? userData?.isProfileDataAvailable == true
-                  ? PageName.exerciseList
+                  ? PageName.dashboard
                   : PageName.chat
               : PageName.onboard,
       getPages: [
@@ -106,8 +109,21 @@ class MyApp extends StatelessWidget {
           transition: Transition.noTransition,
           transitionDuration: Duration.zero,
         ),
+        GetPage(
+          name: PageName.bmiCalcScreen,
+          page: () => BMICalcScreen(),
+          bindings: [NavDrawerBinding(), BmiCalcBinding()],
+          transition: Transition.noTransition,
+          transitionDuration: Duration.zero,
+        ),
+           GetPage(
+          name: PageName.dashboard,
+          page: () => DashboardScreen(),
+          bindings: [NavDrawerBinding(), DashboardBinding()],
+          transition: Transition.noTransition,
+          transitionDuration: Duration.zero,
+        ),
       ],
     );
   }
-
 }

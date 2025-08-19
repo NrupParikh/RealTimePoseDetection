@@ -6,9 +6,9 @@ import 'package:pose_detection/Models/excercise_data_model.dart';
 
 final List<ExcerciseDataModel> exerciseList = [
   ExcerciseDataModel(
-    title: 'Push-Up',
+    title: AppStrings.pushup,
     type: ExcerciseType.pushup,
-    gifPath: 'assets/myGif/pushup.gif',
+    gifPath: AppStrings.pushUpGif,
     description:
         'A bodyweight exercise performed in a prone position by lowering and raising the body using the arms, targeting the chest, shoulders, and triceps.',
     poseTip:
@@ -18,9 +18,9 @@ final List<ExcerciseDataModel> exerciseList = [
         "- Builds upper body strength (chest, shoulders, triceps).\n- Engages core for stability.\n -Requires no equipment and can be done anywhere.",
   ),
   ExcerciseDataModel(
-    title: 'Squat',
+    title: AppStrings.squat,
     type: ExcerciseType.squat,
-    gifPath: 'assets/myGif/squat.gif',
+    gifPath: AppStrings.squatGif,
     description:
         'A lower-body exercise where the hips are lowered from a standing position and then raised back up, engaging the thighs, hips, and glutes.',
     poseTip:
@@ -30,9 +30,9 @@ final List<ExcerciseDataModel> exerciseList = [
         "- Strengthens legs, glutes, and hips.\n- Improves balance and mobility.\n - Boosts calorie burn and functional movement.",
   ),
   ExcerciseDataModel(
-    title: 'Jumping Jack',
+    title: AppStrings.jumpingJack,
     type: ExcerciseType.jumpingJack,
-    gifPath: 'assets/myGif/jumping_jack.gif',
+    gifPath: AppStrings.jumpingJackGif,
     description:
         'A full-body aerobic movement involving jumping to a position with legs spread wide and hands overhead, then returning to the starting position. ',
     poseTip:
@@ -42,9 +42,9 @@ final List<ExcerciseDataModel> exerciseList = [
         "- Increases heart rate for cardio fitness.\n- Works the entire body with dynamic movement.\n -Great warm-up or fat-burning exercise.",
   ),
   ExcerciseDataModel(
-    title: 'Plank to Downward Dog',
+    title: AppStrings.plankToDownwardDog,
     type: ExcerciseType.plankToDownwardDog,
-    gifPath: 'assets/myGif/plank_to_downward_dog.gif',
+    gifPath: AppStrings.plankToDownwardDogGif,
     description:
         'A dynamic movement starting in a plank position, then pushing the hips up and back into a Downward Dog yoga pose, stretching the hamstrings and shoulders while building core strength.',
     poseTip:
@@ -54,9 +54,9 @@ final List<ExcerciseDataModel> exerciseList = [
         "- Strengthens core, shoulders, and arms.\n- Improves flexibility in hamstrings and calves.\n - Enhances posture and body awareness.",
   ),
   ExcerciseDataModel(
-    title: 'Over Head Arm Clap',
+    title: AppStrings.overHeadArmClap,
     type: ExcerciseType.overHeadArmClap,
-    gifPath: 'assets/myGif/overhead_clap.gif',
+    gifPath: AppStrings.overHeadArmClapGif,
     description:
         'An upper-body movement where the arms are raised and clapped overhead repeatedly, often performed while standing or as part of cardio routines to engage the shoulders and upper back.',
     poseTip:
@@ -66,6 +66,7 @@ final List<ExcerciseDataModel> exerciseList = [
         "- Activates shoulders and upper back.\n- Promotes shoulder mobility and circulation.\n- Easy to perform in warm-ups or light cardio.",
   ),
 ];
+
 //  ======= AlertDialog Extension =======
 extension AlertDialogExtensions on BuildContext {
   void showAlertDialog({
@@ -107,5 +108,5 @@ extension AlertDialogExtensions on BuildContext {
         );
       },
     );
-  }  
+  } 
 }

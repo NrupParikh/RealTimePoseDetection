@@ -39,7 +39,7 @@ class NavDrawerController extends GetxController {
     FancyAlertDialog.showFancyAlertDialog(
       context: Get.overlayContext ?? Get.context!,
       title: AppStrings.appName,
-      message: "Are you sure you want to logout ?",
+      message: AppStrings.logoutConfirmation,
       onOkPressed: () async {
         Get.back();
         Get.dialog(
@@ -66,7 +66,7 @@ class NavDrawerController extends GetxController {
           // Handle logout failure, e.g., show a snackbar or another dialog
           Get.snackbar(
             AppStrings.appName,
-            "Logout Failed, Please try again.",
+            AppStrings.logoutMsg,
             snackPosition: SnackPosition.BOTTOM,
             backgroundColor: Colors.red,
             colorText: Colors.white,

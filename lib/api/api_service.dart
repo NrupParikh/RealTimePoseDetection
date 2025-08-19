@@ -59,7 +59,8 @@ class ApiService {
     required double height,
     required double weight,
     required String gender,
-    required String goal,
+    required String goal,    
+    required int goalDuration
   }) async {
     Map<String, dynamic> data = {
       'name': name,
@@ -68,6 +69,7 @@ class ApiService {
       'weight': weight,
       'gender': gender,
       'goal': goal,
+      'goal_duration':goalDuration
     };
 
     try {

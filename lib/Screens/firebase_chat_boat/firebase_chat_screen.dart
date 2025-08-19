@@ -21,7 +21,7 @@ class _FirebaseChatScreenState extends State<FirebaseChatScreen> {
     super.initState();
     ever(chatController.isUserDataSaved, (bool saved) {
       if (saved == true) {
-        navigateToExerciseScreen();
+        navigateToDashboard();
       }
     });
   }
@@ -210,7 +210,7 @@ class _FirebaseChatScreenState extends State<FirebaseChatScreen> {
                       Text(
                         chatController.isLoading.value
                             ? "Saving data ..."
-                            : "Navigating to exercise list...",
+                            : "Navigating to Dashboard",
                         style: TextStyle(color: Colors.white),
                       ),
                     ],
@@ -225,10 +225,10 @@ class _FirebaseChatScreenState extends State<FirebaseChatScreen> {
     );
   }
 
-  void navigateToExerciseScreen() {
+  void navigateToDashboard() {
     FocusScope.of(context).unfocus();
     Future.delayed(const Duration(seconds: 3), () {
-      Get.offAllNamed(PageName.exerciseList);
+      Get.offAllNamed(PageName.dashboard);
     });
   }
 }

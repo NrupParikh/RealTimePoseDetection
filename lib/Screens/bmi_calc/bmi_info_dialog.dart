@@ -4,12 +4,9 @@ import 'package:pose_detection/Components/button_widget.dart';
 import 'package:pose_detection/Components/frosted_glass_effect.dart';
 import 'package:pose_detection/Constants/app_colors.dart';
 import 'package:pose_detection/Constants/app_string.dart';
-import 'package:pose_detection/Models/excercise_data_model.dart';
 
-class ExerciseInfoDialog extends StatelessWidget {
-  final ExcerciseDataModel dataModel;
-
-  const ExerciseInfoDialog({super.key, required this.dataModel});
+class BMIInfoDialog extends StatelessWidget {
+  const BMIInfoDialog({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +26,7 @@ class ExerciseInfoDialog extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                dataModel.title,
+                AppStrings.aboutBmi,
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -38,26 +35,13 @@ class ExerciseInfoDialog extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 16),
-
               // Scrollable content
               Flexible(
                 child: SingleChildScrollView(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Align(
-                        alignment: Alignment.topCenter,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(12),
-                          child: Image.asset(
-                            dataModel.startPosition,
-                            fit: BoxFit.scaleDown,
-                            height: 200,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
+                      const Text(
                         AppStrings.description,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -66,12 +50,12 @@ class ExerciseInfoDialog extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        dataModel.description,
+                        AppStrings.bmiDescription,
                         style: TextStyle(fontSize: 14, color: Colors.white),
                       ),
                       const SizedBox(height: 12),
                       const Text(
-                        AppStrings.poseTips,
+                        AppStrings.bmiHowToCalculate,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -79,12 +63,12 @@ class ExerciseInfoDialog extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        dataModel.poseTip,
+                        AppStrings.bmiHowToCalculateDesc,
                         style: TextStyle(fontSize: 14, color: Colors.white),
                       ),
                       const SizedBox(height: 12),
                       const Text(
-                        AppStrings.advantages,
+                        AppStrings.bmiCategories,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -92,7 +76,7 @@ class ExerciseInfoDialog extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        dataModel.advantage,
+                        AppStrings.bmiCategoriesDesc,
                         style: TextStyle(fontSize: 14, color: Colors.white),
                       ),
                     ],
@@ -122,15 +106,12 @@ class ExerciseInfoDialog extends StatelessWidget {
     );
   }
 
-  static void showExerciseInfo(
-    BuildContext mCtx,
-    ExcerciseDataModel dataModel,
-  ) {
+  static void showBMIinfo(BuildContext mCtx) {
     showDialog(
       context: mCtx,
       barrierDismissible: false,
       builder: (context) {
-        return ExerciseInfoDialog(dataModel: dataModel);
+        return BMIInfoDialog();
       },
     );
   }

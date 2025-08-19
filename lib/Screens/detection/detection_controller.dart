@@ -6,6 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 import 'package:pose_detection/Models/excercise_data_model.dart';
+import 'package:pose_detection/Screens/dashboard/dashboard_controller.dart';
 import 'package:pose_detection/Utility/exercise_detectors.dart';
 
 import 'package:pose_detection/main.dart';
@@ -43,17 +44,39 @@ class DetectionController extends GetxController {
   RxInt squatCount = 0.obs;
   bool isSquatting = false;
 
+  final userProfileData = secureStorage.getProfileData();
+  DateTime? exerciseStartTime;
+  DateTime? exerciseEndTime;
+
   // DateTime? lastRepTime;
   // bool warningShown = false;
   // Timer? inactivityTimer;
   // RxString warningMessage = ''.obs;
 
+  RxString goalForExercies = ''.obs;
+
   @override
   void onInit() {
     super.onInit();
-    debugPrint('TAG_DetectionController initialized for: ${dataModel.title}');
+    debugPrint(
+      'TAG_DetectionController initialized for: ${dataModel.type.name}',
+    );
     startCountdown();
     // startInactivityWatcher();
+    print("Tag_current_type ${dataModel.type.name.toString()}");
+    // showGoalForExercise();
+  }
+
+  void showGoalForExercise() {
+    final controller = Get.find<DashboardController>();
+    final fitnessPlan = controller.fitnessPlan.value;
+    final workoutPlan = fitnessPlan?.workoutPlan;
+    final item = workoutPlan?.firstWhere(
+      (element) =>
+          element.exerciseName.toString().toLowerCase() ==
+          dataModel.type.name.toLowerCase(),
+    );
+    goalForExercies.value = item?.value.toString() ?? '';
   }
 
   // void markExerciseStarted() {
@@ -152,6 +175,7 @@ class DetectionController extends GetxController {
             ExerciseDetectors.detectPushUp(
               landmarks: landmarks,
               onPushUpCount: () {
+                markExerciseStartedOnce();
                 pushCount.value++;
                 debugPrint('TAG_Push-up count: ${pushCount.value}');
               },
@@ -164,6 +188,7 @@ class DetectionController extends GetxController {
             ExerciseDetectors.detectSquat(
               landmarks: landmarks,
               onSquatCount: () {
+                markExerciseStartedOnce();
                 squatCount.value++;
                 debugPrint('TAG_Squat count: ${squatCount.value}');
               },
@@ -176,6 +201,7 @@ class DetectionController extends GetxController {
             ExerciseDetectors.detectJumpingJack(
               landmarks: landmarks,
               onJumpingJackCount: () {
+                markExerciseStartedOnce();
                 jumpingJackCount.value++;
                 debugPrint('TAG_Jumping Jack count: ${jumpingJackCount.value}');
               },
@@ -188,6 +214,7 @@ class DetectionController extends GetxController {
             ExerciseDetectors.detectPlankToDownwardDog(
               landmarks: landmarks,
               onTransitionCount: () {
+                markExerciseStartedOnce();
                 plankToDownwardDogCount.value++;
                 debugPrint(
                   '>> Plank to Downward Dog count: ${plankToDownwardDogCount.value}',
@@ -205,6 +232,7 @@ class DetectionController extends GetxController {
             ExerciseDetectors.detectOverheadClaps(
               landmarks: landmarks,
               onClapCount: () {
+                markExerciseStartedOnce();
                 clapCount.value++;
                 debugPrint('TAG_Arm Clap count: ${clapCount.value}');
               },
@@ -317,4 +345,80 @@ class DetectionController extends GetxController {
     debugPrint('TAG_DetectionController disposed');
     super.onClose();
   }
+
+  void getBurnCaloriesAndGoBack() {
+    final profileData = secureStorage.getProfileData();    
+    exerciseEndTime = DateTime.now();
+
+    if (exerciseStartTime != null && exerciseEndTime != null) {
+      final duration = exerciseEndTime!.difference(exerciseStartTime!);
+      final durationMinutes = duration.inSeconds / 60.0;
+
+      final burnedCalories = calculateCaloriesBurned(
+        met: getMetValue(dataModel.type),
+        weightKg: profileData?.weight??60, // Temp set 60 kg
+        durationMinutes: durationMinutes,
+      );
+
+      final results = {
+        'exType': dataModel.type.name,
+        'poseCount': getCount(),
+        'caloriesBurned': burnedCalories,
+        'duration': durationMinutes,
+        'startTime': exerciseStartTime,
+        'endTime': exerciseEndTime,
+      };
+
+      Get.back(result: results);
+    } else {
+      Get.back();
+    }
+  }
+
+  // =================== CALCULATING BURN CALORIES
+
+  void markExerciseStartedOnce() {
+    if (exerciseStartTime == null) {
+      exerciseStartTime = DateTime.now();
+      debugPrint('TAG_Exercise started at: $exerciseStartTime');
+    }
+  }
+
+  // Return MET value of exercise
+  double getMetValue(ExcerciseType exercise) {
+    switch (exercise) {
+      case ExcerciseType.pushup:
+        return 8.0;
+      case ExcerciseType.squat:
+        return 5.0;
+      case ExcerciseType.jumpingJack:
+        return 8.0;
+      case ExcerciseType.plankToDownwardDog:
+        return 4.0;
+      case ExcerciseType.overHeadArmClap:
+        return 6.0;
+    }
+  }
+
+  // Calculate Burn Calories
+  double calculateCaloriesBurned({
+    required double met,
+    required double weightKg,
+    required double durationMinutes,
+  }) {
+    final burnedCalories = (met * 3.5 * weightKg / 200) * durationMinutes;
+    print("""
+    ExName ${dataModel.type.name.toString()}   
+    PoseCount ${getCount()} 
+    Met ${met}
+    Weight ${weightKg}
+    StartTime ${exerciseStartTime}
+    EndTime ${exerciseEndTime}
+    Duration ${durationMinutes}
+    BurnedCal ~ ${burnedCalories}
+    """);
+    return burnedCalories;
+  }
+
+  // ========================
 }

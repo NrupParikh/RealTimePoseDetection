@@ -3,6 +3,7 @@ import 'package:flutter/material.dart'; // For TextEditingController, ScrollCont
 import 'package:get/get.dart';
 import 'package:pose_detection/Components/session_expire_controller.dart';
 import 'package:pose_detection/Constants/app_string.dart';
+import 'package:pose_detection/Constants/gemini_prompt.dart';
 import 'package:pose_detection/Singleton/api_service_singleton.dart';
 import 'package:pose_detection/api/apiModels/profile_response.dart';
 import 'package:pose_detection/api/api_service.dart';
@@ -22,19 +23,22 @@ class ChatControllerNew extends GetxController {
   RxnDouble userWeight = RxnDouble(null);
   RxString userGender = ''.obs;
   RxString userGoal = ''.obs;
+  RxInt goalDuration = 0.obs; // NEW
 
   RxInt questionIndex = 0.obs; // Tracks the current question
   RxBool isUserDataSaved = false.obs;
 
   // Preset questions (no remote config)
-  final RxList<String> questions = <String>[  
-    "What's your name?",
-    "How old are you?",
-    "What's your height in cm?",
-    "What's your weight in kg?",
-    "What's your gender? (Male/Female/Other)",
-    "What's your fitness goal?",
-  ].obs;
+  final RxList<String> questions =
+      <String>[
+        "What's your name?",
+        "How old are you?",
+        "What's your height in cm?",
+        "What's your weight in kg?",
+        "What's your gender? (Male/Female/Other)",
+        "What's your fitness goal?",
+        "In how many weeks do you want to achieve your goal?", // NEW
+      ].obs;
 
   // Firebase / API service instances
   late GenerativeModel _geminiModel;
@@ -132,20 +136,16 @@ class ChatControllerNew extends GetxController {
       case 5:
         currentField = 'goal';
         break;
+      case 6:
+        currentField = 'duration'; // NEW
+        break;  
     }
 
     try {
-      final prompt = """
-      Extract the user's '$currentField' from the following input.
-      If the '$currentField' is numerical (like age, height, weight), extract only the number.
-      If the '$currentField' is gender, prefer 'Male', 'Female', or 'Other'.
-      If the '$currentField' is name or goal, extract the most relevant text.
-      If the information is not present or unclear, or if the input is irrelevant to the question, respond with "N/A".
-
-      User Input: "$response"
-
-      Output the extracted value as plain text.
-      """;
+      final prompt = GeminiPrompt.getExtractionPrompt(
+        currentField: currentField,
+        response: response,
+      );
 
       final content = [Content.text(prompt)];
       final generativeResponse = await _geminiModel.generateContent(content);
@@ -184,7 +184,7 @@ class ChatControllerNew extends GetxController {
             final weight = double.tryParse(extractedValue);
             if (weight == null || weight <= 20 || weight > 200) {
               // Ideally use valEnterValidWeight if exists; fallback to height string if not.
-              _addBotMessage(AppStrings.valEnterValidHeight);
+              _addBotMessage(AppStrings.valEnterValidWeight);
               proceedToNextQuestion = false;
             } else {
               userWeight.value = weight;
@@ -205,6 +205,17 @@ class ChatControllerNew extends GetxController {
           case 5: // Goal
             userGoal.value = extractedValue;
             break;
+          case 6: // Duration (weeks only)
+            final parts = extractedValue.split(" ");
+            final numWeeks = int.tryParse(parts.first) ?? 0;
+
+            if (numWeeks < 1 || numWeeks > 52) {
+              _addBotMessage(AppStrings.valEnterValidGoalDuration);
+              proceedToNextQuestion = false;
+            } else {
+              goalDuration.value = numWeeks;
+            }
+            break;
         }
       }
     } catch (e) {
@@ -221,14 +232,15 @@ class ChatControllerNew extends GetxController {
   }
 
   void _showSummary() async {
-    String summary =
-        "Thanks for registering, ${userName.value.isNotEmpty ? userName.value : 'there'}! Here's what we got:\n\n"
-        "Name: ${userName.value.isNotEmpty ? userName.value : 'N/A'}\n"
-        "Age: ${userAge.value?.toString() ?? 'N/A'}\n"
-        "Height: ${userHeight.value?.toStringAsFixed(1) ?? 'N/A'} cm\n"
-        "Weight: ${userWeight.value?.toStringAsFixed(1) ?? 'N/A'} kg\n"
-        "Gender: ${userGender.value.isNotEmpty ? userGender.value : 'N/A'}\n"
-        "Goal: ${userGoal.value.isNotEmpty ? userGoal.value : 'N/A'}";
+    final summary = GeminiPrompt.formatSummary(
+      userName: userName.value,
+      userAge: userAge.value,
+      userHeight: userHeight.value,
+      userWeight: userWeight.value,
+      userGender: userGender.value,
+      userGoal: userGoal.value,
+      goalDuration: goalDuration.value, // NEW
+    );
     _addBotMessage(summary);
 
     final result = await updateUserProfile();
@@ -260,6 +272,7 @@ class ChatControllerNew extends GetxController {
     final gender = userGender.value;
     final goal = userGoal.value;
     final userId = secureStorage.getUserData()?.id;
+    final duration = goalDuration.value;
 
     try {
       isLoading.value = true;
@@ -271,6 +284,7 @@ class ChatControllerNew extends GetxController {
         weight: weight ?? 0.0,
         gender: gender,
         goal: goal,
+        goalDuration: duration      
       );
       if (appResponse.statusCode == 200) {
         isLoading.value = false;
