@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pose_detection/Components/frosted_glass_effect.dart';
 import 'package:pose_detection/Constants/app_colors.dart';
+import 'package:pose_detection/Constants/app_string.dart';
 import 'package:pose_detection/Screens/bmi_calc/bmi_calc_controller.dart';
+import 'package:pose_detection/Screens/bmi_calc/common_slider.dart';
 import 'package:pose_detection/Screens/exerciseList/navigationDrawer/my_navigation_drawer.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
@@ -14,11 +16,20 @@ class BMICalcScreen extends StatefulWidget {
 class _BMICalcScreenState extends State<BMICalcScreen> {
   final controller = Get.find<BMICalcController>();
 
+  static const GaugeTextStyle rangeLabelStyle = GaugeTextStyle(
+    fontSize: 12,
+    color: Colors.white,
+  );
+  static double widthValue = 30;
+
+  static const labelTextStyle = TextStyle(
+    color: Colors.white,
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+  );
+
   @override
   Widget build(BuildContext context) {
-    const double labelWidth = 70.0;
-    const double valueWidth = 80.0;
-
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -62,213 +73,53 @@ class _BMICalcScreenState extends State<BMICalcScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            // Age Slider
-                            Obx(
-                              () => Row(
-                                children: [
-                                  SizedBox(
-                                    width: labelWidth,
-                                    child: const Text(
-                                      "Age",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Expanded(
-                                    child: SliderTheme(
-                                      data: SliderTheme.of(context).copyWith(
-                                        valueIndicatorTextStyle:
-                                            const TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                      ),
-                                      child: Slider(
-                                        value: controller.age.value.toDouble(),
-                                        min: 0,
-                                        max: 100,
-                                        divisions: 100,
-                                        label:
-                                            controller.age.value.toString() +
-                                            " years",
-                                        activeColor: Colors.yellow,
-                                        inactiveColor: Colors.white,
-                                        onChanged: (double newValue) {
-                                          controller.age.value =
-                                              newValue.round();
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 5),
-                                  SizedBox(
-                                    width: valueWidth,
-                                    child: Text(
-                                      "${controller.age.value} years",
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                            FrostedGlass(
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(5),
                               ),
-                            ),
-                            const SizedBox(height: 20),
-                            // Height Slider
-                            Obx(
-                              () => Row(
-                                children: [
-                                  SizedBox(
-                                    width: labelWidth,
-                                    child: const Text(
-                                      "Height",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                              applyFilter: true,
+                              gradientColors: [
+                                Colors.black.withValues(alpha: 0.6),
+                                Colors.black.withValues(alpha: 0.6),
+                              ],
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Column(
+                                  children: [
+                                    CommonSlider(
+                                      label: "Age",
+                                      min: 0,
+                                      max: 100,
+                                      divisions: 100,
+                                      unit: "years",
+                                      value: controller.age,
                                     ),
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Expanded(
-                                    child: SliderTheme(
-                                      data: SliderTheme.of(context).copyWith(
-                                        valueIndicatorTextStyle:
-                                            const TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                      ),
-                                      child: Slider(
-                                        value:
-                                            controller.height.value.toDouble(),
-                                        min:
-                                            100, // Minimum realistic height in cm
-                                        max:
-                                            220, // Maximum realistic height in cm
-                                        divisions: 120, // (220-100) divisions
-                                        label:
-                                            controller.height.value.toString() +
-                                            " cm",
-                                        activeColor: Colors.yellow,
-                                        inactiveColor: Colors.white,
-                                        onChanged: (double newValue) {
-                                          controller.height.value =
-                                              newValue.round();
-                                        },
-                                      ),
+                                    CommonSlider(
+                                      label: "Height",
+                                      min: 100,
+                                      max: 220,
+                                      divisions: 120,
+                                      unit: "cm",
+                                      value: controller.height,
                                     ),
-                                  ),
-                                  const SizedBox(width: 5),
-                                  SizedBox(
-                                    width: valueWidth,
-                                    child: Text(
-                                      "${controller.height.value} cm",
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
+                                    CommonSlider(
+                                      label: "Weight",
+                                      min: 30,
+                                      max: 150,
+                                      divisions: 120,
+                                      unit: "kg",
+                                      value: controller.weight,
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            // Weight Slider
-                            Obx(
-                              () => Row(
-                                children: [
-                                  SizedBox(
-                                    width: labelWidth,
-                                    child: const Text(
-                                      "Weight",
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 5),
-                                  Expanded(
-                                    child: SliderTheme(
-                                      data: SliderTheme.of(context).copyWith(
-                                        valueIndicatorTextStyle:
-                                            const TextStyle(
-                                              color: Colors.black,
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                      ),
-                                      child: Slider(
-                                        value:
-                                            controller.weight.value.toDouble(),
-                                        min:
-                                            30, // Minimum realistic weight in kg
-                                        max:
-                                            150, // Maximum realistic weight in kg
-                                        divisions: 120, // (150-30) divisions
-                                        label:
-                                            controller.weight.value.toString() +
-                                            " kg",
-                                        activeColor: Colors.yellow,
-                                        inactiveColor: Colors.white,
-                                        onChanged: (double newValue) {
-                                          controller.weight.value =
-                                              newValue.round();
-                                        },
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 5),
-                                  SizedBox(
-                                    width: valueWidth,
-                                    child: Text(
-                                      "${controller.weight.value} kg",
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(height: 20),
-                            Obx(
-                              () => Text(
-                                "BMI: ${controller.calculateBMI().toStringAsFixed(2)}",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                                  ],
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 20),
-                            Obx(
-                              () => Text(
-                                "Result: ${controller.getBMIInterpretation()}",
-                                style: TextStyle(
-                                  color: const Color.fromARGB(255, 22, 18, 18),
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
+                            const SizedBox(height: 16),
                             Container(
                               height: 250,
-                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              width: 250,
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
                               child: Obx(
                                 () => SfRadialGauge(
                                   axes: [
@@ -277,84 +128,72 @@ class _BMICalcScreenState extends State<BMICalcScreen> {
                                       maximum: 40,
                                       showLabels: false,
                                       showTicks: false,
-                                      axisLabelStyle: GaugeTextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                      ),
+                                      axisLabelStyle: rangeLabelStyle,
                                       ranges: [
                                         GaugeRange(
-                                          startWidth: 30,
-                                          endWidth: 30,
+                                          startWidth: widthValue,
+                                          endWidth: widthValue,
                                           startValue: 0,
                                           endValue: 18.5,
-                                          color: Colors.blue,
-                                          label: 'Underweight',
-                                          labelStyle: GaugeTextStyle(
-                                            fontSize: 12,
-                                            color: Colors.black,
-                                          ),
+                                          color: ColorConstants
+                                              .underweightColor,
+                                          label: AppStrings.underweight,
+                                          labelStyle: rangeLabelStyle,
                                         ),
                                         GaugeRange(
-                                          startWidth: 30,
-                                          endWidth: 30,
+                                          startWidth: widthValue,
+                                          endWidth: widthValue,
                                           startValue: 18.5,
                                           endValue: 24.9,
-                                          color: Colors.green,
-                                          label: 'Normal',
-                                          labelStyle: GaugeTextStyle(
-                                            fontSize: 12,
-                                            color: Colors.black,
-                                          ),
+                                          color: ColorConstants
+                                              .normalWeightColor,
+                                          label: AppStrings.normal,
+                                          labelStyle: rangeLabelStyle,
                                         ),
                                         GaugeRange(
-                                          startWidth: 30,
-                                          endWidth: 30,
+                                          startWidth: widthValue,
+                                          endWidth: widthValue,
                                           startValue: 25,
                                           endValue: 29.9,
-                                          color: Colors.yellow,
-                                          label: 'Overweight',
-                                          labelStyle: GaugeTextStyle(
+                                          color: ColorConstants
+                                              .overweightColor,
+                                          label: AppStrings.overweight,
+                                          labelStyle: const GaugeTextStyle(
                                             fontSize: 12,
                                             color: Colors.black,
                                           ),
                                         ),
                                         GaugeRange(
-                                          startWidth: 30,
-                                          endWidth: 30,
+                                          startWidth: widthValue,
+                                          endWidth: widthValue,
                                           startValue: 30,
                                           endValue: 40,
-                                          color: Colors.red,
-                                          label: 'Obese',
-                                          labelStyle: GaugeTextStyle(
-                                            fontSize: 12,
-                                            color: Colors.black,
-                                          ),
+                                          color: ColorConstants.obeseColor,
+                                          label: AppStrings.obese,
+                                          labelStyle: rangeLabelStyle,
                                         ),
                                       ],
                                       pointers: [
                                         NeedlePointer(
                                           enableAnimation: true,
-                                          animationDuration: 1000,
+                                          animationDuration: 1500,
                                           animationType: AnimationType.ease,
                                           value: controller.calculateBMI(),
-                                          needleColor: Colors.black,
+                                          needleColor: Colors.white,
                                           needleLength: 0.9,
                                           needleStartWidth: 1,
                                           needleEndWidth: 5,
-                                          knobStyle: KnobStyle(
-                                            color: Colors.black,
+                                          knobStyle: const KnobStyle(
+                                            color: Colors.white,
                                           ),
                                         ),
                                       ],
                                       annotations: [
                                         GaugeAnnotation(
                                           widget: Text(
-                                            '${controller.calculateBMI().toStringAsFixed(2)}',
-                                            style: TextStyle(
-                                              fontSize: 20,
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold,
-                                            ),
+                                            textAlign: TextAlign.center,
+                                            'BMI\n${controller.calculateBMI().toStringAsFixed(2)}\n ${controller.getBMIInterpretation()}',
+                                            style: labelTextStyle,
                                           ),
                                           angle: 90,
                                           positionFactor: 0.5,

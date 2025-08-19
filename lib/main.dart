@@ -53,7 +53,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-  
     return GetMaterialApp(
       title: 'Pose Detection',
       debugShowCheckedModeBanner: false,
@@ -65,7 +64,7 @@ class MyApp extends StatelessWidget {
               ? userData?.isProfileDataAvailable == true
                   ? PageName.dashboard
                   : PageName.chat
-              : PageName.dashboard,
+              : PageName.onboard,
       getPages: [
         GetPage(name: PageName.onboard, page: () => OnBoardScreen()),
         GetPage(
@@ -127,5 +126,4 @@ class MyApp extends StatelessWidget {
       ],
     );
   }
-
 }

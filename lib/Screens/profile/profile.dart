@@ -29,18 +29,18 @@ class _ProfileState extends State<Profile> {
           actions: [
             controller.isEdit.value
                 ? IconButton(
-                    icon: Icon(Icons.edit),
-                    onPressed: () {
-                      controller.isEdit.value = false;
-                    },
-                  )
+                  icon: Icon(Icons.edit),
+                  onPressed: () {
+                    controller.isEdit.value = false;
+                  },
+                )
                 : IconButton(
-                    icon: Icon(Icons.done),
-                    onPressed: () {
-                      FocusScope.of(context).unfocus();
-                      updateProfile();
-                    },
-                  ),
+                  icon: Icon(Icons.done),
+                  onPressed: () {
+                    FocusScope.of(context).unfocus();
+                    updateProfile();
+                  },
+                ),
           ],
         ),
         drawer: MyNavigationDrawer(),
@@ -73,7 +73,8 @@ class _ProfileState extends State<Profile> {
                       // Constrain the child of SingleChildScrollView to ensure it's at least as tall as the available space
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
-                          minHeight: constraints.maxHeight, // This is the key line
+                          minHeight:
+                              constraints.maxHeight, // This is the key line
                         ),
                         // IntrinsicHeight allows the Column to measure its children (including Spacer) correctly
                         child: IntrinsicHeight(
@@ -154,6 +155,22 @@ class _ProfileState extends State<Profile> {
                                   hideIcon: false,
                                   keyboardType: TextInputType.text,
                                   controller: controller.goalController,
+                                  textInputAction: TextInputAction.next,
+                                  isEnabled: !controller.isEdit.value,
+                                  onSubmitted: (value) {
+                                    controller.focusNodeGoalDuration
+                                        .requestFocus();
+                                  },
+                                  focusNode: controller.focusNodeGoal,
+                                ),
+
+                                SizedBox(height: 15),
+                                TextWidget(
+                                  hintTitle: AppStrings.goalDuration,
+                                  rightIcon: Icons.calendar_month,
+                                  hideIcon: false,
+                                  keyboardType: TextInputType.number,
+                                  controller: controller.goalDurationController,
                                   textInputAction: TextInputAction.done,
                                   isEnabled: !controller.isEdit.value,
                                   onSubmitted: (value) {

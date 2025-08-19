@@ -1,14 +1,27 @@
 import 'package:get/get.dart';
+import 'package:pose_detection/Constants/app_string.dart';
+import 'package:pose_detection/main.dart';
 
 class BMICalcController extends GetxController {
-  RxInt age = 25.obs; 
-  RxInt height = 170.obs; // Default height in cm
-  RxInt weight = 70.obs; // Default weight in kg
+  RxInt age = 25.obs;
+  RxInt height = 150.obs;
+  RxInt weight = 60.obs; 
+
+  final profileData = secureStorage.getProfileData();
 
   @override
   void onInit() {
     super.onInit();
-    // You can add any initial logic here if needed
+
+    if (profileData != null) {
+      age.value = profileData?.age ?? 25;
+      height.value = (profileData?.height ?? 150).toInt();
+      weight.value = (profileData?.weight ?? 60).toInt();
+    } else {     
+      age.value = 25;
+      height.value = 150;
+      weight.value = 60;
+    }
   }
 
   // You might want to add a method to calculate BMI here
@@ -29,13 +42,13 @@ class BMICalcController extends GetxController {
       return "BMI for children and teens should be interpreted using growth charts.";
     } else {
       if (bmi < 18.5) {
-        return "Underweight";
+        return AppStrings.underweight;
       } else if (bmi >= 18.5 && bmi < 24.9) {
-        return "Normal weight";
+        return AppStrings.normal;
       } else if (bmi >= 25 && bmi < 29.9) {
-        return "Overweight";
+        return AppStrings.overweight;
       } else {
-        return "Obesity";
+        return AppStrings.obese;
       }
     }
   }

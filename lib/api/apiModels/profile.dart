@@ -7,6 +7,7 @@ class Profile {
   final double? weight;
   final String? gender;
   final String? goal;
+  final int? goalDuration;
 
   Profile({
     required this.name,
@@ -15,6 +16,7 @@ class Profile {
     required this.weight,
     required this.gender,
     required this.goal,
+    required this.goalDuration
   });
 
   factory Profile.fromJson(Map<String, dynamic> json) {
@@ -25,6 +27,7 @@ class Profile {
       weight: SafeParser.toDouble(json['weight']),
       gender: SafeParser.toStringVal(json['gender']),
       goal: SafeParser.toStringVal(json['goal']),
+      goalDuration: SafeParser.toInt(json['goalDuration']),
     );
   }
 
@@ -36,11 +39,12 @@ class Profile {
       'weight': weight,
       'gender': gender,
       'goal': goal,
+      'goalDuration': goalDuration,
     };
   }
 
   @override
   String toString() {
-    return 'Profile(name: $name,age: $age, height: $height, weight: $weight, gender: $gender, goal: $goal)';
+    return 'Profile(name: $name,age: $age, height: $height, weight: $weight, gender: $gender, goal: $goal, Goal Duration: $goalDuration)';
   }
 }

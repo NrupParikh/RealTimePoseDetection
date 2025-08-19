@@ -51,6 +51,7 @@ dependencies:
   dio: ^5.8.0+1
   pretty_dio_logger: ^1.4.0
   syncfusion_flutter_gauges: ^30.1.42
+  marquee: ^2.3.0
 
 
 dev_dependencies:
