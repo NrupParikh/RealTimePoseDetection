@@ -87,6 +87,7 @@ Duration: $duration week(s)
     required int height,
     required int weight,
     required String goal,
+    required int goalDuration,
     required String taskDescription,
     required String jsonStructure,
   }) {
@@ -99,6 +100,7 @@ User Profile:
 - Height: ${height}cm
 - Weight: ${weight}kg
 - Goal: $goal
+- Duration: ${goalDuration}week
 
 Tasks:
 $taskDescription

@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:pose_detection/Constants/app_key.dart';
+import 'package:pose_detection/api/apiModels/fitness_plan_response.dart';
+import 'package:pose_detection/api/apiModels/fitness_tips_response.dart';
 import 'package:pose_detection/api/apiModels/profile.dart';
 import 'package:pose_detection/api/apiModels/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -95,7 +97,6 @@ class SecureStorageSingleton {
     }
   }
 
-
   void storeProfileData(Profile profile) {
     if (!_initialized) {
       throw Exception("SecureStorageSingleton not initialized.");
@@ -121,6 +122,70 @@ class SecureStorageSingleton {
     } catch (e) {
       if (kDebugMode) {
         print('Error decoding LoginData: $e');
+      }
+      return null;
+    }
+  }
+
+  void storeFitnessTips(FitnessTipsResponse tips) {
+    if (!_initialized) {
+      throw Exception("SecureStorageSingleton not initialized.");
+    }
+    final String fitnessTipsData = jsonEncode(tips.toJson());
+    _prefs.setString(AppKey.keyFitnessTips, fitnessTipsData);
+  }
+
+  FitnessTipsResponse? getFitnessTips() {
+    if (!_initialized) {
+      throw Exception("SecureStorageSingleton not initialized.");
+    }
+    final String? fitnessTipsData = _prefs.getString(AppKey.keyFitnessTips);
+    if (fitnessTipsData == null) {
+      if (kDebugMode) {
+        print('No FitnessTips in SharedPreferences.');
+      }
+      return null;
+    }
+    try {
+      final Map<String, dynamic> fitnessTipsDataMap = jsonDecode(
+        fitnessTipsData,
+      );
+      return FitnessTipsResponse.fromJson(fitnessTipsDataMap);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error decoding FitnessTips: $e');
+      }
+      return null;
+    }
+  }
+
+  void storeFitnessPlan(FitnessPlanResponse fitnessPlan) {
+    if (!_initialized) {
+      throw Exception("SecureStorageSingleton not initialized.");
+    }
+    final String fitnessPlanData = jsonEncode(fitnessPlan.toJson());
+    _prefs.setString(AppKey.keyFitnessPlan, fitnessPlanData);
+  }
+
+  FitnessPlanResponse? getFitnessPlan() {
+    if (!_initialized) {
+      throw Exception("SecureStorageSingleton not initialized.");
+    }
+    final String? fitnessPlanData = _prefs.getString(AppKey.keyFitnessPlan);
+    if (fitnessPlanData == null) {
+      if (kDebugMode) {
+        print('No FitnessPlan found in SharedPreferences.');
+      }
+      return null;
+    }
+    try {
+      final Map<String, dynamic> fitnessPlanDataMap = jsonDecode(
+        fitnessPlanData,
+      );
+      return FitnessPlanResponse.fromJson(fitnessPlanDataMap);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error decoding FitnessPlan: $e');
       }
       return null;
     }

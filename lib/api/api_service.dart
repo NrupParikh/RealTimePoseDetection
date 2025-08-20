@@ -118,4 +118,77 @@ class ApiService {
       rethrow;
     }
   }
+  
+  // Get Fitness Tips
+  Future<AppResponse> getFitnessTips() async {
+    try {
+      final response = await _networkService.get(
+        url: "${ApiConstants.tips}",
+        showProgressBar: false,
+      );
+      return _networkService.handleException(response);
+    } catch (e) {
+      if (kDebugMode) {
+        print("TAG Exception: $e");
+      }
+      rethrow;
+    }
+  }
+
+  // Save Fitness Tips
+  Future<AppResponse> saveFitnessTipsAPI({
+    required String fitnessTips,
+  }) async {   
+    try {
+       print("Tag_Save_fitness_tips_API_Call");
+      final response = await _networkService.post(
+        url: "${ApiConstants.tips}",
+        data: fitnessTips,
+        showProgressBar: false,
+      );
+      return _networkService.handleException(response);
+    } catch (e) {
+      if (kDebugMode) {
+        print("TAG Exception: $e");
+      }
+      rethrow;
+    }
+  }
+
+
+  // Get Fitness Plan
+  Future<AppResponse> getFitnessPlan() async {
+    try {
+      final response = await _networkService.get(
+        url: "${ApiConstants.fitnessPlan}",
+        showProgressBar: false,
+      );
+      return _networkService.handleException(response);
+    } catch (e) {
+      if (kDebugMode) {
+        print("TAG Exception: $e");
+      }
+      rethrow;
+    }
+  }
+
+  // Save Fitness Plan
+  Future<AppResponse> saveFitnessPlanAPI({
+    required String fitnessPlan,
+  }) async {   
+    try {
+       print("Tag_Save_fitness_plan_API_Call");
+      final response = await _networkService.post(
+        url: "${ApiConstants.fitnessPlan}",
+        data: fitnessPlan,
+        showProgressBar: false,
+      );
+      return _networkService.handleException(response);
+    } catch (e) {
+      if (kDebugMode) {
+        print("TAG Exception: $e");
+      }
+      rethrow;
+    }
+  }
 }

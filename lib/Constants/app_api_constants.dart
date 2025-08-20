@@ -5,4 +5,6 @@ class ApiConstants {
   static const register = "register";
   static const profile = "profile";
   static const logout = "logout";
+  static const tips = "tips";
+  static const fitnessPlan = "recommended-exercises";
 }

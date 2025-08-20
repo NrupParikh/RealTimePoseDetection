@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:pose_detection/Components/fancy_alert_dialog.dart';
 import 'package:pose_detection/Components/session_expire_controller.dart';
 import 'package:pose_detection/Constants/app_string.dart';
+import 'package:pose_detection/Screens/dashboard/dashboard_controller.dart';
 import 'package:pose_detection/Singleton/api_service_singleton.dart';
 import 'package:pose_detection/api/apiModels/profile_response.dart';
 import 'package:pose_detection/api/api_service.dart';
@@ -45,48 +46,26 @@ class ProfileController extends GetxController {
   @override
   void onInit() async {
     super.onInit();
-    await getProfile().then((result) {
-      if (result.item1) {
-        final profileData = secureStorage.getProfileData();
-        if (profileData != null) {
-          nameController.text = profileData.name.toString();
-          ageController.text = profileData.age.toString();
-          heightController.text = profileData.height.toString();
-          weightController.text = profileData.weight.toString();
-          genderController.text = profileData.gender.toString();
-          goalController.text = profileData.goal.toString();
-          goalDurationController.text = profileData.goalDuration.toString();
 
-          // Store initial values
-          initialName = profileData.name.toString();
-          initialAge = profileData.age.toString();
-          initialHeight = profileData.height.toString();
-          initialWeight = profileData.weight.toString();
-          initialGender = profileData.gender.toString();
-          initialGoal = profileData.goal.toString();
-          initialGoalDuration = profileData.goalDuration.toString();
-        }
-      } else if (result.item3 == 401) {
-        if (Get.context != null && !Get.isDialogOpen!) {
-          sessionController.showSessionExpiredDialog(
-            Get.context!,
-            result.item2.toString(),
-          );
-        }
-      } else {
-        if (Get.context != null && !Get.isDialogOpen!) {
-          FancyAlertDialog.showFancyAlertDialog(
-            context: Get.context!,
-            title: AppStrings.appName,
-            message: result.item2.toString(),
-            onOkPressed: () {
-              Get.back();
-            },
-            onCancelPressed: null,
-          );
-        }
-      }
-    });
+    final profileData = secureStorage.getProfileData();
+    if (profileData != null) {
+      nameController.text = profileData.name.toString();
+      ageController.text = profileData.age.toString();
+      heightController.text = profileData.height.toString();
+      weightController.text = profileData.weight.toString();
+      genderController.text = profileData.gender.toString();
+      goalController.text = profileData.goal.toString();
+      goalDurationController.text = profileData.goalDuration.toString();
+
+      // Store initial values
+      initialName = profileData.name.toString();
+      initialAge = profileData.age.toString();
+      initialHeight = profileData.height.toString();
+      initialWeight = profileData.weight.toString();
+      initialGender = profileData.gender.toString();
+      initialGoal = profileData.goal.toString();
+      initialGoalDuration = profileData.goalDuration.toString();
+    }
   }
 
   Future<Tuple3<bool, String?, int>> handleUpdateProfile() async {
@@ -195,63 +174,6 @@ class ProfileController extends GetxController {
         isLoading.value = false;
         return Tuple3(false, "$ex", 0);
       }
-    }
-  }
-
-  // Get Profile Data
-  Future<Tuple3<bool, String?, int>> getProfile() async {
-    final userId = secureStorage.getUserData()?.id ?? 0;
-    try {
-      isLoading.value = true;
-      var appResponse = await _apiService.getProfile(id: userId);
-      if (appResponse.statusCode == 200) {
-        isLoading.value = false;
-        if (appResponse.data is Map<String, dynamic>) {
-          try {
-            final ProfileResponse data = ProfileResponse.fromJson(
-              appResponse.data,
-            );
-            debugPrint("Tag_data ${data.profile}");
-            secureStorage.storeProfileData(data.profile);
-            return Tuple3(
-              true,
-              appResponse.message.toString(),
-              appResponse.statusCode.toInt(),
-            );
-          } catch (e) {
-            isLoading.value = false;
-            return Tuple3(
-              false,
-              "Error parsing ApiResponse",
-              appResponse.statusCode.toInt(),
-            );
-          }
-        } else {
-          isLoading.value = false;
-          return Tuple3(
-            false,
-            "appResponse.data is not a Map",
-            appResponse.statusCode.toInt(),
-          );
-        }
-      } else if (appResponse.statusCode == 401) {
-        isLoading.value = false;
-        return Tuple3(
-          false,
-          appResponse.message.toString(),
-          appResponse.statusCode.toInt(),
-        );
-      } else {
-        isLoading.value = false;
-        return Tuple3(
-          false,
-          appResponse.message.toString(),
-          appResponse.statusCode.toInt(),
-        );
-      }
-    } catch (ex) {
-      isLoading.value = false;
-      return Tuple3(false, "$ex", 0);
     }
   }
 

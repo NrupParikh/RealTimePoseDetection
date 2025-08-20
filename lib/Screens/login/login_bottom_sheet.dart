@@ -31,7 +31,7 @@ class LoginBottomSheetState extends State<LoginBottomSheet> {
       final userData = secureStorage.getUserData();
       if (userData != null) {
         if (userData.isProfileDataAvailable) {
-          Get.offAllNamed(PageName.exerciseList);
+          Get.offAllNamed(PageName.dashboard);
         } else {
           Get.offAllNamed(PageName.chat);
         }

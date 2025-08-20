@@ -12,6 +12,7 @@ import 'package:pose_detection/Screens/dashboard/fitness_tips.dart';
 import 'package:pose_detection/Screens/dashboard/recommanded_ex.dart';
 import 'package:pose_detection/Screens/dashboard/recommanded_ex_info_dialog.dart';
 import 'package:pose_detection/Screens/exerciseList/navigationDrawer/my_navigation_drawer.dart';
+import 'package:pose_detection/main.dart';
 
 class DashboardScreen extends StatefulWidget {
   @override
@@ -20,6 +21,7 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   final controller = Get.find<DashboardController>();
+  final profileData = secureStorage.getProfileData();
 
   @override
   Widget build(BuildContext context) {
@@ -94,7 +96,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   children: [
                                     Text(
                                       AppStrings.greeting(
-                                        controller.profileData?.name,
+                                        profileData?.name,
                                       ),
                                       style: TextStyle(
                                         fontSize: 14,
