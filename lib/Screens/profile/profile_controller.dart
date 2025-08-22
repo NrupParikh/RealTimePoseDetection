@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:pose_detection/Components/fancy_alert_dialog.dart';
 import 'package:pose_detection/Components/session_expire_controller.dart';
 import 'package:pose_detection/Constants/app_string.dart';
-import 'package:pose_detection/Screens/dashboard/dashboard_controller.dart';
 import 'package:pose_detection/Singleton/api_service_singleton.dart';
 import 'package:pose_detection/api/apiModels/profile_response.dart';
 import 'package:pose_detection/api/api_service.dart';
@@ -94,6 +92,24 @@ class ProfileController extends GetxController {
       ); // Assuming you have a string constant for this
     }
 
+    // ===== SET geminiUpdateRequired
+    if (age != null && height != null && weight != null && duration != null) {
+      sessionController.geminiUpdateRequired.value = shouldUpdateGemini(
+        age: age,
+        initialAge: initialAge,
+        height: height,
+        initialHeight: initialHeight,
+        weight: weight,
+        initialWeight: initialWeight,
+        gender: gender,
+        initialGender: initialGender,
+        goal: goal,
+        initialGoal: initialGoal,
+        duration: duration,
+        initialGoalDuration: initialGoalDuration,
+      );
+    }
+
     if (GetUtils.isNullOrBlank(name) == true) {
       return Tuple3(false, AppStrings.valEnterUserName, 0);
     } else if (age == null || age <= 0 || age >= 120) {
@@ -162,6 +178,13 @@ class ProfileController extends GetxController {
               appResponse.statusCode.toInt(),
             );
           }
+        } else if (appResponse.statusCode == 401) {
+          isLoading.value = false;
+          return Tuple3(
+            false,
+            appResponse.message.toString(),
+            appResponse.statusCode.toInt(),
+          );
         } else {
           isLoading.value = false;
           return Tuple3(
@@ -195,5 +218,27 @@ class ProfileController extends GetxController {
     focusNodeGoal.dispose();
     focusNodeGoalDuration.dispose();
     super.onClose();
+  }
+
+  bool shouldUpdateGemini({
+    required int age,
+    required String initialAge,
+    required double height,
+    required String initialHeight,
+    required double weight,
+    required String initialWeight,
+    required String gender,
+    required String initialGender,
+    required String goal,
+    required String initialGoal,
+    required int duration,
+    required String initialGoalDuration,
+  }) {
+    return age.toString() != initialAge ||
+        height.toString() != initialHeight ||
+        weight.toString() != initialWeight ||
+        gender != initialGender ||
+        goal != initialGoal ||
+        duration.toString() != initialGoalDuration;
   }
 }

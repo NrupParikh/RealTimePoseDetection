@@ -227,8 +227,6 @@ class _FirebaseChatScreenState extends State<FirebaseChatScreen> {
 
   void navigateToDashboard() {
     FocusScope.of(context).unfocus();
-    Future.delayed(const Duration(seconds: 3), () {
-      Get.offAllNamed(PageName.dashboard);
-    });
+    Get.offAllNamed(PageName.dashboard);
   }
 }

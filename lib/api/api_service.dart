@@ -59,8 +59,8 @@ class ApiService {
     required double height,
     required double weight,
     required String gender,
-    required String goal,    
-    required int goalDuration
+    required String goal,
+    required int goalDuration,
   }) async {
     Map<String, dynamic> data = {
       'name': name,
@@ -69,7 +69,7 @@ class ApiService {
       'weight': weight,
       'gender': gender,
       'goal': goal,
-      'goal_duration':goalDuration
+      'goal_duration': goalDuration,
     };
 
     try {
@@ -118,7 +118,7 @@ class ApiService {
       rethrow;
     }
   }
-  
+
   // Get Fitness Tips
   Future<AppResponse> getFitnessTips() async {
     try {
@@ -136,11 +136,9 @@ class ApiService {
   }
 
   // Save Fitness Tips
-  Future<AppResponse> saveFitnessTipsAPI({
-    required String fitnessTips,
-  }) async {   
+  Future<AppResponse> saveFitnessTipsAPI({required String fitnessTips}) async {
     try {
-       print("Tag_Save_fitness_tips_API_Call");
+      print("Tag_Save_fitness_tips_API_Call");
       final response = await _networkService.post(
         url: "${ApiConstants.tips}",
         data: fitnessTips,
@@ -154,7 +152,6 @@ class ApiService {
       rethrow;
     }
   }
-
 
   // Get Fitness Plan
   Future<AppResponse> getFitnessPlan() async {
@@ -173,14 +170,32 @@ class ApiService {
   }
 
   // Save Fitness Plan
-  Future<AppResponse> saveFitnessPlanAPI({
-    required String fitnessPlan,
-  }) async {   
+  Future<AppResponse> saveFitnessPlanAPI({required String fitnessPlan}) async {
     try {
-       print("Tag_Save_fitness_plan_API_Call");
+      print("Tag_Save_fitness_plan_API_Call");
       final response = await _networkService.post(
         url: "${ApiConstants.fitnessPlan}",
         data: fitnessPlan,
+        showProgressBar: false,
+      );
+      return _networkService.handleException(response);
+    } catch (e) {
+      if (kDebugMode) {
+        print("TAG Exception: $e");
+      }
+      rethrow;
+    }
+  }
+
+  // Save Burned Calories
+  Future<AppResponse> saveCaloriesStatus(double burnedCalories) async {
+    Map<String, dynamic> data = {'calories_status': burnedCalories};
+
+    try {
+      print("Tag_Save_calories_status_API_Call");
+      final response = await _networkService.put(
+        url: "${ApiConstants.caloriesStatus}",
+        data: data,
         showProgressBar: false,
       );
       return _networkService.handleException(response);

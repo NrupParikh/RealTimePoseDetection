@@ -31,8 +31,8 @@ class GeminiPrompt {
     final age = userAge?.toString() ?? '0';
     final height = userHeight?.toStringAsFixed(1) ?? '0';
     final weight = userWeight?.toStringAsFixed(1) ?? '0';
-    final gender = userGender.isNotEmpty ? userGender : 'Male';
-    final goal = userGoal.isNotEmpty ? userGoal : 'Lose weight';
+    final gender = userGender.isNotEmpty ? userGender : 'Other';
+    final goal = userGoal.isNotEmpty ? userGoal : '';
     final duration = goalDuration?.toString() ?? '0';
 
     return """

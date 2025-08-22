@@ -119,4 +119,14 @@ class AppStrings {
   static String logoutConfirmation = "Are you sure you want to logout ?";
   static String logoutMsg = "Logout Failed, Please try again.";
 
+  static String dashboard= "Dashboard";
+  static String exerciseList = "Exercise List";
+  static String profile = "Profile";
+  static String bmiCalculator = "BMI Calculator";
+  static String logout = "Logout";
+
+  static String lblHeight = "Height (cm)";
+  static String lblWeight = "Weight (kg)";
+  static String lblBMI = "BMI";
+  static String lblStatus = "Status";
 }

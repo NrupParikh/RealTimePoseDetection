@@ -9,6 +9,7 @@ import 'package:pose_detection/api/apiModels/fitness_plan_data.dart';
 import 'package:pose_detection/api/apiModels/fitness_plan_response.dart';
 import 'package:pose_detection/api/apiModels/fitness_tips_data.dart';
 import 'package:pose_detection/api/apiModels/fitness_tips_response.dart';
+import 'package:pose_detection/api/apiModels/profile.dart';
 import 'package:pose_detection/api/apiModels/profile_response.dart';
 import 'package:pose_detection/api/api_service.dart';
 import 'package:pose_detection/api/gemini_api_service.dart';
@@ -22,8 +23,12 @@ class DashboardController extends GetxController {
       Get.find<SessionExpireController>();
 
   // --- UI STATE VARIABLES ---
-  final RxBool isLoading = false.obs;
+  final RxBool isLoadingForFitnessPlan = false.obs;
+  final RxBool isLoadingForFitnessPlanGemini = false.obs;
   final RxBool isLoadingForTips = false.obs;
+  final RxBool isLoadingForTipsGemini = false.obs;
+  final RxBool isLoadingForProfile = false.obs;
+  // final RxBool isLoadingForSaveCalories = false.obs;
 
   final RxString errorMessageForFitnessPlan = ''.obs;
   final RxString errorMessageForFitnessTips = ''.obs;
@@ -35,28 +40,39 @@ class DashboardController extends GetxController {
   // --- USER PROFILE & BMI DATA ---
   final RxDouble height = 0.0.obs;
   final RxDouble weight = 0.0.obs;
-
-  final RxTotalBurnedCal = 0.0.obs;
-
+  final RxString userName = 'User'.obs;
+  final RxInt goalDuration = 0.obs;
+  final RxDouble totalBurnedCal = 0.0.obs;
+  final RxInt day = 0.obs;
   var currentTipIndex = 0.obs;
 
   @override
   void onInit() async {
     super.onInit();
 
+    totalBurnedCal.value = secureStorage.getBurnCalories() ?? 0.0;
+
+    final isGeminiCallOnProfileUpdate =
+        sessionController.geminiUpdateRequired.value;
+    print("Tag_isGeminiCallOnProfileUpdate ${isGeminiCallOnProfileUpdate}");
+
     // Set initial height and weight from stored profile or use defaults
     // Load profile data once at the beginning
     final profileData = secureStorage.getProfileData();
     if (profileData != null) {
-      height.value = (profileData.height ?? 0).toDouble();
-      weight.value = (profileData.weight ?? 0).toDouble();
+      setUpProfileData(profileData);
       calculateBMI();
     } else {
       await callProfileAPI();
     }
 
-    await handleFitnessPlan();
-    await handleFitnessTips();
+    if (isGeminiCallOnProfileUpdate) {
+      await callFitnessPlanFromGemini();
+      await callFitnessTipsFromGemini();
+    } else {
+      await handleFitnessPlan();
+      await handleFitnessTips();
+    }
   }
 
   Future<void> callProfileAPI() async {
@@ -64,8 +80,7 @@ class DashboardController extends GetxController {
       if (result.item1) {
         final profileData = secureStorage.getProfileData();
         if (profileData != null) {
-          height.value = (profileData.height ?? 0).toDouble();
-          weight.value = (profileData.weight ?? 0).toDouble();
+          setUpProfileData(profileData);
           calculateBMI();
         }
       } else if (result.item3 == 401) {
@@ -74,6 +89,16 @@ class DashboardController extends GetxController {
         showFancyDialog(result);
       }
     });
+  }
+
+  // ===== set up profile related variables
+  void setUpProfileData(Profile profileData) {
+    height.value = (profileData.height).toDouble();
+    weight.value = (profileData.weight).toDouble();
+    userName.value = (profileData.name);
+    goalDuration.value = (profileData.goalDuration).toInt();
+    totalBurnedCal.value = (profileData.caloriesStatus ?? 0).toDouble();
+    day.value = (profileData.getDayCount());
   }
 
   // =========== FITNESS PLAN ===========
@@ -91,19 +116,24 @@ class DashboardController extends GetxController {
           displaySessionExpireDialog(result);
         } else {
           // =========== GEMINI API CALL
-          final plan = await getFitnessPlanFromGemini();
-          if (plan != null) {
-            // =========== SAVE TO OUR API
-            final result = await saveFitnessPlanAPI();
-            if (result.item1) {
-            } else if (result.item3 == 401) {
-              displaySessionExpireDialog(result);
-            } else {
-              showFancyDialog(result);
-            }
-          }
+          await callFitnessPlanFromGemini();
         }
       });
+    }
+  }
+
+  Future<void> callFitnessPlanFromGemini() async {
+    final plan = await getFitnessPlanFromGemini();
+    if (plan != null) {
+      // =========== SAVE TO OUR API
+      final result = await saveFitnessPlanAPI();
+      if (result.item1) {
+        sessionController.geminiUpdateRequired.value = false;
+      } else if (result.item3 == 401) {
+        displaySessionExpireDialog(result);
+      } else {
+        showFancyDialog(result);
+      }
     }
   }
 
@@ -122,19 +152,24 @@ class DashboardController extends GetxController {
           displaySessionExpireDialog(result);
         } else {
           // =========== GEMINI API CALL
-          final tips = await getFitnessTipsFromGemini();
-          if (tips != null) {
-            // =========== SAVE TO OUR API
-            final result = await saveFitnessTipsAPI();
-            if (result.item1) {
-            } else if (result.item3 == 401) {
-              displaySessionExpireDialog(result);
-            } else {
-              showFancyDialog(result);
-            }
-          }
+          await callFitnessTipsFromGemini();
         }
       });
+    }
+  }
+
+  Future<void> callFitnessTipsFromGemini() async {
+    final tips = await getFitnessTipsFromGemini();
+    if (tips != null) {
+      // =========== SAVE TO OUR API
+      final result = await saveFitnessTipsAPI();
+      if (result.item1) {
+        sessionController.geminiUpdateRequired.value = false;
+      } else if (result.item3 == 401) {
+        displaySessionExpireDialog(result);
+      } else {
+        showFancyDialog(result);
+      }
     }
   }
 
@@ -181,12 +216,12 @@ class DashboardController extends GetxController {
     final profileData = secureStorage.getProfileData();
     if (profileData != null) {
       final plan = await getGeminiFitnessPlan(
-        age: profileData.age ?? 0,
-        gender: profileData.gender ?? 'male',
-        height: profileData.height?.toInt() ?? 0,
-        weight: profileData.weight?.toInt() ?? 0,
-        goal: profileData.goal ?? 'Lose weight',
-        goalDuration: profileData.goalDuration?.toInt() ?? 0,
+        age: profileData.age,
+        gender: profileData.gender,
+        height: profileData.height.toInt(),
+        weight: profileData.weight.toInt(),
+        goal: profileData.goal,
+        goalDuration: profileData.goalDuration.toInt(),
       );
       return plan;
     } else {
@@ -200,12 +235,12 @@ class DashboardController extends GetxController {
     final profileData = secureStorage.getProfileData();
     if (profileData != null) {
       final tips = await getGeminiFitnessTips(
-        age: profileData.age ?? 0,
-        gender: profileData.gender ?? 'male',
-        height: profileData.height?.toInt() ?? 0,
-        weight: profileData.weight?.toInt() ?? 0,
-        goal: profileData.goal ?? 'Lose weight',
-        goalDuration: profileData.goalDuration?.toInt() ?? 0,
+        age: profileData.age,
+        gender: profileData.gender,
+        height: profileData.height.toInt(),
+        weight: profileData.weight.toInt(),
+        goal: profileData.goal,
+        goalDuration: profileData.goalDuration.toInt(),
       );
       return tips;
     } else {
@@ -225,7 +260,7 @@ class DashboardController extends GetxController {
     required int goalDuration,
   }) async {
     try {
-      isLoading.value = true;
+      isLoadingForFitnessPlanGemini.value = true;
       errorMessageForFitnessPlan.value = '';
       fitnessPlan.value = null;
 
@@ -244,25 +279,26 @@ class DashboardController extends GetxController {
       fitnessPlan.value = FitnessPlanResponse.fromJson(jsonMap);
       if (fitnessPlan.value != null) {
         secureStorage.storeFitnessPlan(fitnessPlan.value!);
-        return fitnessPlan.value; // ✅ success
+        return fitnessPlan.value;
       }
       return null;
     } catch (e) {
+      isLoadingForFitnessPlanGemini.value = false;
       errorMessageForFitnessPlan.value = e.toString();
       return null;
     } finally {
-      isLoading.value = false;
+      isLoadingForFitnessPlanGemini.value = false;
     }
   }
-  
+
   // Get Profile Data
   Future<Tuple3<bool, String?, int>> getProfile() async {
+    isLoadingForProfile.value = true;
     final userId = secureStorage.getUserData()?.id ?? 0;
     try {
-      isLoading.value = true;
       var appResponse = await _apiService.getProfile(id: userId);
       if (appResponse.statusCode == 200) {
-        isLoading.value = false;
+        isLoadingForProfile.value = false;
         if (appResponse.data is Map<String, dynamic>) {
           try {
             final ProfileResponse data = ProfileResponse.fromJson(
@@ -276,7 +312,7 @@ class DashboardController extends GetxController {
               appResponse.statusCode.toInt(),
             );
           } catch (e) {
-            isLoading.value = false;
+            isLoadingForProfile.value = false;
             return Tuple3(
               false,
               "Error parsing ApiResponse",
@@ -284,7 +320,7 @@ class DashboardController extends GetxController {
             );
           }
         } else {
-          isLoading.value = false;
+          isLoadingForProfile.value = false;
           return Tuple3(
             false,
             "appResponse.data is not a Map",
@@ -292,14 +328,14 @@ class DashboardController extends GetxController {
           );
         }
       } else if (appResponse.statusCode == 401) {
-        isLoading.value = false;
+        isLoadingForProfile.value = false;
         return Tuple3(
           false,
           appResponse.message.toString(),
           appResponse.statusCode.toInt(),
         );
       } else {
-        isLoading.value = false;
+        isLoadingForProfile.value = false;
         return Tuple3(
           false,
           appResponse.message.toString(),
@@ -307,7 +343,7 @@ class DashboardController extends GetxController {
         );
       }
     } catch (ex) {
-      isLoading.value = false;
+      isLoadingForProfile.value = false;
       return Tuple3(false, "$ex", 0);
     }
   }
@@ -322,7 +358,7 @@ class DashboardController extends GetxController {
     required int goalDuration,
   }) async {
     try {
-      isLoadingForTips.value = true;
+      isLoadingForTipsGemini.value = true;
       errorMessageForFitnessTips.value = '';
       fitnessTipsDataModel.value = null;
 
@@ -342,23 +378,24 @@ class DashboardController extends GetxController {
 
       if (fitnessTipsDataModel.value != null) {
         secureStorage.storeFitnessTips(fitnessTipsDataModel.value!);
-        return fitnessTipsDataModel.value; // ✅ success
+        return fitnessTipsDataModel.value;
       }
       return null;
     } catch (e) {
+      isLoadingForTipsGemini.value = false;
       errorMessageForFitnessTips.value = e.toString();
       return null;
     } finally {
-      isLoadingForTips.value = false;
+      isLoadingForTipsGemini.value = false;
     }
   }
 
   Future<Tuple3<bool, String?, int>> getFitnessTipsFromAPI() async {
     try {
-      isLoading.value = true;
+      isLoadingForTips.value = true;
       var appResponse = await _apiService.getFitnessTips();
       if (appResponse.statusCode == 200) {
-        isLoading.value = false;
+        isLoadingForTips.value = false;
         if (appResponse.data is Map<String, dynamic>) {
           try {
             final FitnessTipsData data = FitnessTipsData.fromJson(
@@ -376,7 +413,7 @@ class DashboardController extends GetxController {
               appResponse.statusCode.toInt(),
             );
           } catch (e) {
-            isLoading.value = false;
+            isLoadingForTips.value = false;
             return Tuple3(
               false,
               "Error parsing ApiResponse",
@@ -384,7 +421,7 @@ class DashboardController extends GetxController {
             );
           }
         } else {
-          isLoading.value = false;
+          isLoadingForTips.value = false;
           return Tuple3(
             false,
             "appResponse.data is not a Map",
@@ -392,14 +429,14 @@ class DashboardController extends GetxController {
           );
         }
       } else if (appResponse.statusCode == 401) {
-        isLoading.value = false;
+        isLoadingForTips.value = false;
         return Tuple3(
           false,
           appResponse.message.toString(),
           appResponse.statusCode.toInt(),
         );
       } else {
-        isLoading.value = false;
+        isLoadingForTips.value = false;
         return Tuple3(
           false,
           appResponse.message.toString(),
@@ -407,7 +444,7 @@ class DashboardController extends GetxController {
         );
       }
     } catch (ex) {
-      isLoading.value = false;
+      isLoadingForTips.value = false;
       return Tuple3(false, "$ex", 0);
     }
   }
@@ -419,13 +456,13 @@ class DashboardController extends GetxController {
     print("Tag_MY_request ${stringValueOfTipsObj}");
     if (stringValueOfTipsObj != null) {
       try {
-        isLoading.value = true;
+        isLoadingForTips.value = true;
         var appResponse = await _apiService.saveFitnessTipsAPI(
           fitnessTips: stringValueOfTipsObj,
         );
         // For 200 or 201 handling we use result=1
         if (appResponse.result == 1) {
-          isLoading.value = false;
+          isLoadingForTips.value = false;
           if (appResponse.data is Map<String, dynamic>) {
             try {
               final FitnessTipsData data = FitnessTipsData.fromJson(
@@ -445,7 +482,7 @@ class DashboardController extends GetxController {
                 appResponse.statusCode.toInt(),
               );
             } catch (e) {
-              isLoading.value = false;
+              isLoadingForTips.value = false;
               return Tuple3(
                 false,
                 "Error parsing ApiResponse",
@@ -453,7 +490,7 @@ class DashboardController extends GetxController {
               );
             }
           } else {
-            isLoading.value = false;
+            isLoadingForTips.value = false;
             return Tuple3(
               false,
               "appResponse.data is not a Map",
@@ -461,7 +498,7 @@ class DashboardController extends GetxController {
             );
           }
         } else {
-          isLoading.value = false;
+          isLoadingForTips.value = false;
           return Tuple3(
             false,
             appResponse.message.toString(),
@@ -469,21 +506,21 @@ class DashboardController extends GetxController {
           );
         }
       } catch (ex) {
-        isLoading.value = false;
+        isLoadingForTips.value = false;
         return Tuple3(false, "$ex", 0);
       }
     } else {
-      isLoading.value = false;
+      isLoadingForTips.value = false;
       return Tuple3(false, "Invalid Json format", 0);
     }
   }
 
   Future<Tuple3<bool, String?, int>> getFitnessPlanFromAPI() async {
     try {
-      isLoading.value = true;
+      isLoadingForFitnessPlan.value = true;
       var appResponse = await _apiService.getFitnessPlan();
       if (appResponse.statusCode == 200) {
-        isLoading.value = false;
+        isLoadingForFitnessPlan.value = false;
         if (appResponse.data is Map<String, dynamic>) {
           try {
             final FitnessPlanData data = FitnessPlanData.fromJson(
@@ -501,7 +538,7 @@ class DashboardController extends GetxController {
               appResponse.statusCode.toInt(),
             );
           } catch (e) {
-            isLoading.value = false;
+            isLoadingForFitnessPlan.value = false;
             return Tuple3(
               false,
               "Error parsing ApiResponse",
@@ -509,7 +546,7 @@ class DashboardController extends GetxController {
             );
           }
         } else {
-          isLoading.value = false;
+          isLoadingForFitnessPlan.value = false;
           return Tuple3(
             false,
             "appResponse.data is not a Map",
@@ -517,14 +554,14 @@ class DashboardController extends GetxController {
           );
         }
       } else if (appResponse.statusCode == 401) {
-        isLoading.value = false;
+        isLoadingForFitnessPlan.value = false;
         return Tuple3(
           false,
           appResponse.message.toString(),
           appResponse.statusCode.toInt(),
         );
       } else {
-        isLoading.value = false;
+        isLoadingForFitnessPlan.value = false;
         return Tuple3(
           false,
           appResponse.message.toString(),
@@ -532,7 +569,7 @@ class DashboardController extends GetxController {
         );
       }
     } catch (ex) {
-      isLoading.value = false;
+      isLoadingForFitnessPlan.value = false;
       return Tuple3(false, "$ex", 0);
     }
   }
@@ -544,13 +581,13 @@ class DashboardController extends GetxController {
     print("Tag_MY_request ${stringValueOfFitnessPlanObj}");
     if (stringValueOfFitnessPlanObj != null) {
       try {
-        isLoading.value = true;
+        isLoadingForFitnessPlan.value = true;
         var appResponse = await _apiService.saveFitnessPlanAPI(
           fitnessPlan: stringValueOfFitnessPlanObj,
         );
         // For 200 or 201 handling we use result=1
         if (appResponse.result == 1) {
-          isLoading.value = false;
+          isLoadingForFitnessPlan.value = false;
           if (appResponse.data is Map<String, dynamic>) {
             try {
               final FitnessPlanData data = FitnessPlanData.fromJson(
@@ -570,7 +607,7 @@ class DashboardController extends GetxController {
                 appResponse.statusCode.toInt(),
               );
             } catch (e) {
-              isLoading.value = false;
+              isLoadingForFitnessPlan.value = false;
               return Tuple3(
                 false,
                 "Error parsing ApiResponse",
@@ -578,7 +615,7 @@ class DashboardController extends GetxController {
               );
             }
           } else {
-            isLoading.value = false;
+            isLoadingForFitnessPlan.value = false;
             return Tuple3(
               false,
               "appResponse.data is not a Map",
@@ -586,7 +623,7 @@ class DashboardController extends GetxController {
             );
           }
         } else {
-          isLoading.value = false;
+          isLoadingForFitnessPlan.value = false;
           return Tuple3(
             false,
             appResponse.message.toString(),
@@ -594,12 +631,62 @@ class DashboardController extends GetxController {
           );
         }
       } catch (ex) {
-        isLoading.value = false;
+        isLoadingForFitnessPlan.value = false;
         return Tuple3(false, "$ex", 0);
       }
     } else {
-      isLoading.value = false;
+      isLoadingForFitnessPlan.value = false;
       return Tuple3(false, "Invalid Json format", 0);
+    }
+  }
+
+  Future<void> callSaveCaloriesStatus() async {
+    final result = await saveCaloriesStatus();
+    if (result.item1) {
+      print("Tag_calories_status_updated");
+      // Success
+    } else if (result.item3 == 401) {
+      displaySessionExpireDialog(result);
+    } else {
+      showFancyDialog(result);
+    }
+  }
+
+  // Save Calories Status
+  Future<Tuple3<bool, String?, int>> saveCaloriesStatus() async {
+    final burnedCalories = secureStorage.getBurnCalories();
+    print("Tag_burnedCalories ${burnedCalories}");
+
+    // isLoadingForSaveCalories.value = true;
+    try {
+      var appResponse = await _apiService.saveCaloriesStatus(
+        burnedCalories ?? 0.0,
+      );
+
+      if (appResponse.statusCode == 200) {
+        return Tuple3(
+          true,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      } else if (appResponse.statusCode == 401) {
+        // isLoadingForSaveCalories.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      } else {
+        // isLoadingForSaveCalories.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      }
+    } catch (ex) {
+      // isLoadingForSaveCalories.value = false;
+      return Tuple3(false, "$ex", 0);
     }
   }
 }

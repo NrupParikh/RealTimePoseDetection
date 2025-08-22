@@ -190,4 +190,36 @@ class SecureStorageSingleton {
       return null;
     }
   }
+
+  Future<void> storeBurnCalories(double calories) async {
+    if (!_initialized) {
+      throw Exception("SecureStorageSingleton not initialized.");
+    }
+
+    final profile = getProfileData();
+    if (profile != null) {
+      final updatedProfile = profile.copyWith(caloriesStatus: calories);
+
+      await _prefs.setString(
+        AppKey.keyProfileObject,
+        jsonEncode(updatedProfile.toJson()),
+      );
+
+      if (kDebugMode) {
+        print("Burned calories updated → $calories");
+      }
+    } else {
+      if (kDebugMode) {
+        print("No profile found. Cannot store burned calories.");
+      }
+    }
+  }
+
+  double? getBurnCalories() {
+    if (!_initialized) {
+      throw Exception("SecureStorageSingleton not initialized.");
+    }
+    final profile = getProfileData();
+    return profile?.caloriesStatus;
+  }
 }

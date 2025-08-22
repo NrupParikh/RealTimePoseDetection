@@ -7,4 +7,5 @@ class ApiConstants {
   static const logout = "logout";
   static const tips = "tips";
   static const fitnessPlan = "recommended-exercises";
+  static const caloriesStatus = "profile/calories-status";
 }

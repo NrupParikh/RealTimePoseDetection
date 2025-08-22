@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pose_detection/Constants/app_string.dart';
 import 'package:pose_detection/Screens/dashboard/dashboard_controller.dart';
 
 class BMIInfoWidget extends StatefulWidget {
@@ -15,7 +16,7 @@ class _BMIInfoWidgetState extends State<BMIInfoWidget> {
   Widget build(BuildContext context) {
     return Obx(
       () => Padding(
-        padding: const EdgeInsets.only(left: 16.0), 
+        padding: const EdgeInsets.only(left: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -23,11 +24,11 @@ class _BMIInfoWidgetState extends State<BMIInfoWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildInfoItem(
-                  label: "Height (cm)",
+                  label: AppStrings.lblHeight,
                   value: controller.height.value.toString(),
                 ),
                 _buildInfoItem(
-                  label: "Weight (kg)",
+                  label: AppStrings.weight,
                   value: controller.weight.value.toString(),
                 ),
               ],
@@ -37,11 +38,11 @@ class _BMIInfoWidgetState extends State<BMIInfoWidget> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 _buildInfoItem(
-                  label: "BMI",
+                  label: AppStrings.lblBMI,
                   value: controller.calculateBMI().toStringAsFixed(2),
                 ),
                 _buildInfoItem(
-                  label: "Status",
+                  label: AppStrings.lblStatus,
                   value: controller.getBMIInterpretation(),
                 ),
               ],
@@ -53,8 +54,8 @@ class _BMIInfoWidgetState extends State<BMIInfoWidget> {
   }
 
   Widget _buildInfoItem({required String label, required String value}) {
-    return Expanded(  
-      child: Container(    
+    return Expanded(
+      child: Container(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
