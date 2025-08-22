@@ -12,6 +12,7 @@ import 'package:pose_detection/Screens/dashboard/fitness_tips.dart';
 import 'package:pose_detection/Screens/dashboard/recommanded_ex.dart';
 import 'package:pose_detection/Screens/dashboard/recommanded_ex_info_dialog.dart';
 import 'package:pose_detection/Screens/exerciseList/navigationDrawer/my_navigation_drawer.dart';
+import 'package:pose_detection/main.dart';
 
 class DashboardScreen extends StatefulWidget {
   @override
@@ -24,9 +25,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final List<StatusItem> bmiStatuses = [
-      StatusItem(color: ColorConstants.underweightColor, label: AppStrings.underweight),
-      StatusItem(color: ColorConstants.normalWeightColor, label: AppStrings.normal),
-      StatusItem(color: ColorConstants.overweightColor, label: AppStrings.overweight),
+      StatusItem(
+        color: ColorConstants.underweightColor,
+        label: AppStrings.underweight,
+      ),
+      StatusItem(
+        color: ColorConstants.normalWeightColor,
+        label: AppStrings.normal,
+      ),
+      StatusItem(
+        color: ColorConstants.overweightColor,
+        label: AppStrings.overweight,
+      ),
       StatusItem(color: ColorConstants.obeseColor, label: AppStrings.obese),
     ];
 
@@ -45,6 +55,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       drawer: MyNavigationDrawer(),
       body: Stack(
         children: [
+          // --- Background ---
           Positioned.fill(
             child: Image.asset("assets/images/login_bg.jpg", fit: BoxFit.cover),
           ),
@@ -59,6 +70,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
               child: const SizedBox.expand(),
             ),
           ),
+
+          // --- Main UI ---
           SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
@@ -76,7 +89,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                         child: Obx(() {
                           final plan = controller.fitnessPlan.value;
                           final tipsObj = controller.fitnessTipsDataModel.value;
-                          final burned = controller.RxTotalBurnedCal.value;
+                          final burned = controller.totalBurnedCal.value;
                           final dailyGoal =
                               plan?.estimatedCaloriesBurned.perDay ?? 0;
                           final progress =
@@ -92,14 +105,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                 padding: const EdgeInsets.only(left: 4),
                                 child: Row(
                                   children: [
-                                    Text(
-                                      AppStrings.greeting(
-                                        controller.profileData?.name,
-                                      ),
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                                    Obx(
+                                      () => Text(
+                                        AppStrings.greeting(
+                                          controller.userName.value,
+                                        ),
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
                                     const Text(
@@ -109,11 +124,11 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   ],
                                 ),
                               ),
-                              const Padding(
-                                padding: EdgeInsets.only(left: 4),
+                              Padding(
+                                padding: const EdgeInsets.only(left: 4),
                                 child: Text(
-                                  AppStrings.welcomMsg,
-                                  style: TextStyle(
+                                  "${AppStrings.welcomMsg} : ${secureStorage.getProfileData()?.goal ?? ""}",
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
                                     color: Colors.white70,
@@ -143,22 +158,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           plan?.estimatedCaloriesBurned.perDay,
                                           plan?.estimatedCaloriesBurned.perWeek,
                                         ),
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w600,
                                           color: Colors.white,
                                         ),
                                       ),
                                       const SizedBox(height: 4),
-                                      Text(
-                                        AppStrings.challengeDayText(
-                                          1, // current day
-                                          7, // total days
-                                          burned,
-                                        ),
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.white70,
+                                      Obx(
+                                        () => Text(
+                                          AppStrings.challengeDayText(
+                                            controller.day.value, // current day
+                                            ((controller.goalDuration.value) *
+                                                7),
+                                            burned,
+                                          ),
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.white70,
+                                          ),
                                         ),
                                       ),
                                       const SizedBox(height: 4),
@@ -198,14 +216,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Row(
-                                              children: [
-                                                const Icon(
+                                              children: const [
+                                                Icon(
                                                   Icons.balance,
                                                   color: Colors.white,
                                                   size: 20,
                                                 ),
-                                                const SizedBox(width: 8),
-                                                const Text(
+                                                SizedBox(width: 8),
+                                                Text(
                                                   AppStrings.bmiAndHealthStatus,
                                                   style: TextStyle(
                                                     color: Colors.white,
@@ -230,17 +248,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           ],
                                         ),
                                       ),
-                                      SizedBox(height: 8),
+                                      const SizedBox(height: 8),
                                       Row(
-                                        children: [
+                                        children: const [
                                           SizedBox(
                                             height: 115,
                                             width: 115,
                                             child: BmiRadialGauge(),
                                           ),
-                                          const Expanded(
-                                            child: BMIInfoWidget(),
-                                          ),
+                                          Expanded(child: BMIInfoWidget()),
                                         ],
                                       ),
                                       StatusIndicatorRow(
@@ -253,17 +269,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               const SizedBox(height: 4),
 
                               // Recommended Exercise
-                              if (controller.isLoading.value)
-                                Center(child: CircularProgressIndicator())
-                              else if (controller
+                              if (controller
                                   .errorMessageForFitnessPlan
                                   .isNotEmpty)
                                 SizedBox(
                                   height: 20,
                                   child: Text(
-                                    textAlign: TextAlign.start,
                                     "Error: ${controller.errorMessageForFitnessPlan.value}",
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,
                                       color: Colors.white70,
@@ -276,7 +289,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   child: Center(
                                     child: Text(
                                       AppStrings.noExerciseAvailable,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
                                         color: Colors.white70,
@@ -310,14 +323,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Row(
-                                                children: [
-                                                  const Icon(
+                                                children: const [
+                                                  Icon(
                                                     Icons.fitness_center,
                                                     color: Colors.white,
                                                     size: 20,
                                                   ),
-                                                  const SizedBox(width: 8),
-                                                  const Text(
+                                                  SizedBox(width: 8),
+                                                  Text(
                                                     AppStrings
                                                         .recommandedExercise,
                                                     style: TextStyle(
@@ -329,7 +342,6 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                   ),
                                                 ],
                                               ),
-
                                               GestureDetector(
                                                 onTap:
                                                     () =>
@@ -354,7 +366,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                           AppStrings.estimatedCaloriesBurned(
                                             plan.estimatedCaloriesBurned.perDay,
                                           ),
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             color: Colors.white,
                                             fontWeight: FontWeight.bold,
                                             fontSize: 12,
@@ -368,17 +380,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
                               const SizedBox(height: 4),
 
                               // Fitness Tips
-                              if (controller.isLoadingForTips.value)
-                                Center(child: CircularProgressIndicator())
-                              else if (controller
+                              if (controller
                                   .errorMessageForFitnessTips
-                                  .isNotEmpty)                                  
+                                  .isNotEmpty)
                                 SizedBox(
                                   height: 20,
                                   child: Text(
-                                    textAlign: TextAlign.start,
                                     "Error: ${controller.errorMessageForFitnessTips.value}",
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w500,
                                       color: Colors.white70,
@@ -392,7 +401,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   child: Center(
                                     child: Text(
                                       AppStrings.noTipsAvailable,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w500,
                                         color: Colors.white70,
@@ -430,6 +439,31 @@ class _DashboardScreenState extends State<DashboardScreen> {
               },
             ),
           ),
+
+          // --- Fullscreen Loader Overlay ---
+          Obx(() {
+            final bool showFitnessPlanLoader =
+                controller.isLoadingForFitnessPlanGemini.value
+                    ? controller.isLoadingForFitnessPlanGemini.value
+                    : controller.isLoadingForFitnessPlan.value;
+
+            final bool showTipsLoader =
+                controller.isLoadingForTipsGemini.value
+                    ? controller.isLoadingForTipsGemini.value
+                    : controller.isLoadingForTips.value;
+
+            if (showFitnessPlanLoader ||
+                showTipsLoader ||
+                controller.isLoadingForProfile.value 
+                // || controller.isLoadingForSaveCalories.value                
+                ) {
+              return Container(
+                color: Colors.black54,
+                child: const Center(child: CircularProgressIndicator()),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
         ],
       ),
     );

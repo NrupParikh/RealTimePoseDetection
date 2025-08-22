@@ -1,17 +1,34 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pose_detection/Components/fancy_alert_dialog.dart';
+import 'package:pose_detection/Components/session_expire_controller.dart';
 import 'package:pose_detection/Constants/app_string.dart';
 import 'package:pose_detection/Constants/gemini_prompt.dart';
+import 'package:pose_detection/Singleton/api_service_singleton.dart';
+import 'package:pose_detection/api/apiModels/fitness_plan_data.dart';
 import 'package:pose_detection/api/apiModels/fitness_plan_response.dart';
+import 'package:pose_detection/api/apiModels/fitness_tips_data.dart';
 import 'package:pose_detection/api/apiModels/fitness_tips_response.dart';
+import 'package:pose_detection/api/apiModels/profile.dart';
+import 'package:pose_detection/api/apiModels/profile_response.dart';
+import 'package:pose_detection/api/api_service.dart';
 import 'package:pose_detection/api/gemini_api_service.dart';
 import 'package:pose_detection/main.dart';
+import 'package:tuple/tuple.dart';
 
 class DashboardController extends GetxController {
   final geminiService = GeminiApiService();
+  final ApiService _apiService = ApiServiceSingleton().apiService;
+  final SessionExpireController sessionController =
+      Get.find<SessionExpireController>();
 
   // --- UI STATE VARIABLES ---
-  final RxBool isLoading = false.obs;
+  final RxBool isLoadingForFitnessPlan = false.obs;
+  final RxBool isLoadingForFitnessPlanGemini = false.obs;
   final RxBool isLoadingForTips = false.obs;
+  final RxBool isLoadingForTipsGemini = false.obs;
+  final RxBool isLoadingForProfile = false.obs;
+  // final RxBool isLoadingForSaveCalories = false.obs;
 
   final RxString errorMessageForFitnessPlan = ''.obs;
   final RxString errorMessageForFitnessTips = ''.obs;
@@ -21,116 +38,229 @@ class DashboardController extends GetxController {
       Rx<FitnessTipsResponse?>(null);
 
   // --- USER PROFILE & BMI DATA ---
-  final RxInt height = 0.obs;
-  final RxInt weight = 0.obs;
-  // Load profile data once at the beginning
-  final profileData = secureStorage.getProfileData();
-
-  final RxTotalBurnedCal = 0.0.obs;
-
+  final RxDouble height = 0.0.obs;
+  final RxDouble weight = 0.0.obs;
+  final RxString userName = 'User'.obs;
+  final RxInt goalDuration = 0.obs;
+  final RxDouble totalBurnedCal = 0.0.obs;
+  final RxInt day = 0.obs;
   var currentTipIndex = 0.obs;
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
 
+    totalBurnedCal.value = secureStorage.getBurnCalories() ?? 0.0;
+
+    final isGeminiCallOnProfileUpdate =
+        sessionController.geminiUpdateRequired.value;
+    print("Tag_isGeminiCallOnProfileUpdate ${isGeminiCallOnProfileUpdate}");
+
     // Set initial height and weight from stored profile or use defaults
+    // Load profile data once at the beginning
+    final profileData = secureStorage.getProfileData();
     if (profileData != null) {
-      height.value = (profileData?.height ?? 0).toInt();
-      weight.value = (profileData?.weight ?? 0).toInt();
+      setUpProfileData(profileData);
+      calculateBMI();
     } else {
-      height.value = 0;
-      weight.value = 0;
+      await callProfileAPI();
     }
-    calculateBMI();
-    loadFitnessPlan();
-    loadFitnessTips();
+
+    if (isGeminiCallOnProfileUpdate) {
+      await callFitnessPlanFromGemini();
+      await callFitnessTipsFromGemini();
+    } else {
+      await handleFitnessPlan();
+      await handleFitnessTips();
+    }
+  }
+
+  Future<void> callProfileAPI() async {
+    await getProfile().then((result) {
+      if (result.item1) {
+        final profileData = secureStorage.getProfileData();
+        if (profileData != null) {
+          setUpProfileData(profileData);
+          calculateBMI();
+        }
+      } else if (result.item3 == 401) {
+        displaySessionExpireDialog(result);
+      } else {
+        showFancyDialog(result);
+      }
+    });
+  }
+
+  // ===== set up profile related variables
+  void setUpProfileData(Profile profileData) {
+    height.value = (profileData.height).toDouble();
+    weight.value = (profileData.weight).toDouble();
+    userName.value = (profileData.name);
+    goalDuration.value = (profileData.goalDuration).toInt();
+    totalBurnedCal.value = (profileData.caloriesStatus ?? 0).toDouble();
+    day.value = (profileData.getDayCount());
+  }
+
+  // =========== FITNESS PLAN ===========
+  Future<void> handleFitnessPlan() async {
+    // =========== PREFERENCE CHECK
+    final plan = await secureStorage.getFitnessPlan();
+    if (plan != null) {
+      print("Tag_workout_lenght ${plan.workoutPlan.length}");
+      fitnessPlan.value = plan;
+    } else {
+      // =========== OUR API CHECK
+      await getFitnessPlanFromAPI().then((result) async {
+        if (result.item1) {
+        } else if (result.item3 == 401) {
+          displaySessionExpireDialog(result);
+        } else {
+          // =========== GEMINI API CALL
+          await callFitnessPlanFromGemini();
+        }
+      });
+    }
+  }
+
+  Future<void> callFitnessPlanFromGemini() async {
+    final plan = await getFitnessPlanFromGemini();
+    if (plan != null) {
+      // =========== SAVE TO OUR API
+      final result = await saveFitnessPlanAPI();
+      if (result.item1) {
+        sessionController.geminiUpdateRequired.value = false;
+      } else if (result.item3 == 401) {
+        displaySessionExpireDialog(result);
+      } else {
+        showFancyDialog(result);
+      }
+    }
+  }
+
+  // =========== FITNESS TIPS ===========
+  Future<void> handleFitnessTips() async {
+    // =========== PREFERENCE CHECK
+    final tips = await secureStorage.getFitnessTips();
+    if (tips != null) {
+      print("Tag_tips_lenght ${tips.fitnessTips.length}");
+      fitnessTipsDataModel.value = tips;
+    } else {
+      // =========== OUR API CHECK
+      await getFitnessTipsFromAPI().then((result) async {
+        if (result.item1) {
+        } else if (result.item3 == 401) {
+          displaySessionExpireDialog(result);
+        } else {
+          // =========== GEMINI API CALL
+          await callFitnessTipsFromGemini();
+        }
+      });
+    }
+  }
+
+  Future<void> callFitnessTipsFromGemini() async {
+    final tips = await getFitnessTipsFromGemini();
+    if (tips != null) {
+      // =========== SAVE TO OUR API
+      final result = await saveFitnessTipsAPI();
+      if (result.item1) {
+        sessionController.geminiUpdateRequired.value = false;
+      } else if (result.item3 == 401) {
+        displaySessionExpireDialog(result);
+      } else {
+        showFancyDialog(result);
+      }
+    }
+  }
+
+  void showFancyDialog(Tuple3<bool, String?, int> result) {
+    if (Get.context != null && !Get.isDialogOpen!) {
+      FancyAlertDialog.showFancyAlertDialog(
+        context: Get.context!,
+        title: AppStrings.appName,
+        message: result.item2.toString(),
+        onOkPressed: () {
+          Get.back();
+        },
+        onCancelPressed: null,
+      );
+    }
+  }
+
+  void displaySessionExpireDialog(Tuple3<bool, String?, int> result) {
+    if (Get.context != null && !Get.isDialogOpen!) {
+      sessionController.showSessionExpiredDialog(
+        Get.context!,
+        result.item2.toString(),
+      );
+    }
   }
 
   // --- BMI CALCULATION LOGIC ---
 
   double calculateBMI() {
-    if (height.value <= 0 || weight.value <= 0) {
-      return 0.0;
-    }
-    double heightInMeters = height.value / 100.0;
-    return weight.value / (heightInMeters * heightInMeters);
+    if (height.value <= 0 || weight.value <= 0) return 0.0;
+    final h = height.value / 100;
+    return weight.value / (h * h);
   }
 
   String getBMIInterpretation() {
-    double bmi = calculateBMI();
-    if (bmi < 18.5) {
-      return AppStrings.underweight;
-    } else if (bmi >= 18.5 && bmi < 24.9) {
-      return AppStrings.normal;
-    } else if (bmi >= 25 && bmi < 29.9) {
-      return AppStrings.overweight;
-    } else {
-      return AppStrings.obese;
-    }
+    final bmi = calculateBMI();
+    if (bmi < 18.5) return AppStrings.underweight;
+    if (bmi < 24.9) return AppStrings.normal;
+    if (bmi < 29.9) return AppStrings.overweight;
+    return AppStrings.obese;
   }
 
-  // --- DATA FETCHING LOGIC ---
-
-  /// Retrieves user profile from storage and triggers the API call.
-  Future<void> loadFitnessPlan() async {
-    // This logic uses the profile data if it exists, otherwise uses sensible defaults.
+  Future<FitnessPlanResponse?> getFitnessPlanFromGemini() async {
+    final profileData = secureStorage.getProfileData();
     if (profileData != null) {
-      await getFitnessPlan(
-        age: profileData!.age ?? 0,
-        gender: profileData!.gender ?? 'male',
-        height: profileData!.height?.toInt() ?? 0,
-        weight: profileData!.weight?.toInt() ?? 0,
-        goal: profileData!.goal ?? 'Lose weight',
+      final plan = await getGeminiFitnessPlan(
+        age: profileData.age,
+        gender: profileData.gender,
+        height: profileData.height.toInt(),
+        weight: profileData.weight.toInt(),
+        goal: profileData.goal,
+        goalDuration: profileData.goalDuration.toInt(),
       );
+      return plan;
     } else {
-      // This path is taken if the user has no profile saved.      
       errorMessageForFitnessPlan.value =
           "No profile data found for recommanded exercise";
-      // await getFitnessPlan(
-      //   age: 25,
-      //   gender: 'male',
-      //   height: 150,
-      //   weight: 60, // Avoid sending 0 as weight
-      //   goal: 'Lose weight',
-      // );
+      return null;
     }
   }
 
-  Future<void> loadFitnessTips() async {
-    // This logic uses the profile data if it exists, otherwise uses sensible defaults.
+  Future<FitnessTipsResponse?> getFitnessTipsFromGemini() async {
+    final profileData = secureStorage.getProfileData();
     if (profileData != null) {
-      await getFitnessTips(
-        age: profileData!.age ?? 0,
-        gender: profileData!.gender ?? 'male',
-        height: profileData!.height?.toInt() ?? 0,
-        weight: profileData!.weight?.toInt() ?? 0,
-        goal: profileData!.goal ?? 'Lose weight',
+      final tips = await getGeminiFitnessTips(
+        age: profileData.age,
+        gender: profileData.gender,
+        height: profileData.height.toInt(),
+        weight: profileData.weight.toInt(),
+        goal: profileData.goal,
+        goalDuration: profileData.goalDuration.toInt(),
       );
+      return tips;
     } else {
-      // This path is taken if the user has no profile saved.
       errorMessageForFitnessTips.value =
           "No profile data found for fitness tips";
-      // await getFitnessTips(
-      //   age: 25,
-      //   gender: 'male',
-      //   height: 150,
-      //   weight: 60, // Avoid sending 0 as weight
-      //   goal: 'Lose weight',
-      // );
+      return null;
     }
   }
 
   /// Fetches the fitness plan using a direct HTTP request to the Google AI API.
-  Future<void> getFitnessPlan({
+  Future<FitnessPlanResponse?> getGeminiFitnessPlan({
     required int age,
     required String gender,
     required int height,
     required int weight,
     required String goal,
+    required int goalDuration,
   }) async {
     try {
-      isLoading.value = true;
+      isLoadingForFitnessPlanGemini.value = true;
       errorMessageForFitnessPlan.value = '';
       fitnessPlan.value = null;
 
@@ -140,44 +270,95 @@ class DashboardController extends GetxController {
         height: height,
         weight: weight,
         goal: goal,
+        goalDuration: goalDuration,
         taskDescription: GeminiPrompt.taskDescForFitnessPlan,
         jsonStructure: GeminiPrompt.jsonStructureForFitnessPlan,
       );
 
       final jsonMap = await geminiService.fetchJsonResponse(exercisePrompt);
       fitnessPlan.value = FitnessPlanResponse.fromJson(jsonMap);
+      if (fitnessPlan.value != null) {
+        secureStorage.storeFitnessPlan(fitnessPlan.value!);
+        return fitnessPlan.value;
+      }
+      return null;
     } catch (e) {
+      isLoadingForFitnessPlanGemini.value = false;
       errorMessageForFitnessPlan.value = e.toString();
+      return null;
     } finally {
-      isLoading.value = false;
+      isLoadingForFitnessPlanGemini.value = false;
     }
   }
 
-  // Future<void> getFitnessPlan({
-  //   required int age,
-  //   required String gender,
-  //   required int height,
-  //   required int weight,
-  //   required String goal,
-  // }) async {
-  //   isLoading.value = false;
-  //   errorMessageForFitnessPlan.value = '';
-  //   final Map<String, dynamic> jsonMap = json.decode(
-  //     GeminiPrompt.recommandedExerciseStaticResponse,
-  //   );
-  //   fitnessPlan.value = FitnessPlanResponse.fromJson(jsonMap);
-  // }
+  // Get Profile Data
+  Future<Tuple3<bool, String?, int>> getProfile() async {
+    isLoadingForProfile.value = true;
+    final userId = secureStorage.getUserData()?.id ?? 0;
+    try {
+      var appResponse = await _apiService.getProfile(id: userId);
+      if (appResponse.statusCode == 200) {
+        isLoadingForProfile.value = false;
+        if (appResponse.data is Map<String, dynamic>) {
+          try {
+            final ProfileResponse data = ProfileResponse.fromJson(
+              appResponse.data,
+            );
+            debugPrint("Tag_data ${data.profile}");
+            secureStorage.storeProfileData(data.profile);
+            return Tuple3(
+              true,
+              appResponse.message.toString(),
+              appResponse.statusCode.toInt(),
+            );
+          } catch (e) {
+            isLoadingForProfile.value = false;
+            return Tuple3(
+              false,
+              "Error parsing ApiResponse",
+              appResponse.statusCode.toInt(),
+            );
+          }
+        } else {
+          isLoadingForProfile.value = false;
+          return Tuple3(
+            false,
+            "appResponse.data is not a Map",
+            appResponse.statusCode.toInt(),
+          );
+        }
+      } else if (appResponse.statusCode == 401) {
+        isLoadingForProfile.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      } else {
+        isLoadingForProfile.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      }
+    } catch (ex) {
+      isLoadingForProfile.value = false;
+      return Tuple3(false, "$ex", 0);
+    }
+  }
 
-  // Fitness Tips
-  Future<void> getFitnessTips({
+  // ===================== Fitness Tips =====================
+  Future<FitnessTipsResponse?> getGeminiFitnessTips({
     required int age,
     required String gender,
     required int height,
     required int weight,
     required String goal,
+    required int goalDuration,
   }) async {
     try {
-      isLoadingForTips.value = true;
+      isLoadingForTipsGemini.value = true;
       errorMessageForFitnessTips.value = '';
       fitnessTipsDataModel.value = null;
 
@@ -187,32 +368,325 @@ class DashboardController extends GetxController {
         height: height,
         weight: weight,
         goal: goal,
+        goalDuration: goalDuration,
         taskDescription: GeminiPrompt.taskDescForFitnessTips,
         jsonStructure: GeminiPrompt.jsonStructureForFitnessTips,
       );
 
       final jsonMap = await geminiService.fetchJsonResponse(tipsPrompt);
       fitnessTipsDataModel.value = FitnessTipsResponse.fromJson(jsonMap);
+
+      if (fitnessTipsDataModel.value != null) {
+        secureStorage.storeFitnessTips(fitnessTipsDataModel.value!);
+        return fitnessTipsDataModel.value;
+      }
+      return null;
     } catch (e) {
+      isLoadingForTipsGemini.value = false;
       errorMessageForFitnessTips.value = e.toString();
+      return null;
     } finally {
-      isLoadingForTips.value = false;
+      isLoadingForTipsGemini.value = false;
     }
   }
 
-  // Future<void> getFitnessTips({
-  //   required int age,
-  //   required String gender,
-  //   required int height,
-  //   required int weight,
-  //   required String goal,
-  // }) async {
-  //   isLoadingForTips.value = false;
-  //   errorMessageForFitnessTips.value = '';
-  //   final Map<String, dynamic> jsonMap = json.decode(
-  //     GeminiPrompt.fitnessTipsStaticResponse,
-  //   );
-  //   print("Tag_jsonMap ${jsonMap.toString()}");
-  //   fitnessTipsDataModel.value = FitnessTipsResponse.fromJson(jsonMap);
-  // }
+  Future<Tuple3<bool, String?, int>> getFitnessTipsFromAPI() async {
+    try {
+      isLoadingForTips.value = true;
+      var appResponse = await _apiService.getFitnessTips();
+      if (appResponse.statusCode == 200) {
+        isLoadingForTips.value = false;
+        if (appResponse.data is Map<String, dynamic>) {
+          try {
+            final FitnessTipsData data = FitnessTipsData.fromJson(
+              appResponse.data,
+            );
+            fitnessTipsDataModel.value = data.geminiFitnessTips;
+            if (data.geminiFitnessTips != null) {
+              secureStorage.storeFitnessTips(data.geminiFitnessTips!);
+            }
+            debugPrint("Tag_fitness_tips ${data.geminiFitnessTips.toString()}");
+            debugPrint("Tag_created_at ${data.createdAt.toString()}");
+            return Tuple3(
+              true,
+              appResponse.message.toString(),
+              appResponse.statusCode.toInt(),
+            );
+          } catch (e) {
+            isLoadingForTips.value = false;
+            return Tuple3(
+              false,
+              "Error parsing ApiResponse",
+              appResponse.statusCode.toInt(),
+            );
+          }
+        } else {
+          isLoadingForTips.value = false;
+          return Tuple3(
+            false,
+            "appResponse.data is not a Map",
+            appResponse.statusCode.toInt(),
+          );
+        }
+      } else if (appResponse.statusCode == 401) {
+        isLoadingForTips.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      } else {
+        isLoadingForTips.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      }
+    } catch (ex) {
+      isLoadingForTips.value = false;
+      return Tuple3(false, "$ex", 0);
+    }
+  }
+
+  Future<Tuple3<bool, String?, int>> saveFitnessTipsAPI() async {
+    print("Tag_Save_fitness_tips_Function");
+    final tips = secureStorage.getFitnessTips();
+    final stringValueOfTipsObj = tips?.toJsonString();
+    print("Tag_MY_request ${stringValueOfTipsObj}");
+    if (stringValueOfTipsObj != null) {
+      try {
+        isLoadingForTips.value = true;
+        var appResponse = await _apiService.saveFitnessTipsAPI(
+          fitnessTips: stringValueOfTipsObj,
+        );
+        // For 200 or 201 handling we use result=1
+        if (appResponse.result == 1) {
+          isLoadingForTips.value = false;
+          if (appResponse.data is Map<String, dynamic>) {
+            try {
+              final FitnessTipsData data = FitnessTipsData.fromJson(
+                appResponse.data,
+              );
+              fitnessTipsDataModel.value = data.geminiFitnessTips;
+              if (data.geminiFitnessTips != null) {
+                secureStorage.storeFitnessTips(data.geminiFitnessTips!);
+              }
+              debugPrint(
+                "Tag_fitness_tips ${data.geminiFitnessTips.toString()}",
+              );
+              debugPrint("Tag_created_at ${data.createdAt.toString()}");
+              return Tuple3(
+                true,
+                appResponse.message.toString(),
+                appResponse.statusCode.toInt(),
+              );
+            } catch (e) {
+              isLoadingForTips.value = false;
+              return Tuple3(
+                false,
+                "Error parsing ApiResponse",
+                appResponse.statusCode.toInt(),
+              );
+            }
+          } else {
+            isLoadingForTips.value = false;
+            return Tuple3(
+              false,
+              "appResponse.data is not a Map",
+              appResponse.statusCode.toInt(),
+            );
+          }
+        } else {
+          isLoadingForTips.value = false;
+          return Tuple3(
+            false,
+            appResponse.message.toString(),
+            appResponse.statusCode.toInt(),
+          );
+        }
+      } catch (ex) {
+        isLoadingForTips.value = false;
+        return Tuple3(false, "$ex", 0);
+      }
+    } else {
+      isLoadingForTips.value = false;
+      return Tuple3(false, "Invalid Json format", 0);
+    }
+  }
+
+  Future<Tuple3<bool, String?, int>> getFitnessPlanFromAPI() async {
+    try {
+      isLoadingForFitnessPlan.value = true;
+      var appResponse = await _apiService.getFitnessPlan();
+      if (appResponse.statusCode == 200) {
+        isLoadingForFitnessPlan.value = false;
+        if (appResponse.data is Map<String, dynamic>) {
+          try {
+            final FitnessPlanData data = FitnessPlanData.fromJson(
+              appResponse.data,
+            );
+            fitnessPlan.value = data.geminiFitnessPlan;
+            if (data.geminiFitnessPlan != null) {
+              secureStorage.storeFitnessPlan(data.geminiFitnessPlan!);
+            }
+            debugPrint("Tag_fitness_plan ${data.geminiFitnessPlan.toString()}");
+            debugPrint("Tag_created_at ${data.createdAt.toString()}");
+            return Tuple3(
+              true,
+              appResponse.message.toString(),
+              appResponse.statusCode.toInt(),
+            );
+          } catch (e) {
+            isLoadingForFitnessPlan.value = false;
+            return Tuple3(
+              false,
+              "Error parsing ApiResponse",
+              appResponse.statusCode.toInt(),
+            );
+          }
+        } else {
+          isLoadingForFitnessPlan.value = false;
+          return Tuple3(
+            false,
+            "appResponse.data is not a Map",
+            appResponse.statusCode.toInt(),
+          );
+        }
+      } else if (appResponse.statusCode == 401) {
+        isLoadingForFitnessPlan.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      } else {
+        isLoadingForFitnessPlan.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      }
+    } catch (ex) {
+      isLoadingForFitnessPlan.value = false;
+      return Tuple3(false, "$ex", 0);
+    }
+  }
+
+  Future<Tuple3<bool, String?, int>> saveFitnessPlanAPI() async {
+    print("Tag_Save_fitness_plan_Function");
+    final plan = secureStorage.getFitnessPlan();
+    final stringValueOfFitnessPlanObj = plan?.toJsonString();
+    print("Tag_MY_request ${stringValueOfFitnessPlanObj}");
+    if (stringValueOfFitnessPlanObj != null) {
+      try {
+        isLoadingForFitnessPlan.value = true;
+        var appResponse = await _apiService.saveFitnessPlanAPI(
+          fitnessPlan: stringValueOfFitnessPlanObj,
+        );
+        // For 200 or 201 handling we use result=1
+        if (appResponse.result == 1) {
+          isLoadingForFitnessPlan.value = false;
+          if (appResponse.data is Map<String, dynamic>) {
+            try {
+              final FitnessPlanData data = FitnessPlanData.fromJson(
+                appResponse.data,
+              );
+              fitnessPlan.value = data.geminiFitnessPlan;
+              if (data.geminiFitnessPlan != null) {
+                secureStorage.storeFitnessPlan(data.geminiFitnessPlan!);
+              }
+              debugPrint(
+                "Tag_fitness_plan ${data.geminiFitnessPlan.toString()}",
+              );
+              debugPrint("Tag_created_at ${data.createdAt.toString()}");
+              return Tuple3(
+                true,
+                appResponse.message.toString(),
+                appResponse.statusCode.toInt(),
+              );
+            } catch (e) {
+              isLoadingForFitnessPlan.value = false;
+              return Tuple3(
+                false,
+                "Error parsing ApiResponse",
+                appResponse.statusCode.toInt(),
+              );
+            }
+          } else {
+            isLoadingForFitnessPlan.value = false;
+            return Tuple3(
+              false,
+              "appResponse.data is not a Map",
+              appResponse.statusCode.toInt(),
+            );
+          }
+        } else {
+          isLoadingForFitnessPlan.value = false;
+          return Tuple3(
+            false,
+            appResponse.message.toString(),
+            appResponse.statusCode.toInt(),
+          );
+        }
+      } catch (ex) {
+        isLoadingForFitnessPlan.value = false;
+        return Tuple3(false, "$ex", 0);
+      }
+    } else {
+      isLoadingForFitnessPlan.value = false;
+      return Tuple3(false, "Invalid Json format", 0);
+    }
+  }
+
+  Future<void> callSaveCaloriesStatus() async {
+    final result = await saveCaloriesStatus();
+    if (result.item1) {
+      print("Tag_calories_status_updated");
+      // Success
+    } else if (result.item3 == 401) {
+      displaySessionExpireDialog(result);
+    } else {
+      showFancyDialog(result);
+    }
+  }
+
+  // Save Calories Status
+  Future<Tuple3<bool, String?, int>> saveCaloriesStatus() async {
+    final burnedCalories = secureStorage.getBurnCalories();
+    print("Tag_burnedCalories ${burnedCalories}");
+
+    // isLoadingForSaveCalories.value = true;
+    try {
+      var appResponse = await _apiService.saveCaloriesStatus(
+        burnedCalories ?? 0.0,
+      );
+
+      if (appResponse.statusCode == 200) {
+        return Tuple3(
+          true,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      } else if (appResponse.statusCode == 401) {
+        // isLoadingForSaveCalories.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      } else {
+        // isLoadingForSaveCalories.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      }
+    } catch (ex) {
+      // isLoadingForSaveCalories.value = false;
+      return Tuple3(false, "$ex", 0);
+    }
+  }
 }

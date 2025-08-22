@@ -29,4 +29,7 @@ class SessionExpireController extends GetxController {
     _secureStorage.clearSharedPreference(); // Use the injected instance
     Get.offAllNamed(PageName.login);
   }
+
+  // For update the Gemini APIs if profile related info gets update
+  RxBool geminiUpdateRequired = false.obs;
 }

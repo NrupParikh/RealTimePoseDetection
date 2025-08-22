@@ -1,7 +1,6 @@
 import 'package:get/get.dart';
 import 'package:pose_detection/Screens/dashboard/dashboard_controller.dart';
 
-
 class  DashboardBinding extends Bindings {
   @override
   void dependencies() {

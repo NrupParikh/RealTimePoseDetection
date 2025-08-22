@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class FitnessTipsResponse {
   final List<String> fitnessTips;
 
@@ -10,8 +12,15 @@ class FitnessTipsResponse {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'fitness_tips': fitnessTips,
-    };
+    return {'fitness_tips': fitnessTips};
+  }
+
+  /// Convert object to JSON string
+  String toJsonString() => jsonEncode(toJson());
+
+  /// Convert JSON string back to object
+  factory FitnessTipsResponse.fromJsonString(String jsonString) {
+    final Map<String, dynamic> jsonMap = jsonDecode(jsonString);
+    return FitnessTipsResponse.fromJson(jsonMap);
   }
 }

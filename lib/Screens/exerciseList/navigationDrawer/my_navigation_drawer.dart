@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pose_detection/Components/frosted_glass_effect.dart';
 import 'package:pose_detection/Constants/app_colors.dart';
+import 'package:pose_detection/Constants/app_string.dart';
 import 'package:pose_detection/Constants/page_name.dart';
 import 'package:pose_detection/Screens/exerciseList/navigationDrawer/nav_drawer_controller.dart';
 
@@ -15,12 +16,58 @@ class MyNavigationDrawer extends StatefulWidget {
 class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
   final navDrawerController = Get.find<NavDrawerController>();
 
+  // Common text style
+  final TextStyle drawerTextStyle = const TextStyle(
+    color: Colors.white,
+    fontWeight: FontWeight.bold,
+    fontSize: 16,
+  );
+
+  // Common drawer item
+  Widget buildDrawerItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    bool isSelected = false,
+  }) {
+    return ListTile(
+      selected: isSelected,
+      selectedTileColor: Colors.black.withValues(alpha: 0.2),
+      leading: Icon(icon, color: Colors.white),
+      title: Text(title, style: drawerTextStyle),
+      onTap: () {
+        Get.back();
+        onTap();
+      },
+    );
+  }
+
+  // Drawer section with divider + item
+  Widget buildDrawerSection({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    bool isSelected = false,
+  }) {
+    return Column(
+      children: [
+        buildDrawerItem(
+          icon: icon,
+          title: title,
+          onTap: onTap,
+          isSelected: isSelected,
+        ),
+        Divider(color: ColorConstants.startColor),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDashboardSelected = Get.currentRoute == PageName.dashboard;
-    final isExerciseListSelected = Get.currentRoute == PageName.exerciseList;
+    // final isExerciseListSelected = Get.currentRoute == PageName.exerciseList;
     final isProfileSelected = Get.currentRoute == PageName.profile;
-    final isBMISelected = Get.currentRoute == PageName.bmiCalcScreen;
+    // final isBMISelected = Get.currentRoute == PageName.bmiCalcScreen;
     return Drawer(
       child: FrostedGlass(
         applyFilter: false,
@@ -36,109 +83,57 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
                 padding: EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    Divider(color: ColorConstants.startColor),
-                    ListTile(
-                      selected: isDashboardSelected,
-                      selectedTileColor: Colors.black.withValues(alpha: 0.2),
-                      leading: Icon(Icons.person_outline, color: Colors.white),
-                      title: Text(
-                        "Dashboard",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
+                    buildDrawerSection(
+                      icon: Icons.dashboard_outlined,
+                      title: AppStrings.dashboard,
+                      isSelected: isDashboardSelected,
                       onTap: () {
-                        // Close the drawer first
                         Get.back();
                         if (Get.currentRoute != PageName.dashboard) {
                           Get.offAllNamed(PageName.dashboard);
                         }
                       },
                     ),
-                    ListTile(
-                      selected: isExerciseListSelected,
-                      selectedTileColor: Colors.black.withValues(alpha: 0.2),
-                      leading: Icon(Icons.home_outlined, color: Colors.white),
-                      title: Text(
-                        "Exercise List",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
+                    // buildDrawerSection(
+                    //   icon: Icons.fitness_center,
+                    //   title: AppStrings.exerciseList,
+                    //   isSelected: isExerciseListSelected,
+                    //   onTap: () {
+                    //     Get.back();
+                    //     if (Get.currentRoute != PageName.exerciseList) {
+                    //       Get.offAllNamed(PageName.exerciseList);
+                    //     }
+                    //   },
+                    // ),
+                    buildDrawerSection(
+                      icon: Icons.person_outline,
+                      title: AppStrings.profile,
+                      isSelected: isProfileSelected,
                       onTap: () {
-                        // Close the drawer first
-                        Get.back();
-                        if (Get.currentRoute != PageName.exerciseList) {
-                          Get.offAllNamed(PageName.exerciseList);
-                        }
-                      },
-                    ),
-                    Divider(color: ColorConstants.startColor),
-                    ListTile(
-                      selected: isProfileSelected,
-                      selectedTileColor: Colors.black.withValues(alpha: 0.2),
-                      leading: Icon(Icons.person_outline, color: Colors.white),
-                      title: Text(
-                        "Profile",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      onTap: () {
-                        // Close the drawer first
                         Get.back();
                         if (Get.currentRoute != PageName.profile) {
                           Get.offAllNamed(PageName.profile);
                         }
                       },
                     ),
-                    Divider(color: ColorConstants.startColor),
-                    ListTile(
-                      selected: isBMISelected,
-                      selectedTileColor: Colors.black.withValues(alpha: 0.2),
-                      leading: Icon(
-                        Icons.calculate_outlined,
-                        color: Colors.white,
-                      ),
-                      title: Text(
-                        "BMI Calculator",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
+                    // buildDrawerSection(
+                    //   icon: Icons.calculate_outlined,
+                    //   title: AppStrings.bmiCalculator,
+                    //   isSelected: isBMISelected,
+                    //   onTap: () {
+                    //     Get.back();
+                    //     if (Get.currentRoute != PageName.bmiCalcScreen) {
+                    //       Get.offAllNamed(PageName.bmiCalcScreen);
+                    //     }
+                    //   },
+                    // ),
+                    buildDrawerSection(
+                      icon: Icons.logout_outlined,
+                      title: AppStrings.logout,
                       onTap: () {
-                        // Close the drawer first
-                        Get.back();
-                        if (Get.currentRoute != PageName.bmiCalcScreen) {
-                          Get.offAllNamed(PageName.bmiCalcScreen);
-                        }
-                      },
-                    ),
-                    Divider(color: ColorConstants.startColor),
-                    ListTile(
-                      leading: Icon(Icons.logout_outlined, color: Colors.white),
-                      title: Text(
-                        "Logout",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                        ),
-                      ),
-                      onTap: () {
-                        Get.back();
                         navDrawerController.handleLogout();
                       },
                     ),
-                    Divider(color: ColorConstants.startColor),
                   ],
                 ),
               ),

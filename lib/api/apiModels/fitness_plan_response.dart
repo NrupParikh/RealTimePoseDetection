@@ -16,17 +16,32 @@ class FitnessPlanResponse {
     if (json['workout_plan'] == null ||
         json['estimated_calories_burned'] == null) {
       throw FormatException(
-          "Invalid JSON structure: Missing 'workout_plan' or 'estimated_calories_burned'");
+        "Invalid JSON structure: Missing 'workout_plan' or 'estimated_calories_burned'",
+      );
     }
 
-    return FitnessPlanResponse(      
+    return FitnessPlanResponse(
       workoutPlan: List<WorkoutPlan>.from(
         json["workout_plan"].map((x) => WorkoutPlan.fromJson(x)),
-      ),      
+      ),
       estimatedCaloriesBurned: EstimatedCaloriesBurned.fromJson(
         json["estimated_calories_burned"],
       ),
     );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "workout_plan": workoutPlan.map((x) => x.toJson()).toList(),
+    "estimated_calories_burned": estimatedCaloriesBurned.toJson(),
+  };
+
+  /// Convert object to JSON string
+  String toJsonString() => jsonEncode(toJson());
+
+  /// Convert JSON string back to object
+  factory FitnessPlanResponse.fromJsonString(String jsonString) {
+    final Map<String, dynamic> jsonMap = jsonDecode(jsonString);
+    return FitnessPlanResponse.fromJson(jsonMap);
   }
 }
 
@@ -34,10 +49,7 @@ class EstimatedCaloriesBurned {
   final int perDay;
   final int perWeek;
 
-  EstimatedCaloriesBurned({
-    required this.perDay,
-    required this.perWeek,
-  });
+  EstimatedCaloriesBurned({required this.perDay, required this.perWeek});
 
   factory EstimatedCaloriesBurned.fromJson(Map<String, dynamic> json) {
     return EstimatedCaloriesBurned(
@@ -45,6 +57,8 @@ class EstimatedCaloriesBurned {
       perWeek: json["per_week"],
     );
   }
+
+  Map<String, dynamic> toJson() => {"per_day": perDay, "per_week": perWeek};
 }
 
 class WorkoutPlan {
@@ -58,7 +72,6 @@ class WorkoutPlan {
     required this.value,
   });
 
-  
   factory WorkoutPlan.fromJson(Map<String, dynamic> json) {
     return WorkoutPlan(
       exerciseName: json["exercise_name"],
@@ -66,6 +79,12 @@ class WorkoutPlan {
       value: json["value"],
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    "exercise_name": exerciseName,
+    "type": type,
+    "value": value,
+  };
 }
 
 // ====== Sample JSON structure for reference ======
