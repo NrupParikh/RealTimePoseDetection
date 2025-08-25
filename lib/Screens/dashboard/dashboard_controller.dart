@@ -73,6 +73,10 @@ class DashboardController extends GetxController {
       await handleFitnessPlan();
       await handleFitnessTips();
     }
+
+    // Goal status
+    isGoalDurationCompleted();
+    isGoalAchieved();
   }
 
   Future<void> callProfileAPI() async {
@@ -99,6 +103,36 @@ class DashboardController extends GetxController {
     goalDuration.value = (profileData.goalDuration).toInt();
     totalBurnedCal.value = (profileData.caloriesStatus ?? 0).toDouble();
     day.value = (profileData.getDayCount());
+  }
+
+  int durationInDays() {
+    return ((goalDuration.value) * 7);
+  }
+
+  Tuple2<bool,String> isGoalDurationCompleted() {
+    if (day.value == durationInDays) {
+      print("Tag_goal_duration_completed");
+      return Tuple2(true, "Goal duration completed");
+    } else {
+      final reminingDuration = durationInDays() - day.value;
+      print("Tag_goal_duration_running ${reminingDuration} days remaining");
+      return Tuple2(false, "${reminingDuration} days remaining out of ${durationInDays()} days challenge");
+    }
+  }
+
+  Tuple2<bool,String> isGoalAchieved() {
+    if (totalBurnedCal.value ==
+        fitnessPlan.value?.estimatedCaloriesBurned.perWeek) {
+     return Tuple2(true, "Goal acheived");
+    } else {
+      final reminingCaloriesToBurn =
+          ((fitnessPlan.value?.estimatedCaloriesBurned.perWeek ?? 0.0) -
+              totalBurnedCal.value);
+      print(
+        "Tag_goal_not_achieved ${reminingCaloriesToBurn} kcal needs to burn per week",
+      );
+      return Tuple2(false, "${reminingCaloriesToBurn.toStringAsFixed(2)} kcal/week needs to burn out of ${(fitnessPlan.value?.estimatedCaloriesBurned.perWeek ?? 0.0)} kcal/week");
+    }
   }
 
   // =========== FITNESS PLAN ===========

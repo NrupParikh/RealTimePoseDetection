@@ -59,6 +59,7 @@ class AppStrings {
   static const String poseTips = "Pose Tips";
   static const String advantages = "Advantages";
   static const aboutBmi = "About BMI";
+  static const aboutGoal = "About Goal";
   static const String description = "Description";
   static const String bmiDescription =
       "BMI (Body Mass Index) is a tool used to estimate body fat based on your height and weight. It's a quick way to screen for weight categories that may lead to health problems";
@@ -74,6 +75,9 @@ class AppStrings {
 - Obese: 30.0 or higher
 """;
 
+static const String goalDescription = "To acheive your goal you need to perform recommanded exercies and follow the given fitness tips during give time period";
+static const String goalDurationStatus = "Duration status";
+static const String caloriesStatus = "Calories Status";
   static const aboutReEx = "About Recommanded Exercise";
   static const String recommandedExDescription =
       "This plan is tailored to your profile and includes a selection of exercises from the following: Push-up, Squat, Jumping Jack, Plank to Downward Dog, and Overhead Arm Clap.Each exercise includes the suggested number of sets/repetitions or a duration, helping you follow a structured routine";
@@ -102,7 +106,7 @@ class AppStrings {
   static const String bmiAndHealthStatus = "BMI & Health Status";
   static const String recommandedExercise = "Recommended Exercises";
   static String goalText(int? perDay, int? perWeek) =>
-      'Your Goal: Burn ${perDay ?? 0} kcal/day or ${perWeek ?? 0} kcal/week';
+      'Goal : Burn ${perDay ?? 0} kcal/day or ${perWeek ?? 0} kcal/week';
   static String challengeDayText(int dayNumber, int totalDays, double burned) =>
       'Day $dayNumber of $totalDays day challenge : ${burned.toStringAsFixed(2)} kcal burned';
   static String estimatedCaloriesBurned(int? perDay) =>
