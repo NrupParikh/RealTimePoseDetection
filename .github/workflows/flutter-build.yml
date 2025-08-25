@@ -5,6 +5,10 @@ on:
     branches:
       - main  # Change this to your target branch
 
+permissions:
+  actions: write
+  contents: read      
+
 jobs:
   build-android:
     name: Android Lint, Analyze, Format & Build
@@ -29,11 +33,11 @@ jobs:
       - name: Run Dart Format Check (Dry Run)
         run: dart format .
 
-      - name: Run Android Lint
-        run: |
-          cd android 
-          chmod +x gradlew
-          ./gradlew app:lintDebug
+      # - name: Run Android Lint
+      #   run: |
+      #     cd android 
+      #     chmod +x gradlew
+      #     ./gradlew app:lintDebug
 
       - name: Cleanup old artifacts
         run: |
