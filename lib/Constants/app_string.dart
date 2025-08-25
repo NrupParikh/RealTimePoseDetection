@@ -133,4 +133,9 @@ static const String caloriesStatus = "Calories Status";
   static String lblWeight = "Weight (kg)";
   static String lblBMI = "BMI";
   static String lblStatus = "Status";
+
+  // Goal status
+  static String goalAcheivedOnTime= "Congratulations You have acheived your goal on time!";
+  static String durationCompleted = "Your goal duration completed!";
+  static String goalAcheivedBeforeTime = "Congratulations You have acheived your goal before duration!";
 }

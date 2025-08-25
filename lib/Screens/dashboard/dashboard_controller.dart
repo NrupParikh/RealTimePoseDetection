@@ -75,8 +75,24 @@ class DashboardController extends GetxController {
     }
 
     // Goal status
-    isGoalDurationCompleted();
-    isGoalAchieved();
+    final durationStatus = isGoalDurationCompleted();
+    final burnedCaloriesStatus = isBurnedCaloriesGoalAcheived();
+
+    // if duration completed and calories burned
+    if (durationStatus.item1 && burnedCaloriesStatus.item1) {
+      showFancyDialog(AppStrings.goalAcheivedOnTime);
+    } else
+    // if only duration completed
+    if (durationStatus.item1 && burnedCaloriesStatus.item1 == false) {
+      showFancyDialog(AppStrings.durationCompleted);
+    }
+    // if duration not completed but calories burned
+    else if (durationStatus.item1 == false &&
+        burnedCaloriesStatus.item1) {
+      showFancyDialog(AppStrings.goalAcheivedBeforeTime);
+    } else {
+      print("Tag_in_progress");
+    }
   }
 
   Future<void> callProfileAPI() async {
@@ -90,7 +106,7 @@ class DashboardController extends GetxController {
       } else if (result.item3 == 401) {
         displaySessionExpireDialog(result);
       } else {
-        showFancyDialog(result);
+        showFancyDialog(result.item2.toString());
       }
     });
   }
@@ -109,21 +125,24 @@ class DashboardController extends GetxController {
     return ((goalDuration.value) * 7);
   }
 
-  Tuple2<bool,String> isGoalDurationCompleted() {
-    if (day.value == durationInDays) {
+  Tuple2<bool, String> isGoalDurationCompleted() {
+    if (day.value > durationInDays()) {
       print("Tag_goal_duration_completed");
       return Tuple2(true, "Goal duration completed");
     } else {
       final reminingDuration = durationInDays() - day.value;
       print("Tag_goal_duration_running ${reminingDuration} days remaining");
-      return Tuple2(false, "${reminingDuration} days remaining out of ${durationInDays()} days challenge");
+      return Tuple2(
+        false,
+        "${reminingDuration} days remaining out of ${durationInDays()} days challenge",
+      );
     }
   }
 
-  Tuple2<bool,String> isGoalAchieved() {
+  Tuple2<bool, String> isBurnedCaloriesGoalAcheived() {
     if (totalBurnedCal.value ==
         fitnessPlan.value?.estimatedCaloriesBurned.perWeek) {
-     return Tuple2(true, "Goal acheived");
+      return Tuple2(true, "Goal acheived");
     } else {
       final reminingCaloriesToBurn =
           ((fitnessPlan.value?.estimatedCaloriesBurned.perWeek ?? 0.0) -
@@ -131,7 +150,10 @@ class DashboardController extends GetxController {
       print(
         "Tag_goal_not_achieved ${reminingCaloriesToBurn} kcal needs to burn per week",
       );
-      return Tuple2(false, "${reminingCaloriesToBurn.toStringAsFixed(2)} kcal/week needs to burn out of ${(fitnessPlan.value?.estimatedCaloriesBurned.perWeek ?? 0.0)} kcal/week");
+      return Tuple2(
+        false,
+        "${reminingCaloriesToBurn.toStringAsFixed(2)} kcal/week needs to burn out of ${(fitnessPlan.value?.estimatedCaloriesBurned.perWeek ?? 0.0)} kcal/week",
+      );
     }
   }
 
@@ -166,7 +188,7 @@ class DashboardController extends GetxController {
       } else if (result.item3 == 401) {
         displaySessionExpireDialog(result);
       } else {
-        showFancyDialog(result);
+        showFancyDialog(result.item2.toString());
       }
     }
   }
@@ -202,17 +224,17 @@ class DashboardController extends GetxController {
       } else if (result.item3 == 401) {
         displaySessionExpireDialog(result);
       } else {
-        showFancyDialog(result);
+        showFancyDialog(result.item2.toString());
       }
     }
   }
 
-  void showFancyDialog(Tuple3<bool, String?, int> result) {
+  void showFancyDialog(String message) {
     if (Get.context != null && !Get.isDialogOpen!) {
       FancyAlertDialog.showFancyAlertDialog(
         context: Get.context!,
         title: AppStrings.appName,
-        message: result.item2.toString(),
+        message: message,
         onOkPressed: () {
           Get.back();
         },
@@ -682,7 +704,7 @@ class DashboardController extends GetxController {
     } else if (result.item3 == 401) {
       displaySessionExpireDialog(result);
     } else {
-      showFancyDialog(result);
+      showFancyDialog(result.item2.toString());
     }
   }
 

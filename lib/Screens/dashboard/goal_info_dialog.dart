@@ -78,7 +78,7 @@ class GoalInfoDialog extends StatelessWidget {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        dashboardController.isGoalAchieved().item2,
+                        dashboardController.isBurnedCaloriesGoalAcheived().item2,
                         style: TextStyle(fontSize: 14, color: Colors.white),
                       ),
                     ],
