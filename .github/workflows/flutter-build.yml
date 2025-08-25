@@ -1,78 +1,50 @@
-name: Flutter Build on Merge
+  name: Flutter Build on Merge
 
-on:
-  push:
-    branches:
-      - main  # Change this to your target branch
+  on:
+    push:
+      branches:
+        - main  # Change this to your target branch
 
-permissions:
-  actions: write
-  contents: write      
+  permissions:
+    actions: write
+    contents: write      
 
-jobs:
-  build-android:
-    name: Android Lint, Analyze, Format & Build
-    runs-on: ubuntu-latest
-    # timeout-minutes: 20 
+  jobs:
+    build-android:
+      name: Android Lint, Analyze, Format & Build
+      runs-on: ubuntu-latest
+      timeout-minutes: 60
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      steps:
+        - name: Checkout code
+          uses: actions/checkout@v4
 
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.32.6'
+        - name: Set up Flutter
+          uses: subosito/flutter-action@v2
+          with:
+            flutter-version: '3.32.6'
 
-      - name: Install Flutter dependencies
-        run: flutter pub get
+        - name: Install Flutter dependencies
+          run: flutter pub get
 
-      - name: Run Flutter Analyze
-        run: flutter analyze
+        - name: Configure Gradle
+          run: |
+            mkdir -p ~/.gradle
+            echo "org.gradle.jvmargs=-Xmx2g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8" >> ~/.gradle/gradle.properties
+            echo "org.gradle.vfs.watch=false" >> ~/.gradle/gradle.properties
 
-      - name: Run Dart Format Check (Dry Run)
-        run: dart format .
+        - name: Run Flutter Analyze
+          run: flutter analyze
 
-      - name: Run Android Lint
-        run: |
-          cd android 
-          chmod +x gradlew
-          ./gradlew app:lintDebug
+        - name: Run Dart Format Check (Dry Run)
+          run: dart format .
 
-      # Clean old releases, keep only latest
-      - name: Cleanup old releases (keep only latest)
-        run: |
-          echo "🧹 Cleaning up old releases, keeping only the latest..."
-          releases=$(gh api repos/${{ github.repository }}/releases -q '.[].id')
-          latest=$(echo "$releases" | head -n1)
-          for rel in $releases; do
-            if [ "$rel" != "$latest" ]; then
-              gh api --method DELETE repos/${{ github.repository }}/releases/$rel
-              echo "Deleted release ID: $rel"
-            else
-              echo "Keeping latest release ID: $rel"
-            fi
-          done
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        - name: Run Android Lint
+          run: |
+            cd android 
+            chmod +x gradlew
+            ./gradlew app:lintDebug
 
-      - name: Run ktlint Check (Kotlin Format Check)
-        run: |
-          curl -sSLO https://github.com/pinterest/ktlint/releases/download/1.2.1/ktlint && chmod +x ktlint
-          ./ktlint "android/**/*.kt" --reporter=plain || true
+        - name: Build Android APK
+          run: flutter build apk --release --no-tree-shake-icons --no-shrink
 
-      - name: Build Android APK
-        run: flutter build apk --release
-
-      - name: Upload APK to GitHub Release (replace old one)
-        run: |
-          set +e
-          # Ensure release exists
-          if ! gh release view latest >/dev/null 2>&1; then
-            gh release create latest --notes "Latest build" || true
-          fi
-          # Upload/replace APK
-          gh release upload latest build/app/outputs/flutter-apk/app-release.apk --clobber
-          echo "APK uploaded to latest release"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
