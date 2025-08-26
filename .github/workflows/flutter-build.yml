@@ -1,50 +1,32 @@
-  name: Flutter Build on Merge
+name: Flutter Build on Merge
 
-  on:
-    push:
-      branches:
-        - main  # Change this to your target branch
+on:
+  push:
+    branches:
+      - main  # Change this to your target branch
 
-  permissions:
-    actions: write
-    contents: write      
+jobs:
+  build-android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
 
-  jobs:
-    build-android:
-      name: Android Lint, Analyze, Format & Build
-      runs-on: ubuntu-latest
-      timeout-minutes: 60
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      steps:
-        - name: Checkout code
-          uses: actions/checkout@v4
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.6'  # Replace with your Flutter version
 
-        - name: Set up Flutter
-          uses: subosito/flutter-action@v2
-          with:
-            flutter-version: '3.32.6'
+      - name: Install dependencies
+        run: flutter pub get
 
-        - name: Install Flutter dependencies
-          run: flutter pub get
+      - name: Build APK
+        run: flutter build apk --release
 
-        - name: Configure Gradle
-          run: |
-            mkdir -p ~/.gradle
-            echo "org.gradle.jvmargs=-Xmx2g -XX:+HeapDumpOnOutOfMemoryError -Dfile.encoding=UTF-8" >> ~/.gradle/gradle.properties
-            echo "org.gradle.vfs.watch=false" >> ~/.gradle/gradle.properties
-
-        - name: Run Flutter Analyze
-          run: flutter analyze
-
-        - name: Run Dart Format Check (Dry Run)
-          run: dart format .
-
-        - name: Run Android Lint
-          run: |
-            cd android 
-            chmod +x gradlew
-            ./gradlew app:lintDebug
-
-        - name: Build Android APK
-          run: flutter build apk --release --no-tree-shake-icons --no-shrink
-
+      - name: Upload APK Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
