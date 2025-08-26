@@ -9,6 +9,7 @@ import 'package:pose_detection/Screens/dashboard/bmi/bmi_radial_gauge.dart';
 import 'package:pose_detection/Screens/dashboard/dashboard_controller.dart';
 import 'package:pose_detection/Screens/dashboard/bmi/status_indicator_row.dart';
 import 'package:pose_detection/Screens/dashboard/fitness_tips.dart';
+import 'package:pose_detection/Screens/dashboard/goal_info_dialog.dart';
 import 'package:pose_detection/Screens/dashboard/recommanded_ex.dart';
 import 'package:pose_detection/Screens/dashboard/recommanded_ex_info_dialog.dart';
 import 'package:pose_detection/Screens/exerciseList/navigationDrawer/my_navigation_drawer.dart';
@@ -152,18 +153,52 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        AppStrings.goalText(
-                                          plan?.estimatedCaloriesBurned.perDay,
-                                          plan?.estimatedCaloriesBurned.perWeek,
+                                    children: [              
+
+                                      Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: Row(
+                                                children: [
+                                                  Icon(
+                                                    Icons.flag_outlined,
+                                                    color: Colors.white,
+                                                    size: 20,
+                                                  ),
+                                                  SizedBox(width: 8),
+                                                  Expanded(
+                                                    child: Text(
+                                                      AppStrings.goalText(plan?.estimatedCaloriesBurned.perDay, plan?.estimatedCaloriesBurned.perWeek),
+                                                      softWrap: true,
+                                                      maxLines: 2,
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 14,
+                                                        fontWeight: FontWeight.w600,
+                                                        overflow: TextOverflow.visible,                                                    
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            GestureDetector(
+                                              onTap:
+                                                  () =>
+                                                      GoalInfoDialog.showGoalinfo(
+                                                        context,
+                                                      ),
+                                              child: const Icon(
+                                                Icons.info_outline,
+                                                color: Colors.white,
+                                                size: 20,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white,
-                                        ),
-                                      ),
+                                      
                                       const SizedBox(height: 4),
                                       Obx(
                                         () => Text(
@@ -455,6 +490,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             if (showFitnessPlanLoader ||
                 showTipsLoader ||
                 controller.isLoadingForProfile.value 
+                || controller.isLoadingForSaveGoalStatus.value
                 // || controller.isLoadingForSaveCalories.value                
                 ) {
               return Container(

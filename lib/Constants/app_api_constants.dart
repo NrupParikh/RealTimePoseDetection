@@ -8,4 +8,5 @@ class ApiConstants {
   static const tips = "tips";
   static const fitnessPlan = "recommended-exercises";
   static const caloriesStatus = "profile/calories-status";
+  static const goalStatus = "goal-status";
 }

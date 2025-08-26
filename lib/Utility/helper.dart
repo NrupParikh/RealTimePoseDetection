@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pose_detection/Constants/app_string.dart';
 import 'package:pose_detection/Screens/dashboard/dashboard_controller.dart';
 import 'package:pose_detection/main.dart';
 
@@ -25,8 +26,13 @@ class Helper {
       Get.snackbar(
         backgroundColor: Colors.green,
         colorText: Colors.white,
-        'Workout Status!',
-        'You did $reps reps of $title and burned ${calories.toStringAsFixed(2)} calories in ${duration.toStringAsFixed(2)} minutes.',
+        AppStrings.workoutStatus,
+        AppStrings.workoutStatusSummary (
+          reps,
+          title,
+          calories,
+          duration,
+        ),
         snackPosition: SnackPosition.TOP,
         duration: const Duration(seconds: 5),
       );

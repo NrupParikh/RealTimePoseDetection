@@ -49,7 +49,8 @@ class AppStrings {
       "Please specify your gender as Male, Female, or Other.";
   static const valEnterGoal = "Please enter goal";
   static const valEnterGoalDuration = "Please enter goal duration";
-  static const valEnterValidGoalDuration = "Please enter a valid duration between 1 and 52 weeks.";
+  static const valEnterValidGoalDuration =
+      "Please enter a valid duration between 1 and 52 weeks.";
 
   static const noChangesMade = "No changes made to the profile";
 
@@ -75,9 +76,10 @@ class AppStrings {
 - Obese: 30.0 or higher
 """;
 
-static const String goalDescription = "To acheive your goal you need to perform recommanded exercies and follow the given fitness tips during give time period";
-static const String goalDurationStatus = "Duration status";
-static const String caloriesStatus = "Calories Status";
+  static const String goalDescription =
+      "To acheive your goal you need to perform recommanded exercies and follow the given fitness tips during give time period";
+  static const String goalDurationStatus = "Duration status";
+  static const String caloriesStatus = "Calories Status";
   static const aboutReEx = "About Recommanded Exercise";
   static const String recommandedExDescription =
       "This plan is tailored to your profile and includes a selection of exercises from the following: Push-up, Squat, Jumping Jack, Plank to Downward Dog, and Overhead Arm Clap.Each exercise includes the suggested number of sets/repetitions or a duration, helping you follow a structured routine";
@@ -123,7 +125,7 @@ static const String caloriesStatus = "Calories Status";
   static String logoutConfirmation = "Are you sure you want to logout ?";
   static String logoutMsg = "Logout Failed, Please try again.";
 
-  static String dashboard= "Dashboard";
+  static String dashboard = "Dashboard";
   static String exerciseList = "Exercise List";
   static String profile = "Profile";
   static String bmiCalculator = "BMI Calculator";
@@ -135,7 +137,19 @@ static const String caloriesStatus = "Calories Status";
   static String lblStatus = "Status";
 
   // Goal status
-  static String goalAcheivedOnTime= "Congratulations You have acheived your goal on time!";
-  static String durationCompleted = "Your goal duration completed!";
-  static String goalAcheivedBeforeTime = "Congratulations You have acheived your goal before duration!";
+  static String goalAcheivedOnTime =
+      "Congratulations You have acheived your goal on time! Saving your goal status. Resetting burned calories and day count.";
+  static String durationCompleted =
+      "Your goal duration completed! Saving your goal status. Resetting burned calories and day count.";
+  static String goalAcheivedBeforeTime =
+      "Congratulations You have acheived your goal before duration! Saving your goal status. Resetting burned calories and day count.";
+
+  static String workoutStatus = "Workout Status!";
+  static String workoutStatusSummary(
+    int reps,
+    String title,
+    double calories,
+    double duration,
+  ) =>
+      'You did $reps reps of $title and burned ${calories.toStringAsFixed(2)} calories in ${duration.toStringAsFixed(2)} minutes.';
 }

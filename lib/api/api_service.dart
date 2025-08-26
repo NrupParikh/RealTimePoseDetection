@@ -60,7 +60,7 @@ class ApiService {
     required double weight,
     required String gender,
     required String goal,
-    required int goalDuration,
+    required int goalDuration
   }) async {
     Map<String, dynamic> data = {
       'name': name,
@@ -69,7 +69,7 @@ class ApiService {
       'weight': weight,
       'gender': gender,
       'goal': goal,
-      'goal_duration': goalDuration,
+      'goal_duration': goalDuration
     };
 
     try {
@@ -195,6 +195,70 @@ class ApiService {
       print("Tag_Save_calories_status_API_Call");
       final response = await _networkService.put(
         url: "${ApiConstants.caloriesStatus}",
+        data: data,
+        showProgressBar: false,
+      );
+      return _networkService.handleException(response);
+    } catch (e) {
+      if (kDebugMode) {
+        print("TAG Exception: $e");
+      }
+      rethrow;
+    }
+  }
+
+  Future<AppResponse> saveGoalStatus({
+    required int age,
+    required double height,
+    required double weight,
+    required double bmi,
+    required String bmiStatus,
+    required String gender,
+    required String goal,
+    required int goalDuration,
+    required int goalDurationAchieved,
+    required int caloriesToBurn,
+    required double caloriesBurned,
+    required bool isDurationCompleted,
+    required bool isCaloriesBurned,
+  }) async {
+    if (kDebugMode) {
+      print("""-----saveGoalStatus Parameters---
+    'age: $age'
+    'height: $height'
+    'weight: $weight'
+    'bmi: $bmi'
+    'bmiStatus: $bmiStatus'
+    'gender: $gender'
+    'goal: $goal'
+    'goalDuration: $goalDuration'
+    'goalDurationAchieved: $goalDurationAchieved'
+    'caloriesToBurn: ${caloriesToBurn.toStringAsFixed(2)}'
+    'caloriesBurned: $caloriesBurned'
+    'isDurationCompleted: $isDurationCompleted'
+    'isCaloriesBurned: $isCaloriesBurned'
+    '--------------------------------');
+    """);
+    }
+    Map<String, dynamic> data = {
+      'age': age,
+      'height': height,
+      'weight': weight,
+      'bmi': bmi,
+      'bmi_status': bmiStatus,
+      'gender': gender,
+      'goal': goal,
+      'goal_duration': goalDuration,
+      'goal_duration_achieved': goalDurationAchieved,
+      'caloriesToBurn': caloriesToBurn,
+      'caloriesBurned': caloriesBurned,
+      'isDurationCompleted': isDurationCompleted,
+      'isCaloriesBurned': isCaloriesBurned,
+    };
+
+    try {
+      final response = await _networkService.post(
+        url: "${ApiConstants.goalStatus}",
         data: data,
         showProgressBar: false,
       );

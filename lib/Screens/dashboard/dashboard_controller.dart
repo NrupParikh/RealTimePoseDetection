@@ -29,6 +29,7 @@ class DashboardController extends GetxController {
   final RxBool isLoadingForTipsGemini = false.obs;
   final RxBool isLoadingForProfile = false.obs;
   // final RxBool isLoadingForSaveCalories = false.obs;
+  final RxBool isLoadingForSaveGoalStatus = false.obs;
 
   final RxString errorMessageForFitnessPlan = ''.obs;
   final RxString errorMessageForFitnessTips = ''.obs;
@@ -80,16 +81,15 @@ class DashboardController extends GetxController {
 
     // if duration completed and calories burned
     if (durationStatus.item1 && burnedCaloriesStatus.item1) {
-      showFancyDialog(AppStrings.goalAcheivedOnTime);
+      showFancyDialogAndCallSaveStatusAPI(AppStrings.goalAcheivedOnTime);
     } else
     // if only duration completed
     if (durationStatus.item1 && burnedCaloriesStatus.item1 == false) {
-      showFancyDialog(AppStrings.durationCompleted);
+      showFancyDialogAndCallSaveStatusAPI(AppStrings.durationCompleted);
     }
     // if duration not completed but calories burned
-    else if (durationStatus.item1 == false &&
-        burnedCaloriesStatus.item1) {
-      showFancyDialog(AppStrings.goalAcheivedBeforeTime);
+    else if (durationStatus.item1 == false && burnedCaloriesStatus.item1) {
+      showFancyDialogAndCallSaveStatusAPI(AppStrings.goalAcheivedBeforeTime);
     } else {
       print("Tag_in_progress");
     }
@@ -140,8 +140,8 @@ class DashboardController extends GetxController {
   }
 
   Tuple2<bool, String> isBurnedCaloriesGoalAcheived() {
-    if (totalBurnedCal.value ==
-        fitnessPlan.value?.estimatedCaloriesBurned.perWeek) {
+    if (totalBurnedCal.value >=
+        (fitnessPlan.value?.estimatedCaloriesBurned.perWeek ?? 0)) {
       return Tuple2(true, "Goal acheived");
     } else {
       final reminingCaloriesToBurn =
@@ -241,6 +241,34 @@ class DashboardController extends GetxController {
         onCancelPressed: null,
       );
     }
+  }
+
+  void showFancyDialogAndCallSaveStatusAPI(String message) {
+    if (Get.context != null && !Get.isDialogOpen!) {
+      FancyAlertDialog.showFancyAlertDialog(
+        context: Get.context!,
+        title: AppStrings.appName,
+        message: message,
+        onOkPressed: () {
+          callSaveGoalAPI();
+          Get.back();
+        },
+        onCancelPressed: null,
+      );
+    }
+  }
+
+  Future<void> callSaveGoalAPI() async {
+    await saveGoalStatus().then((result) {
+      if (result.item1) {
+        print("Tag_goal_status_saved");
+        updateProfile();
+      } else if (result.item3 == 401) {
+        displaySessionExpireDialog(result);
+      } else {
+        showFancyDialog(result.item2.toString());
+      }
+    });
   }
 
   void displaySessionExpireDialog(Tuple3<bool, String?, int> result) {
@@ -742,6 +770,167 @@ class DashboardController extends GetxController {
       }
     } catch (ex) {
       // isLoadingForSaveCalories.value = false;
+      return Tuple3(false, "$ex", 0);
+    }
+  }
+
+  Future<Tuple3<bool, String?, int>> saveGoalStatus() async {
+    final profileData = secureStorage.getProfileData();
+    isLoadingForSaveGoalStatus.value = true;
+    try {
+      var appResponse = await _apiService.saveGoalStatus(
+        age: profileData?.age ?? 0,
+        height: profileData?.height ?? 0.0,
+        weight: profileData?.weight ?? 0.0,
+        bmi: calculateBMI(),
+        bmiStatus: getBMIInterpretation(),
+        gender: profileData?.gender ?? '',
+        goal: profileData?.goal ?? '',
+        goalDuration: durationInDays(),
+        goalDurationAchieved: day.value,
+        caloriesToBurn: fitnessPlan.value?.estimatedCaloriesBurned.perWeek ?? 0,
+        caloriesBurned: totalBurnedCal.value,
+        isDurationCompleted: isGoalDurationCompleted().item1,
+        isCaloriesBurned: isBurnedCaloriesGoalAcheived().item1,
+      );
+      if (appResponse.statusCode == 200) {
+        isLoadingForSaveGoalStatus.value = false;
+        // Reset data when goal status is saved successfully
+        print("Tag_goal_status_reset");
+        return Tuple3(
+          true,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      } else if (appResponse.statusCode == 401) {
+        isLoadingForSaveGoalStatus.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      } else {
+        isLoadingForSaveGoalStatus.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      }
+    } catch (ex) {
+      isLoadingForSaveGoalStatus.value = false;
+      return Tuple3(false, "$ex", 0);
+    }
+  }
+
+  void updateProfile() {
+    handleUpdateProfile().then((result) {
+      if (result.item1) {
+        if (Get.context != null && !Get.isDialogOpen!) {
+          FancyAlertDialog.showFancyAlertDialog(
+            context: Get.context!,
+            title: AppStrings.appName,
+            message: result.item2.toString(),
+            onOkPressed: () {             
+              Get.back();
+            },
+            onCancelPressed: null,
+          );
+        }
+      } else if (result.item3 == 401) {
+        if (Get.context != null && !Get.isDialogOpen!) {
+          sessionController.showSessionExpiredDialog(
+            Get.context!,
+            result.item2.toString(),
+          );
+        }
+      } else {
+        if (Get.context != null && !Get.isDialogOpen!) {
+          FancyAlertDialog.showFancyAlertDialog(
+            context: Get.context!,
+            title: AppStrings.appName,
+            message: result.item2.toString(),
+            onOkPressed: () {             
+              Get.back();
+            },
+            onCancelPressed: null,
+          );
+        }
+      }
+    });
+  }
+
+  Future<Tuple3<bool, String?, int>> handleUpdateProfile() async {
+    final profileData = secureStorage.getProfileData();
+    final name = profileData?.name ?? '';
+    final age = profileData?.age ?? 0;
+    final height = profileData?.height ?? 0.0;
+    final weight = profileData?.weight ?? 0.0;
+    final gender = profileData?.gender ?? '';
+    final goal = profileData?.goal ?? '';
+    final duration = profileData?.goalDuration ?? 0;
+    final userId = secureStorage.getUserData()?.id ?? 0;
+    try {
+      isLoadingForProfile.value = true;
+      var appResponse = await _apiService.updateUserProfile(
+        id: userId,
+        name: name,
+        age: age,
+        height: height,
+        weight: weight,
+        gender: gender,
+        goal: goal,
+        goalDuration: duration,
+      );
+      if (appResponse.statusCode == 200) {
+        isLoadingForProfile.value = false;
+        if (appResponse.data is Map<String, dynamic>) {
+          try {
+            final ProfileResponse data = ProfileResponse.fromJson(
+              appResponse.data,
+            );
+            debugPrint("Tag_data ${data.profile}");
+            secureStorage.storeProfileData(data.profile);
+            day.value = 1;
+            totalBurnedCal.value = 0.0;
+            return Tuple3(
+              true,
+              appResponse.message.toString(),
+              appResponse.statusCode.toInt(),
+            );
+          } catch (e) {
+            isLoadingForProfile.value = false;
+            return Tuple3(
+              false,
+              "Error parsing ApiResponse",
+              appResponse.statusCode.toInt(),
+            );
+          }
+        } else {
+          isLoadingForProfile.value = false;
+          return Tuple3(
+            false,
+            "appResponse.data is not a Map",
+            appResponse.statusCode.toInt(),
+          );
+        }
+      } else if (appResponse.statusCode == 401) {
+        isLoadingForProfile.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      } else {
+        isLoadingForProfile.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      }
+    } catch (ex) {
+      isLoadingForProfile.value = false;
       return Tuple3(false, "$ex", 0);
     }
   }

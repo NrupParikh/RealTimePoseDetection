@@ -115,6 +115,7 @@ class FancyAlertDialog extends StatelessWidget {
     required VoidCallback? onCancelPressed,
   }) {
     showDialog(
+      barrierDismissible: false, // Prevent dismissing by tapping outside
       context: context,
       builder: (BuildContext context) {
         return FancyAlertDialog(
