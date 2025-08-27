@@ -87,14 +87,6 @@ class _BMICalcScreenState extends State<BMICalcScreen> {
                                 child: Column(
                                   children: [
                                     CommonSlider(
-                                      label: "Age",
-                                      min: 0,
-                                      max: 100,
-                                      divisions: 100,
-                                      unit: "years",
-                                      value: controller.age,
-                                    ),
-                                    CommonSlider(
                                       label: "Height",
                                       min: 100,
                                       max: 220,
@@ -178,7 +170,7 @@ class _BMICalcScreenState extends State<BMICalcScreen> {
                                           enableAnimation: true,
                                           animationDuration: 1500,
                                           animationType: AnimationType.ease,
-                                          value: controller.calculateBMI(),
+                                          value: controller.bmi,
                                           needleColor: Colors.white,
                                           needleLength: 0.9,
                                           needleStartWidth: 1,
@@ -192,7 +184,7 @@ class _BMICalcScreenState extends State<BMICalcScreen> {
                                         GaugeAnnotation(
                                           widget: Text(
                                             textAlign: TextAlign.center,
-                                            'BMI\n${controller.calculateBMI().toStringAsFixed(2)}\n ${controller.getBMIInterpretation()}',
+                                            'BMI\n${controller.bmi.toStringAsFixed(2)}\n ${controller.bmiStatus}',
                                             style: labelTextStyle,
                                           ),
                                           angle: 90,

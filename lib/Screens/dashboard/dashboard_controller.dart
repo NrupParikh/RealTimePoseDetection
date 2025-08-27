@@ -5,6 +5,7 @@ import 'package:pose_detection/Components/session_expire_controller.dart';
 import 'package:pose_detection/Constants/app_string.dart';
 import 'package:pose_detection/Constants/gemini_prompt.dart';
 import 'package:pose_detection/Singleton/api_service_singleton.dart';
+import 'package:pose_detection/Utility/bmi_calculator.dart';
 import 'package:pose_detection/api/apiModels/fitness_plan_data.dart';
 import 'package:pose_detection/api/apiModels/fitness_plan_response.dart';
 import 'package:pose_detection/api/apiModels/fitness_tips_data.dart';
@@ -283,17 +284,15 @@ class DashboardController extends GetxController {
   // --- BMI CALCULATION LOGIC ---
 
   double calculateBMI() {
-    if (height.value <= 0 || weight.value <= 0) return 0.0;
-    final h = height.value / 100;
-    return weight.value / (h * h);
+    return BMICalculator.calculateBMI(
+      heightCm: height.value,
+      weightKg: weight.value,
+    );
   }
 
   String getBMIInterpretation() {
     final bmi = calculateBMI();
-    if (bmi < 18.5) return AppStrings.underweight;
-    if (bmi < 24.9) return AppStrings.normal;
-    if (bmi < 29.9) return AppStrings.overweight;
-    return AppStrings.obese;
+    return BMICalculator.getBMIInterpretation(bmi);
   }
 
   Future<FitnessPlanResponse?> getFitnessPlanFromGemini() async {
@@ -831,7 +830,7 @@ class DashboardController extends GetxController {
             context: Get.context!,
             title: AppStrings.appName,
             message: result.item2.toString(),
-            onOkPressed: () {             
+            onOkPressed: () {
               Get.back();
             },
             onCancelPressed: null,
@@ -850,7 +849,7 @@ class DashboardController extends GetxController {
             context: Get.context!,
             title: AppStrings.appName,
             message: result.item2.toString(),
-            onOkPressed: () {             
+            onOkPressed: () {
               Get.back();
             },
             onCancelPressed: null,

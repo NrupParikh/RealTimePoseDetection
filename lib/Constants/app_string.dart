@@ -129,7 +129,8 @@ class AppStrings {
   static String exerciseList = "Exercise List";
   static String profile = "Profile";
   static String bmiCalculator = "BMI Calculator";
-  static String logout = "Logout";
+  static String goalHistory = "Goal History";
+  static String logout = "Logout";  
 
   static String lblHeight = "Height (cm)";
   static String lblWeight = "Weight (kg)";

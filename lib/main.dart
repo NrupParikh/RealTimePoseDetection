@@ -15,6 +15,8 @@ import 'package:pose_detection/Screens/exerciseList/navigationDrawer/nav_drawer_
 import 'package:pose_detection/Screens/exerciseList/exercise_list_screen.dart';
 import 'package:pose_detection/Screens/firebase_chat_boat/chat_binding.dart';
 import 'package:pose_detection/Screens/firebase_chat_boat/firebase_chat_screen.dart';
+import 'package:pose_detection/Screens/goalHistory/goal_history.dart';
+import 'package:pose_detection/Screens/goalHistory/goal_history_binding.dart';
 import 'package:pose_detection/Screens/login/login_binding.dart';
 import 'package:pose_detection/Screens/login/login_screen.dart';
 import 'package:pose_detection/Screens/onboard/on_board_screen.dart';
@@ -116,10 +118,17 @@ class MyApp extends StatelessWidget {
           transition: Transition.noTransition,
           transitionDuration: Duration.zero,
         ),
-           GetPage(
+        GetPage(
           name: PageName.dashboard,
           page: () => DashboardScreen(),
           bindings: [NavDrawerBinding(), DashboardBinding()],
+          transition: Transition.noTransition,
+          transitionDuration: Duration.zero,
+        ),
+        GetPage(
+          name: PageName.goalHistory,
+          page: () => GoalHistory(),
+          bindings: [NavDrawerBinding(), GoalHistoryBinding()],
           transition: Transition.noTransition,
           transitionDuration: Duration.zero,
         ),

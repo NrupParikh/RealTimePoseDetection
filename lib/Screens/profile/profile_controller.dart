@@ -81,7 +81,6 @@ class ProfileController extends GetxController {
         age.toString() == initialAge &&
         height.toString() == initialHeight &&
         weight.toString() == initialWeight &&
-        gender == initialGender &&
         goal == initialGoal &&
         duration.toString() == initialGoalDuration) {
       isEdit.value = true;
