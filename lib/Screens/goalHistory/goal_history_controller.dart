@@ -1,11 +1,11 @@
 import 'package:get/get.dart';
 import 'package:pose_detection/Components/session_expire_controller.dart';
 import 'package:pose_detection/Screens/goalHistory/goal_history_data.dart';
-import 'package:pose_detection/Singleton/api_service_singleton.dart';
-import 'package:pose_detection/api/api_service.dart';
+// import 'package:pose_detection/Singleton/api_service_singleton.dart';
+// import 'package:pose_detection/api/api_service.dart';
 
 class GoalHistoryController extends GetxController {
-  final ApiService _apiService = ApiServiceSingleton().apiService;
+  // final ApiService _apiService = ApiServiceSingleton().apiService;
   final SessionExpireController sessionController =
       Get.find<SessionExpireController>();
 
