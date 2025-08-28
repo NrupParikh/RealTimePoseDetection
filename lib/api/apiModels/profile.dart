@@ -95,20 +95,27 @@ class Profile {
     String? dateString;
 
     if (caloriesStatus == 0 && updatedAt != null && updatedAt!.isNotEmpty) {
-      // Use updatedAt if caloriesStatus is 0 and updatedAt exists
-      dateString = updatedAt;
+      dateString = updatedAt; // use updatedAt only when calories not burned yet
     } else {
-      // Otherwise use updatedAt (if available) else createdAt
-      dateString = updatedAt?.isNotEmpty == true ? updatedAt : createdAt;
+      dateString =
+          createdAt; // always fall back to createdAt for goal day counting
     }
 
-    if (dateString == null || dateString.isEmpty) return 1; // default to 1
+    if (dateString == null || dateString.isEmpty) return 1;
 
-    final DateTime baseDate = DateTime.parse(dateString);
+    // Parse "yyyy-MM-dd HH:mm:ss"
+    final DateTime baseDate = DateTime.parse(dateString.replaceFirst(' ', 'T'));
     final DateTime now = DateTime.now();
 
-    final int diffDays = now.difference(baseDate).inDays;
+    final DateTime start = DateTime(
+      baseDate.year,
+      baseDate.month,
+      baseDate.day,
+    );
+    final DateTime today = DateTime(now.year, now.month, now.day);
 
-    return diffDays + 1; // include the starting day
+    final int diffDays = today.difference(start).inDays;
+
+    return diffDays + 1; // inclusive
   }
 }

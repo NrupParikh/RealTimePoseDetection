@@ -107,12 +107,12 @@ class AppStrings {
   static const String welcomMsg = "Let's reach your goal!";
   static const String bmiAndHealthStatus = "BMI & Health Status";
   static const String recommandedExercise = "Recommended Exercises";
-  static String goalText(int? perDay, int? perWeek) =>
-      'Goal : Burn ${perDay ?? 0} kcal/day or ${perWeek ?? 0} kcal/week';
+  static String goalText(int? perDay, int? totalDuration) =>
+      'Goal : Burn ${perDay ?? 0} kcal/day or ${totalDuration ?? 0} kcal in total';
   static String challengeDayText(int dayNumber, int totalDays, double burned) =>
       'Day $dayNumber of $totalDays day challenge : ${burned.toStringAsFixed(2)} kcal burned';
-  static String estimatedCaloriesBurned(int? perDay) =>
-      'Estimated Calories Burned: ${perDay ?? 0} kcal/day';
+  static String estimatedCaloriesBurned(int? perWeek) =>
+      'Estimated Calories Burned: ${perWeek ?? 0} kcal/week';
 
   static String noExerciseAvailable = "No recommended exercise available";
   static String noTipsAvailable = "No fitness tips available";

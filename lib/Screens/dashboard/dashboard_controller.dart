@@ -142,18 +142,18 @@ class DashboardController extends GetxController {
 
   Tuple2<bool, String> isBurnedCaloriesGoalAcheived() {
     if (totalBurnedCal.value >=
-        (fitnessPlan.value?.estimatedCaloriesBurned.perWeek ?? 0)) {
+        ((fitnessPlan.value?.estimatedCaloriesBurned.perDay ?? 0.0) *
+            durationInDays())) {
       return Tuple2(true, "Goal acheived");
     } else {
       final reminingCaloriesToBurn =
-          ((fitnessPlan.value?.estimatedCaloriesBurned.perWeek ?? 0.0) -
-              totalBurnedCal.value);
-      print(
-        "Tag_goal_not_achieved ${reminingCaloriesToBurn} kcal needs to burn per week",
-      );
+          (((fitnessPlan.value?.estimatedCaloriesBurned.perDay ?? 0.0) *
+                  durationInDays()) -
+              totalBurnedCal.value);   
+
       return Tuple2(
         false,
-        "${reminingCaloriesToBurn.toStringAsFixed(2)} kcal/week needs to burn out of ${(fitnessPlan.value?.estimatedCaloriesBurned.perWeek ?? 0.0)} kcal/week",
+        "${reminingCaloriesToBurn.toStringAsFixed(2)} kcal needs to burn out of ${((fitnessPlan.value?.estimatedCaloriesBurned.perDay ?? 0.0) * durationInDays())} kcal",
       );
     }
   }
@@ -777,17 +777,21 @@ class DashboardController extends GetxController {
     final profileData = secureStorage.getProfileData();
     isLoadingForSaveGoalStatus.value = true;
     try {
+      final perDayCaloriesToBurn =
+          fitnessPlan.value?.estimatedCaloriesBurned.perDay ?? 0;
+      final totalDays = durationInDays();
+      final totalCaloriesToBurn = perDayCaloriesToBurn * totalDays;      
       var appResponse = await _apiService.saveGoalStatus(
         age: profileData?.age ?? 0,
         height: profileData?.height ?? 0.0,
         weight: profileData?.weight ?? 0.0,
         bmi: calculateBMI(),
         bmiStatus: getBMIInterpretation(),
-        gender: profileData?.gender ?? '',
+        gender: profileData?.gender.toLowerCase() ?? '',
         goal: profileData?.goal ?? '',
         goalDuration: durationInDays(),
         goalDurationAchieved: day.value,
-        caloriesToBurn: fitnessPlan.value?.estimatedCaloriesBurned.perWeek ?? 0,
+        caloriesToBurn: totalCaloriesToBurn,
         caloriesBurned: totalBurnedCal.value,
         isDurationCompleted: isGoalDurationCompleted().item1,
         isCaloriesBurned: isBurnedCaloriesGoalAcheived().item1,

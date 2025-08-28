@@ -91,12 +91,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           final plan = controller.fitnessPlan.value;
                           final tipsObj = controller.fitnessTipsDataModel.value;
                           final burned = controller.totalBurnedCal.value;
-                          final dailyGoal =
+                          final perDayCaloriesToBurn =
                               plan?.estimatedCaloriesBurned.perDay ?? 0;
+                          final totalDays = controller.durationInDays();   
+                          final totalCaloriesToBurn = perDayCaloriesToBurn * totalDays;   
                           final progress =
-                              dailyGoal > 0
-                                  ? (burned / dailyGoal).clamp(0.0, 1.0)
+                              totalCaloriesToBurn > 0
+                                  ? (burned / totalCaloriesToBurn).clamp(0.0, 1.0)
                                   : 0.0;
+                          print("Tag_progress: $progress");        
 
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,59 +156,62 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
-                                    children: [              
-
+                                    children: [
                                       Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Expanded(
-                                              child: Row(
-                                                children: [
-                                                  Icon(
-                                                    Icons.flag_outlined,
-                                                    color: Colors.white,
-                                                    size: 20,
-                                                  ),
-                                                  SizedBox(width: 8),
-                                                  Expanded(
-                                                    child: Text(
-                                                      AppStrings.goalText(plan?.estimatedCaloriesBurned.perDay, plan?.estimatedCaloriesBurned.perWeek),
-                                                      softWrap: true,
-                                                      maxLines: 2,
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 14,
-                                                        fontWeight: FontWeight.w600,
-                                                        overflow: TextOverflow.visible,                                                    
-                                                      ),
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Expanded(
+                                            child: Row(
+                                              children: [
+                                                Icon(
+                                                  Icons.flag_outlined,
+                                                  color: Colors.white,
+                                                  size: 20,
+                                                ),
+                                                SizedBox(width: 8),
+                                                Expanded(
+                                                  child: Text(                                                  
+                                                    AppStrings.goalText(
+                                                      perDayCaloriesToBurn,
+                                                      totalCaloriesToBurn
+                                                    ),
+                                                    softWrap: true,
+                                                    maxLines: 2,
+                                                    style: TextStyle(
+                                                      color: Colors.white,
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      overflow:
+                                                          TextOverflow.visible,
                                                     ),
                                                   ),
-                                                ],
-                                              ),
+                                                ),
+                                              ],
                                             ),
-                                            GestureDetector(
-                                              onTap:
-                                                  () =>
-                                                      GoalInfoDialog.showGoalinfo(
-                                                        context,
-                                                      ),
-                                              child: const Icon(
-                                                Icons.info_outline,
-                                                color: Colors.white,
-                                                size: 20,
-                                              ),
+                                          ),
+                                          GestureDetector(
+                                            onTap:
+                                                () =>
+                                                    GoalInfoDialog.showGoalinfo(
+                                                      context,
+                                                    ),
+                                            child: const Icon(
+                                              Icons.info_outline,
+                                              color: Colors.white,
+                                              size: 20,
                                             ),
-                                          ],
-                                        ),
-                                      
+                                          ),
+                                        ],
+                                      ),
+
                                       const SizedBox(height: 4),
                                       Obx(
                                         () => Text(
                                           AppStrings.challengeDayText(
                                             controller.day.value, // current day
-                                            ((controller.goalDuration.value) *
-                                                7),
+                                            controller.durationInDays(), // total days
                                             burned,
                                           ),
                                           style: const TextStyle(
@@ -399,7 +405,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         const SizedBox(height: 4),
                                         Text(
                                           AppStrings.estimatedCaloriesBurned(
-                                            plan.estimatedCaloriesBurned.perDay,
+                                            plan
+                                                .estimatedCaloriesBurned
+                                                .perWeek,
                                           ),
                                           style: const TextStyle(
                                             color: Colors.white,
@@ -489,10 +497,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
             if (showFitnessPlanLoader ||
                 showTipsLoader ||
-                controller.isLoadingForProfile.value 
-                || controller.isLoadingForSaveGoalStatus.value
-                // || controller.isLoadingForSaveCalories.value                
-                ) {
+                controller.isLoadingForProfile.value ||
+                controller.isLoadingForSaveGoalStatus.value
+            // || controller.isLoadingForSaveCalories.value
+            ) {
               return Container(
                 color: Colors.black54,
                 child: const Center(child: CircularProgressIndicator()),

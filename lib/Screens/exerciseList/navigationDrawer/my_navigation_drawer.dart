@@ -68,7 +68,7 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
     // final isExerciseListSelected = Get.currentRoute == PageName.exerciseList;
     final isProfileSelected = Get.currentRoute == PageName.profile;
     final isBMISelected = Get.currentRoute == PageName.bmiCalcScreen;
-    // final isGoalHistorySelected = Get.currentRoute == PageName.goalHistory;
+    final isGoalHistorySelected = Get.currentRoute == PageName.goalHistory;
     return Drawer(
       child: FrostedGlass(
         applyFilter: false,
@@ -128,17 +128,17 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
                         }
                       },
                     ),
-                    // buildDrawerSection(
-                    //   icon: Icons.history_outlined,
-                    //   title: AppStrings.goalHistory,
-                    //   isSelected: isGoalHistorySelected,
-                    //   onTap: () {
-                    //    Get.back();
-                    //     if (Get.currentRoute != PageName.goalHistory) {
-                    //       Get.offAllNamed(PageName.goalHistory);
-                    //     }
-                    //   },
-                    // ),
+                    buildDrawerSection(
+                      icon: Icons.history_outlined,
+                      title: AppStrings.goalHistory,
+                      isSelected: isGoalHistorySelected,
+                      onTap: () {
+                       Get.back();
+                        if (Get.currentRoute != PageName.goalHistory) {
+                          Get.offAllNamed(PageName.goalHistory);
+                        }
+                      },
+                    ),
                     buildDrawerSection(
                       icon: Icons.logout_outlined,
                       title: AppStrings.logout,
