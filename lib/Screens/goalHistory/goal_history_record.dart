@@ -1,3 +1,4 @@
+
 class GoalHistoryRecord {
   final int age;
   final double height;
@@ -5,10 +6,12 @@ class GoalHistoryRecord {
   final String gender;
   final String goal;
   final int goalDuration;
+  final double bmi;
+  final String bmiStatus;
   final double caloriesStatus;
   final DateTime createdAt;
   final DateTime updatedAt;
-
+  
   GoalHistoryRecord({
     required this.age,
     required this.height,
@@ -16,8 +19,14 @@ class GoalHistoryRecord {
     required this.gender,
     required this.goal,
     required this.goalDuration,
+    required this.bmi,
+    required this.bmiStatus,
     required this.caloriesStatus,
     required this.createdAt,
     required this.updatedAt,
   });
 }
+
+
+
+  

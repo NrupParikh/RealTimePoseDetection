@@ -28,7 +28,7 @@ class ApiService {
       rethrow;
     }
   }
-
+  
   // ============================= register
   Future<AppResponse> register({
     required String email,
@@ -260,6 +260,21 @@ class ApiService {
       final response = await _networkService.post(
         url: "${ApiConstants.goalStatus}",
         data: data,
+        showProgressBar: false,
+      );
+      return _networkService.handleException(response);
+    } catch (e) {
+      if (kDebugMode) {
+        print("TAG Exception: $e");
+      }
+      rethrow;
+    }
+  }
+
+  Future<AppResponse> getGoalHistory() async {
+    try {
+      final response = await _networkService.get(
+        url: "${ApiConstants.goalStatus}",
         showProgressBar: false,
       );
       return _networkService.handleException(response);

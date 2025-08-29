@@ -1,76 +1,146 @@
 import 'package:get/get.dart';
+import 'package:pose_detection/Components/fancy_alert_dialog.dart';
 import 'package:pose_detection/Components/session_expire_controller.dart';
-import 'package:pose_detection/Screens/goalHistory/goal_history_data.dart';
+import 'package:pose_detection/Constants/app_string.dart';
+import 'package:pose_detection/Screens/goalHistory/goal_history_record.dart';
+import 'package:pose_detection/Screens/goalHistory/goal_status_data.dart';
+import 'package:pose_detection/Singleton/api_service_singleton.dart';
+import 'package:pose_detection/api/api_service.dart';
+import 'package:pose_detection/main.dart';
+import 'package:tuple/tuple.dart';
 // import 'package:pose_detection/Singleton/api_service_singleton.dart';
 // import 'package:pose_detection/api/api_service.dart';
 
 class GoalHistoryController extends GetxController {
-  // final ApiService _apiService = ApiServiceSingleton().apiService;
+  final ApiService _apiService = ApiServiceSingleton().apiService;
   final SessionExpireController sessionController =
       Get.find<SessionExpireController>();
+
+  final RxBool isLoadingForHistory = false.obs;
+
+  final Rx<GoalStatusData?> goalStatusData = Rx<GoalStatusData?>(null);
+  final RxString errorMessage = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
     print("Tag_goal_history_controller");
+    handleFitnessPlan();
   }
 
-  final List<GoalHistoryRecord> goalHistoryRecords = [
-    GoalHistoryRecord(
-      age: 55,
-      height: 145.5,
-      weight: 70,
-      gender: "Male",
-      goal: "Lose Weight",
-      goalDuration: 5,
-      caloriesStatus: 1.30,
-      createdAt: DateTime.parse("2025-07-22 06:14:46"),
-      updatedAt: DateTime.parse("2025-08-22 10:03:57"),
-    ),
-    GoalHistoryRecord(
-      age: 40,
-      height: 160.2,
-      weight: 80,
-      gender: "Female",
-      goal: "Gain Weight",
-      goalDuration: 8,
-      caloriesStatus: 2.15,
-      createdAt: DateTime.parse("2025-07-25 08:20:15"),
-      updatedAt: DateTime.parse("2025-08-21 09:45:00"),
-    ),
-    GoalHistoryRecord(
-      age: 29,
-      height: 172.8,
-      weight: 65,
-      gender: "Other",
-      goal: "Lose Weight",
-      goalDuration: 6,
-      caloriesStatus: 1.75,
-      createdAt: DateTime.parse("2025-07-28 07:05:30"),
-      updatedAt: DateTime.parse("2025-08-20 14:20:10"),
-    ),
-    GoalHistoryRecord(
-      age: 35,
-      height: 180.0,
-      weight: 90,
-      gender: "Male",
-      goal: "Gain Weight",
-      goalDuration: 10,
-      caloriesStatus: 2.80,
-      createdAt: DateTime.parse("2025-07-30 10:45:00"),
-      updatedAt: DateTime.parse("2025-08-19 12:10:25"),
-    ),
-    GoalHistoryRecord(
-      age: 50,
-      height: 155.4,
-      weight: 72,
-      gender: "Female",
-      goal: "Lose Weight",
-      goalDuration: 7,
-      caloriesStatus: 1.95,
-      createdAt: DateTime.parse("2025-07-27 09:15:10"),
-      updatedAt: DateTime.parse("2025-08-18 11:00:00"),
-    ),
+  Future<void> handleFitnessPlan() async {
+ 
+      await getGoalHistory().then((result) async {
+        if (result.item1) {
+        } else if (result.item3 == 401) {
+          displaySessionExpireDialog(result);
+        } else {
+          showFancyDialog(result.item2.toString());
+        }
+      });
     
-  ];
+  }
+
+  void displaySessionExpireDialog(Tuple3<bool, String?, int> result) {
+    if (Get.context != null && !Get.isDialogOpen!) {
+      sessionController.showSessionExpiredDialog(
+        Get.context!,
+        result.item2.toString(),
+      );
+    }
+  }
+
+  void showFancyDialog(String message) {
+    if (Get.context != null && !Get.isDialogOpen!) {
+      FancyAlertDialog.showFancyAlertDialog(
+        context: Get.context!,
+        title: AppStrings.appName,
+        message: message,
+        onOkPressed: () {
+          Get.back();
+        },
+        onCancelPressed: null,
+      );
+    }
+  }
+  
+  Future<Tuple3<bool, String?, int>> getGoalHistory() async {
+    try {
+      isLoadingForHistory.value = true;
+      var appResponse = await _apiService.getGoalHistory();
+      if (appResponse.statusCode == 200) {
+        isLoadingForHistory.value = false;
+        if (appResponse.data is Map<String, dynamic>) {
+          try {
+            print("Tag_goal_history_response ${appResponse.data}");
+            final GoalStatusData data = GoalStatusData.fromJson(
+              appResponse.data,
+            );
+            print("Tag_goal_history_parsed ${data.goalStatusHistory.length}");
+            goalStatusData.value = data;
+            if (goalStatusData.value != null) {              
+              return Tuple3(
+                true,
+                appResponse.message.toString(),
+                appResponse.statusCode.toInt(),
+              );
+            } else {
+              errorMessage.value = "No goal history data available.";
+              return Tuple3(
+                false,
+                "No goal history data available.",
+                appResponse.statusCode.toInt(),
+              );
+            }
+          } catch (e) {
+            isLoadingForHistory.value = false;
+            return Tuple3(
+              false,
+              "Error parsing ApiResponse",
+              appResponse.statusCode.toInt(),
+            );
+          }
+        } else {
+          isLoadingForHistory.value = false;
+          return Tuple3(
+            false,
+            "appResponse.data is not a Map",
+            appResponse.statusCode.toInt(),
+          );
+        }
+      } else if (appResponse.statusCode == 401) {
+        isLoadingForHistory.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      } else {
+        isLoadingForHistory.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      }
+    } catch (ex) {
+      isLoadingForHistory.value = false;
+      return Tuple3(false, "$ex", 0);
+    }    
+  }
+  String goalStatus(bool isCaloriesBurned, bool isDurationCompleted){
+     if (isDurationCompleted && isCaloriesBurned) {
+      return  "Goal Achieved on time";
+    } else
+    // if only duration completed
+    if (isDurationCompleted && isCaloriesBurned == false) {
+      return "Duration Completed";
+    }
+    // if duration not completed but calories burned
+    else if (isDurationCompleted == false && isCaloriesBurned) {
+      return "Goal Achieved before time";
+    } else {
+       return "In progress";
+    }
+  }  
 }
