@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pose_detection/Components/frosted_glass_effect.dart';
 import 'package:pose_detection/Constants/app_colors.dart';
+import 'package:pose_detection/Constants/app_string.dart';
 import 'package:pose_detection/Screens/exerciseList/navigationDrawer/my_navigation_drawer.dart';
 import 'package:pose_detection/Screens/goalHistory/goal_history_controller.dart';
 import 'package:pose_detection/Utility/bmi_calculator.dart';
@@ -98,6 +99,23 @@ class GoalHistoryState extends State<GoalHistory> {
                                     )
                                     .toUpperCase();
 
+                            final goalSummary = AppStrings.goalSummary(
+                              height: record.height,
+                              weight: record.weight,
+                              bmi: bmi,
+                              bmiStatus: bmiStatus,
+                              caloriesBurned: record.caloriesBurned,
+                              goalDurationAchieved: record.goalDurationAchieved,
+                              isDurationCompleted: record.isDurationCompleted,
+                              isCaloriesBurned: record.isCaloriesBurned,
+                              goalStatus: goalStatus,
+                            );
+
+                            final goalPlan = AppStrings.goalPlan(
+                              goal: record.goal,
+                              goalDuration: record.goalDuration,
+                            );
+
                             return Card(
                               color: Colors.transparent,
                               child: FrostedGlass(
@@ -109,7 +127,7 @@ class GoalHistoryState extends State<GoalHistory> {
                                 ],
                                 child: ListTile(
                                   title: Text(
-                                    "Goal was ${record.goal} in ${record.goalDuration} days",
+                                    "${goalPlan}",
                                     style: const TextStyle(
                                       color: Colors.black,
                                       fontWeight: FontWeight.bold,
@@ -117,14 +135,7 @@ class GoalHistoryState extends State<GoalHistory> {
                                     ),
                                   ),
                                   subtitle: Text(
-                                    "Age: ${record.age} years\n"
-                                    "Height: ${record.height} cm\n"
-                                    "Weight: ${record.weight} kg\n"
-                                    "BMI: ${bmi.toStringAsFixed(2)} (${bmiStatus})\n"
-                                    "Burned ${record.caloriesBurned.toStringAsFixed(2)} kcal in ${record.goalDurationAchieved} day(s)\n"
-                                    "Goal Duration Completed: ${record.isDurationCompleted ? "Yes" : "No"}\n"
-                                    "Calories Burned Goal Achieved: ${record.isCaloriesBurned ? "Yes" : "No"}\n"
-                                    "Goal Status: $goalStatus",
+                                    "${goalSummary}",
                                     style: const TextStyle(
                                       color: Colors.black38,
                                       fontWeight: FontWeight.bold,

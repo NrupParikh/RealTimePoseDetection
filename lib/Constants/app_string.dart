@@ -130,7 +130,7 @@ class AppStrings {
   static String profile = "Profile";
   static String bmiCalculator = "BMI Calculator";
   static String goalHistory = "Goal History";
-  static String logout = "Logout";  
+  static String logout = "Logout";
 
   static String lblHeight = "Height (cm)";
   static String lblWeight = "Weight (kg)";
@@ -153,4 +153,28 @@ class AppStrings {
     double duration,
   ) =>
       'You did $reps reps of $title and burned ${calories.toStringAsFixed(2)} calories in ${duration.toStringAsFixed(2)} minutes.';
-}
+
+  static String goalSummary({
+    required double height,
+    required double weight,
+    required double bmi,
+    required String bmiStatus,
+    required int caloriesBurned,
+    required int goalDurationAchieved,
+    required bool isDurationCompleted,
+    required bool isCaloriesBurned,
+    required String goalStatus,
+  }) {
+    return "Height: ${height.toStringAsFixed(1)} cm\n"
+        "Weight: ${weight.toStringAsFixed(1)} kg\n"
+        "BMI: ${bmi.toStringAsFixed(2)} ($bmiStatus)\n"
+        "Burned ${caloriesBurned} kcal in $goalDurationAchieved day(s)\n"
+        "Goal Duration Completed: ${isDurationCompleted ? "Yes" : "No"}\n"
+        "Calories Burned Goal Achieved: ${isCaloriesBurned ? "Yes" : "No"}\n"
+        "Goal Status: $goalStatus";
+  }
+
+  static String goalPlan({required String goal, required int goalDuration}) {
+    return "Goal was $goal in $goalDuration days";
+  }
+} 
