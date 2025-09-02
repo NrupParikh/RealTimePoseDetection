@@ -2,14 +2,10 @@ import 'package:get/get.dart';
 import 'package:pose_detection/Components/fancy_alert_dialog.dart';
 import 'package:pose_detection/Components/session_expire_controller.dart';
 import 'package:pose_detection/Constants/app_string.dart';
-import 'package:pose_detection/Screens/goalHistory/goal_history_record.dart';
 import 'package:pose_detection/Screens/goalHistory/goal_status_data.dart';
 import 'package:pose_detection/Singleton/api_service_singleton.dart';
 import 'package:pose_detection/api/api_service.dart';
-import 'package:pose_detection/main.dart';
 import 'package:tuple/tuple.dart';
-// import 'package:pose_detection/Singleton/api_service_singleton.dart';
-// import 'package:pose_detection/api/api_service.dart';
 
 class GoalHistoryController extends GetxController {
   final ApiService _apiService = ApiServiceSingleton().apiService;
