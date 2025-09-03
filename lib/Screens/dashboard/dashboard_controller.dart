@@ -5,6 +5,7 @@ import 'package:pose_detection/Components/session_expire_controller.dart';
 import 'package:pose_detection/Constants/app_string.dart';
 import 'package:pose_detection/Constants/gemini_prompt.dart';
 import 'package:pose_detection/Singleton/api_service_singleton.dart';
+import 'package:pose_detection/Utility/bmi_calculator.dart';
 import 'package:pose_detection/api/apiModels/fitness_plan_data.dart';
 import 'package:pose_detection/api/apiModels/fitness_plan_response.dart';
 import 'package:pose_detection/api/apiModels/fitness_tips_data.dart';
@@ -29,6 +30,7 @@ class DashboardController extends GetxController {
   final RxBool isLoadingForTipsGemini = false.obs;
   final RxBool isLoadingForProfile = false.obs;
   // final RxBool isLoadingForSaveCalories = false.obs;
+  final RxBool isLoadingForSaveGoalStatus = false.obs;
 
   final RxString errorMessageForFitnessPlan = ''.obs;
   final RxString errorMessageForFitnessTips = ''.obs;
@@ -73,6 +75,25 @@ class DashboardController extends GetxController {
       await handleFitnessPlan();
       await handleFitnessTips();
     }
+
+    // Goal status
+    final durationStatus = isGoalDurationCompleted();
+    final burnedCaloriesStatus = isBurnedCaloriesGoalAcheived();
+
+    // if duration completed and calories burned
+    if (durationStatus.item1 && burnedCaloriesStatus.item1) {
+      showFancyDialogAndCallSaveStatusAPI(AppStrings.goalAcheivedOnTime);
+    } else
+    // if only duration completed
+    if (durationStatus.item1 && burnedCaloriesStatus.item1 == false) {
+      showFancyDialogAndCallSaveStatusAPI(AppStrings.durationCompleted);
+    }
+    // if duration not completed but calories burned
+    else if (durationStatus.item1 == false && burnedCaloriesStatus.item1) {
+      showFancyDialogAndCallSaveStatusAPI(AppStrings.goalAcheivedBeforeTime);
+    } else {
+      print("Tag_in_progress");
+    }
   }
 
   Future<void> callProfileAPI() async {
@@ -86,7 +107,7 @@ class DashboardController extends GetxController {
       } else if (result.item3 == 401) {
         displaySessionExpireDialog(result);
       } else {
-        showFancyDialog(result);
+        showFancyDialog(result.item2.toString());
       }
     });
   }
@@ -99,6 +120,42 @@ class DashboardController extends GetxController {
     goalDuration.value = (profileData.goalDuration).toInt();
     totalBurnedCal.value = (profileData.caloriesStatus ?? 0).toDouble();
     day.value = (profileData.getDayCount());
+  }
+
+  int durationInDays() {
+    return ((goalDuration.value) * 7);
+  }
+
+  Tuple2<bool, String> isGoalDurationCompleted() {
+    if (day.value > durationInDays()) {
+      print("Tag_goal_duration_completed");
+      return Tuple2(true, "Goal duration completed");
+    } else {
+      final reminingDuration = durationInDays() - day.value;
+      print("Tag_goal_duration_running ${reminingDuration} days remaining");
+      return Tuple2(
+        false,
+        "${reminingDuration} days remaining out of ${durationInDays()} days challenge",
+      );
+    }
+  }
+
+  Tuple2<bool, String> isBurnedCaloriesGoalAcheived() {
+    if (totalBurnedCal.value >=
+        ((fitnessPlan.value?.estimatedCaloriesBurned.perDay ?? 0.0) *
+            durationInDays())) {
+      return Tuple2(true, "Goal acheived");
+    } else {
+      final reminingCaloriesToBurn =
+          (((fitnessPlan.value?.estimatedCaloriesBurned.perDay ?? 0.0) *
+                  durationInDays()) -
+              totalBurnedCal.value);   
+
+      return Tuple2(
+        false,
+        "${reminingCaloriesToBurn.toStringAsFixed(2)} kcal needs to burn out of ${((fitnessPlan.value?.estimatedCaloriesBurned.perDay ?? 0.0) * durationInDays())} kcal",
+      );
+    }
   }
 
   // =========== FITNESS PLAN ===========
@@ -132,7 +189,7 @@ class DashboardController extends GetxController {
       } else if (result.item3 == 401) {
         displaySessionExpireDialog(result);
       } else {
-        showFancyDialog(result);
+        showFancyDialog(result.item2.toString());
       }
     }
   }
@@ -168,23 +225,51 @@ class DashboardController extends GetxController {
       } else if (result.item3 == 401) {
         displaySessionExpireDialog(result);
       } else {
-        showFancyDialog(result);
+        showFancyDialog(result.item2.toString());
       }
     }
   }
 
-  void showFancyDialog(Tuple3<bool, String?, int> result) {
+  void showFancyDialog(String message) {
     if (Get.context != null && !Get.isDialogOpen!) {
       FancyAlertDialog.showFancyAlertDialog(
         context: Get.context!,
         title: AppStrings.appName,
-        message: result.item2.toString(),
+        message: message,
         onOkPressed: () {
           Get.back();
         },
         onCancelPressed: null,
       );
     }
+  }
+
+  void showFancyDialogAndCallSaveStatusAPI(String message) {
+    if (Get.context != null && !Get.isDialogOpen!) {
+      FancyAlertDialog.showFancyAlertDialog(
+        context: Get.context!,
+        title: AppStrings.appName,
+        message: message,
+        onOkPressed: () {
+          callSaveGoalAPI();
+          Get.back();
+        },
+        onCancelPressed: null,
+      );
+    }
+  }
+
+  Future<void> callSaveGoalAPI() async {
+    await saveGoalStatus().then((result) {
+      if (result.item1) {
+        print("Tag_goal_status_saved");
+        updateProfile();
+      } else if (result.item3 == 401) {
+        displaySessionExpireDialog(result);
+      } else {
+        showFancyDialog(result.item2.toString());
+      }
+    });
   }
 
   void displaySessionExpireDialog(Tuple3<bool, String?, int> result) {
@@ -199,17 +284,15 @@ class DashboardController extends GetxController {
   // --- BMI CALCULATION LOGIC ---
 
   double calculateBMI() {
-    if (height.value <= 0 || weight.value <= 0) return 0.0;
-    final h = height.value / 100;
-    return weight.value / (h * h);
+    return BMICalculator.calculateBMI(
+      heightCm: height.value,
+      weightKg: weight.value,
+    );
   }
 
   String getBMIInterpretation() {
     final bmi = calculateBMI();
-    if (bmi < 18.5) return AppStrings.underweight;
-    if (bmi < 24.9) return AppStrings.normal;
-    if (bmi < 29.9) return AppStrings.overweight;
-    return AppStrings.obese;
+    return BMICalculator.getBMIInterpretation(bmi);
   }
 
   Future<FitnessPlanResponse?> getFitnessPlanFromGemini() async {
@@ -648,7 +731,7 @@ class DashboardController extends GetxController {
     } else if (result.item3 == 401) {
       displaySessionExpireDialog(result);
     } else {
-      showFancyDialog(result);
+      showFancyDialog(result.item2.toString());
     }
   }
 
@@ -686,6 +769,171 @@ class DashboardController extends GetxController {
       }
     } catch (ex) {
       // isLoadingForSaveCalories.value = false;
+      return Tuple3(false, "$ex", 0);
+    }
+  }
+
+  Future<Tuple3<bool, String?, int>> saveGoalStatus() async {
+    final profileData = secureStorage.getProfileData();
+    isLoadingForSaveGoalStatus.value = true;
+    try {
+      final perDayCaloriesToBurn =
+          fitnessPlan.value?.estimatedCaloriesBurned.perDay ?? 0;
+      final totalDays = durationInDays();
+      final totalCaloriesToBurn = perDayCaloriesToBurn * totalDays;      
+      var appResponse = await _apiService.saveGoalStatus(
+        age: profileData?.age ?? 0,
+        height: profileData?.height ?? 0.0,
+        weight: profileData?.weight ?? 0.0,
+        bmi: calculateBMI(),
+        bmiStatus: getBMIInterpretation(),
+        gender: profileData?.gender.toLowerCase() ?? '',
+        goal: profileData?.goal ?? '',
+        goalDuration: durationInDays(),
+        goalDurationAchieved: day.value,
+        caloriesToBurn: totalCaloriesToBurn,
+        caloriesBurned: totalBurnedCal.value,
+        isDurationCompleted: isGoalDurationCompleted().item1,
+        isCaloriesBurned: isBurnedCaloriesGoalAcheived().item1,
+      );
+      if (appResponse.statusCode == 200) {
+        isLoadingForSaveGoalStatus.value = false;
+        // Reset data when goal status is saved successfully
+        print("Tag_goal_status_reset");
+        return Tuple3(
+          true,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      } else if (appResponse.statusCode == 401) {
+        isLoadingForSaveGoalStatus.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      } else {
+        isLoadingForSaveGoalStatus.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      }
+    } catch (ex) {
+      isLoadingForSaveGoalStatus.value = false;
+      return Tuple3(false, "$ex", 0);
+    }
+  }
+
+  void updateProfile() {
+    handleUpdateProfile().then((result) {
+      if (result.item1) {
+        if (Get.context != null && !Get.isDialogOpen!) {
+          FancyAlertDialog.showFancyAlertDialog(
+            context: Get.context!,
+            title: AppStrings.appName,
+            message: result.item2.toString(),
+            onOkPressed: () {
+              Get.back();
+            },
+            onCancelPressed: null,
+          );
+        }
+      } else if (result.item3 == 401) {
+        if (Get.context != null && !Get.isDialogOpen!) {
+          sessionController.showSessionExpiredDialog(
+            Get.context!,
+            result.item2.toString(),
+          );
+        }
+      } else {
+        if (Get.context != null && !Get.isDialogOpen!) {
+          FancyAlertDialog.showFancyAlertDialog(
+            context: Get.context!,
+            title: AppStrings.appName,
+            message: result.item2.toString(),
+            onOkPressed: () {
+              Get.back();
+            },
+            onCancelPressed: null,
+          );
+        }
+      }
+    });
+  }
+
+  Future<Tuple3<bool, String?, int>> handleUpdateProfile() async {
+    final profileData = secureStorage.getProfileData();
+    final name = profileData?.name ?? '';
+    final age = profileData?.age ?? 0;
+    final height = profileData?.height ?? 0.0;
+    final weight = profileData?.weight ?? 0.0;
+    final gender = profileData?.gender ?? '';
+    final goal = profileData?.goal ?? '';
+    final duration = profileData?.goalDuration ?? 0;
+    final userId = secureStorage.getUserData()?.id ?? 0;
+    try {
+      isLoadingForProfile.value = true;
+      var appResponse = await _apiService.updateUserProfile(
+        id: userId,
+        name: name,
+        age: age,
+        height: height,
+        weight: weight,
+        gender: gender,
+        goal: goal,
+        goalDuration: duration,
+      );
+      if (appResponse.statusCode == 200) {
+        isLoadingForProfile.value = false;
+        if (appResponse.data is Map<String, dynamic>) {
+          try {
+            final ProfileResponse data = ProfileResponse.fromJson(
+              appResponse.data,
+            );
+            debugPrint("Tag_data ${data.profile}");
+            secureStorage.storeProfileData(data.profile);
+            day.value = 1;
+            totalBurnedCal.value = 0.0;
+            return Tuple3(
+              true,
+              appResponse.message.toString(),
+              appResponse.statusCode.toInt(),
+            );
+          } catch (e) {
+            isLoadingForProfile.value = false;
+            return Tuple3(
+              false,
+              "Error parsing ApiResponse",
+              appResponse.statusCode.toInt(),
+            );
+          }
+        } else {
+          isLoadingForProfile.value = false;
+          return Tuple3(
+            false,
+            "appResponse.data is not a Map",
+            appResponse.statusCode.toInt(),
+          );
+        }
+      } else if (appResponse.statusCode == 401) {
+        isLoadingForProfile.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      } else {
+        isLoadingForProfile.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      }
+    } catch (ex) {
+      isLoadingForProfile.value = false;
       return Tuple3(false, "$ex", 0);
     }
   }

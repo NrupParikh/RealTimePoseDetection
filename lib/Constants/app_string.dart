@@ -49,7 +49,8 @@ class AppStrings {
       "Please specify your gender as Male, Female, or Other.";
   static const valEnterGoal = "Please enter goal";
   static const valEnterGoalDuration = "Please enter goal duration";
-  static const valEnterValidGoalDuration = "Please enter a valid duration between 1 and 52 weeks.";
+  static const valEnterValidGoalDuration =
+      "Please enter a valid duration between 1 and 52 weeks.";
 
   static const noChangesMade = "No changes made to the profile";
 
@@ -59,6 +60,7 @@ class AppStrings {
   static const String poseTips = "Pose Tips";
   static const String advantages = "Advantages";
   static const aboutBmi = "About BMI";
+  static const aboutGoal = "About Goal";
   static const String description = "Description";
   static const String bmiDescription =
       "BMI (Body Mass Index) is a tool used to estimate body fat based on your height and weight. It's a quick way to screen for weight categories that may lead to health problems";
@@ -74,6 +76,10 @@ class AppStrings {
 - Obese: 30.0 or higher
 """;
 
+  static const String goalDescription =
+      "To acheive your goal you need to perform recommanded exercies and follow the given fitness tips during give time period";
+  static const String goalDurationStatus = "Duration status";
+  static const String caloriesStatus = "Calories Status";
   static const aboutReEx = "About Recommanded Exercise";
   static const String recommandedExDescription =
       "This plan is tailored to your profile and includes a selection of exercises from the following: Push-up, Squat, Jumping Jack, Plank to Downward Dog, and Overhead Arm Clap.Each exercise includes the suggested number of sets/repetitions or a duration, helping you follow a structured routine";
@@ -101,12 +107,12 @@ class AppStrings {
   static const String welcomMsg = "Let's reach your goal!";
   static const String bmiAndHealthStatus = "BMI & Health Status";
   static const String recommandedExercise = "Recommended Exercises";
-  static String goalText(int? perDay, int? perWeek) =>
-      'Your Goal: Burn ${perDay ?? 0} kcal/day or ${perWeek ?? 0} kcal/week';
+  static String goalText(int? perDay, int? totalDuration) =>
+      'Goal : Burn ${perDay ?? 0} kcal/day or ${totalDuration ?? 0} kcal in total';
   static String challengeDayText(int dayNumber, int totalDays, double burned) =>
       'Day $dayNumber of $totalDays day challenge : ${burned.toStringAsFixed(2)} kcal burned';
-  static String estimatedCaloriesBurned(int? perDay) =>
-      'Estimated Calories Burned: ${perDay ?? 0} kcal/day';
+  static String estimatedCaloriesBurned(int? perWeek) =>
+      'Estimated Calories Burned: ${perWeek ?? 0} kcal/week';
 
   static String noExerciseAvailable = "No recommended exercise available";
   static String noTipsAvailable = "No fitness tips available";
@@ -119,14 +125,64 @@ class AppStrings {
   static String logoutConfirmation = "Are you sure you want to logout ?";
   static String logoutMsg = "Logout Failed, Please try again.";
 
-  static String dashboard= "Dashboard";
+  static String dashboard = "Dashboard";
   static String exerciseList = "Exercise List";
   static String profile = "Profile";
   static String bmiCalculator = "BMI Calculator";
+  static String goalHistory = "Goal History";
   static String logout = "Logout";
 
   static String lblHeight = "Height (cm)";
   static String lblWeight = "Weight (kg)";
   static String lblBMI = "BMI";
   static String lblStatus = "Status";
+
+  // Goal status
+  static String goalAcheivedOnTime =
+      "Congratulations You have acheived your goal on time! Saving your goal status. Resetting burned calories and day count.";
+  static String durationCompleted =
+      "Your goal duration completed! Saving your goal status. Resetting burned calories and day count.";
+  static String goalAcheivedBeforeTime =
+      "Congratulations You have acheived your goal before duration! Saving your goal status. Resetting burned calories and day count.";
+
+  static String workoutStatus = "Workout Status!";
+  static String workoutStatusSummary(
+    int reps,
+    String title,
+    double calories,
+    double duration,
+  ) =>
+      'You did $reps reps of $title and burned ${calories.toStringAsFixed(2)} calories in ${duration.toStringAsFixed(2)} minutes.';
+
+  static String goalSummary({
+    required double height,
+    required double weight,
+    required double bmi,
+    required String bmiStatus,
+    required int caloriesToBurned,
+    required int caloriesBurned,
+    required int goalDurationAchieved,
+    required bool isDurationCompleted,
+    required bool isCaloriesBurned,
+    required String goalStatus,
+  }) {
+    return "Height: ${height.toStringAsFixed(1)} cm\n"
+        "Weight: ${weight.toStringAsFixed(1)} kg\n"
+        "BMI: ${bmi.toStringAsFixed(2)} ($bmiStatus)\n"
+        "Burned ${caloriesBurned} kcal in $goalDurationAchieved day(s) out of ${caloriesToBurned} kcal\n"
+        "Goal Duration Completed: ${isDurationCompleted ? "Yes" : "No"}\n"
+        "Calories Burned Goal Achieved: ${isCaloriesBurned ? "Yes" : "No"}\n"
+        "Goal Status: $goalStatus";
+  }
+
+  static String goalPlan({required String goal, required int goalDuration}) {
+    return "Goal was $goal in $goalDuration days";
+  }
+
+  static String titleGoalHistoryChart = "Goal History Chart";
+  static String noHistory = "No History found";
+  static String caloriesToBurn = "Calories To Burn";
+  static String caloriesBurned = "Calories Burned";
+  static String xAxisText ="X Axis : Goal with Duration taken/Total duration";
+  static String yAxisText ="Y Axis : Calories in kcal";
 }

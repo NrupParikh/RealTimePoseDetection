@@ -167,7 +167,7 @@ class SecureStorageSingleton {
     _prefs.setString(AppKey.keyFitnessPlan, fitnessPlanData);
   }
 
-  FitnessPlanResponse? getFitnessPlan() {
+   FitnessPlanResponse? getFitnessPlan() {
     if (!_initialized) {
       throw Exception("SecureStorageSingleton not initialized.");
     }

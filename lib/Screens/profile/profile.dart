@@ -142,7 +142,7 @@ class _ProfileState extends State<Profile> {
                                   keyboardType: TextInputType.text,
                                   controller: controller.genderController,
                                   textInputAction: TextInputAction.next,
-                                  isEnabled: !controller.isEdit.value,
+                                  isEnabled: false,
                                   onSubmitted: (value) {
                                     controller.focusNodeGoal.requestFocus();
                                   },

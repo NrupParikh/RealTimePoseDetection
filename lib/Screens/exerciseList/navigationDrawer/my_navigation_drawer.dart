@@ -67,7 +67,8 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
     final isDashboardSelected = Get.currentRoute == PageName.dashboard;
     // final isExerciseListSelected = Get.currentRoute == PageName.exerciseList;
     final isProfileSelected = Get.currentRoute == PageName.profile;
-    // final isBMISelected = Get.currentRoute == PageName.bmiCalcScreen;
+    final isBMISelected = Get.currentRoute == PageName.bmiCalcScreen;
+    final isGoalHistorySelected = Get.currentRoute == PageName.goalHistory;
     return Drawer(
       child: FrostedGlass(
         applyFilter: false,
@@ -116,17 +117,28 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
                         }
                       },
                     ),
-                    // buildDrawerSection(
-                    //   icon: Icons.calculate_outlined,
-                    //   title: AppStrings.bmiCalculator,
-                    //   isSelected: isBMISelected,
-                    //   onTap: () {
-                    //     Get.back();
-                    //     if (Get.currentRoute != PageName.bmiCalcScreen) {
-                    //       Get.offAllNamed(PageName.bmiCalcScreen);
-                    //     }
-                    //   },
-                    // ),
+                    buildDrawerSection(
+                      icon: Icons.calculate_outlined,
+                      title: AppStrings.bmiCalculator,
+                      isSelected: isBMISelected,
+                      onTap: () {
+                        Get.back();
+                        if (Get.currentRoute != PageName.bmiCalcScreen) {
+                          Get.offAllNamed(PageName.bmiCalcScreen);
+                        }
+                      },
+                    ),
+                    buildDrawerSection(
+                      icon: Icons.history_outlined,
+                      title: AppStrings.goalHistory,
+                      isSelected: isGoalHistorySelected,
+                      onTap: () {
+                       Get.back();
+                        if (Get.currentRoute != PageName.goalHistory) {
+                          Get.offAllNamed(PageName.goalHistory);
+                        }
+                      },
+                    ),
                     buildDrawerSection(
                       icon: Icons.logout_outlined,
                       title: AppStrings.logout,

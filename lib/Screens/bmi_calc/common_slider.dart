@@ -6,7 +6,8 @@ class CommonSlider extends StatelessWidget {
   final int max;
   final int divisions;
   final String unit;
-  final RxInt value;
+  final RxDouble value;
+  final bool? enableed;
 
   static const double labelWidth = 70.0;
   static const double valueWidth = 80.0;
@@ -25,6 +26,7 @@ class CommonSlider extends StatelessWidget {
     required this.divisions,
     required this.unit,
     required this.value,
+    this.enableed
   });
 
   @override
@@ -54,9 +56,9 @@ class CommonSlider extends StatelessWidget {
                 label: "${value.value} $unit",
                 activeColor: Colors.yellow,
                 inactiveColor: Colors.white,
-                onChanged: (double newValue) {
-                  value.value = newValue.round();
-                },
+                onChanged: enableed == false ? null : (newValue) {
+                  value.value = newValue.toDouble();
+                },  
               ),
             ),
           ),
