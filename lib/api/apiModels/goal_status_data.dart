@@ -1,4 +1,4 @@
-import 'package:pose_detection/Screens/goalHistory/goal_status_history.dart';
+import 'package:pose_detection/api/apiModels/goal_status_history.dart';
 
 class GoalStatusData {
   final List<GoalStatusHistory> goalStatusHistory;

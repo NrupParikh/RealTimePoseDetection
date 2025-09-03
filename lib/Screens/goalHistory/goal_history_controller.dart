@@ -2,7 +2,7 @@ import 'package:get/get.dart';
 import 'package:pose_detection/Components/fancy_alert_dialog.dart';
 import 'package:pose_detection/Components/session_expire_controller.dart';
 import 'package:pose_detection/Constants/app_string.dart';
-import 'package:pose_detection/Screens/goalHistory/goal_status_data.dart';
+import 'package:pose_detection/api/apiModels/goal_status_data.dart';
 import 'package:pose_detection/Singleton/api_service_singleton.dart';
 import 'package:pose_detection/api/api_service.dart';
 import 'package:tuple/tuple.dart';

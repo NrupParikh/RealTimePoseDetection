@@ -4,6 +4,7 @@ import 'package:pose_detection/Components/frosted_glass_effect.dart';
 import 'package:pose_detection/Constants/app_colors.dart';
 import 'package:pose_detection/Constants/app_string.dart';
 import 'package:pose_detection/Screens/exerciseList/navigationDrawer/my_navigation_drawer.dart';
+import 'package:pose_detection/Screens/goalHistory/goalHistoryChartDialog/goal_history_chart_dialog.dart';
 import 'package:pose_detection/Screens/goalHistory/goal_history_controller.dart';
 import 'package:pose_detection/Utility/bmi_calculator.dart';
 
@@ -27,6 +28,14 @@ class GoalHistoryState extends State<GoalHistory> {
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        actions: [
+          IconButton(
+            onPressed: () {              
+              GoalHistoryChartDialog.showGoalHistoryChartDialog(context);
+            },
+            icon: Icon(Icons.bar_chart, color: Colors.white),
+          ),
+        ],
       ),
       drawer: MyNavigationDrawer(),
       body: Stack(
@@ -104,6 +113,7 @@ class GoalHistoryState extends State<GoalHistory> {
                               weight: record.weight,
                               bmi: bmi,
                               bmiStatus: bmiStatus,
+                              caloriesToBurned: record.caloriesToBurn,
                               caloriesBurned: record.caloriesBurned,
                               goalDurationAchieved: record.goalDurationAchieved,
                               isDurationCompleted: record.isDurationCompleted,

@@ -159,6 +159,7 @@ class AppStrings {
     required double weight,
     required double bmi,
     required String bmiStatus,
+    required int caloriesToBurned,
     required int caloriesBurned,
     required int goalDurationAchieved,
     required bool isDurationCompleted,
@@ -168,7 +169,7 @@ class AppStrings {
     return "Height: ${height.toStringAsFixed(1)} cm\n"
         "Weight: ${weight.toStringAsFixed(1)} kg\n"
         "BMI: ${bmi.toStringAsFixed(2)} ($bmiStatus)\n"
-        "Burned ${caloriesBurned} kcal in $goalDurationAchieved day(s)\n"
+        "Burned ${caloriesBurned} kcal in $goalDurationAchieved day(s) out of ${caloriesToBurned} kcal\n"
         "Goal Duration Completed: ${isDurationCompleted ? "Yes" : "No"}\n"
         "Calories Burned Goal Achieved: ${isCaloriesBurned ? "Yes" : "No"}\n"
         "Goal Status: $goalStatus";
@@ -177,4 +178,4 @@ class AppStrings {
   static String goalPlan({required String goal, required int goalDuration}) {
     return "Goal was $goal in $goalDuration days";
   }
-} 
+}
