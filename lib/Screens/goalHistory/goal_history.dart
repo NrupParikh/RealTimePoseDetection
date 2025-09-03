@@ -30,7 +30,7 @@ class GoalHistoryState extends State<GoalHistory> {
         elevation: 0,
         actions: [
           IconButton(
-            onPressed: () {              
+            onPressed: () {
               GoalHistoryChartDialog.showGoalHistoryChartDialog(context);
             },
             icon: Icon(Icons.bar_chart, color: Colors.white),
@@ -79,7 +79,7 @@ class GoalHistoryState extends State<GoalHistory> {
                             textAlign: TextAlign.center,
                           ),
                         )
-                        : ListView.builder(
+                        : ListView.separated(
                           itemCount:
                               controller
                                   .goalStatusData
@@ -87,6 +87,8 @@ class GoalHistoryState extends State<GoalHistory> {
                                   ?.goalStatusHistory
                                   .length ??
                               0,
+                          separatorBuilder:
+                              (context, index) => const SizedBox(height: 8),
                           itemBuilder: (context, index) {
                             final record =
                                 controller
@@ -126,31 +128,28 @@ class GoalHistoryState extends State<GoalHistory> {
                               goalDuration: record.goalDuration,
                             );
 
-                            return Card(
-                              color: Colors.transparent,
-                              child: FrostedGlass(
-                                applyFilter: false,
-                                borderRadius: BorderRadius.circular(10),
-                                gradientColors: [
-                                  Colors.white.withValues(alpha: 0.6),
-                                  Colors.white.withValues(alpha: 0.6),
-                                ],
-                                child: ListTile(
-                                  title: Text(
-                                    "${goalPlan}",
-                                    style: const TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
+                            return FrostedGlass(
+                              applyFilter: false,
+                              borderRadius: BorderRadius.circular(10),
+                              gradientColors: [
+                                Colors.white.withValues(alpha: 0.4),
+                                Colors.white.withValues(alpha: 0.4),
+                              ],
+                              child: ListTile(
+                                title: Text(
+                                  goalPlan,
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
                                   ),
-                                  subtitle: Text(
-                                    "${goalSummary}",
-                                    style: const TextStyle(
-                                      color: Colors.black38,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 14,
-                                    ),
+                                ),
+                                subtitle: Text(
+                                  goalSummary,
+                                  style: const TextStyle(
+                                    color: Colors.black45,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14,
                                   ),
                                 ),
                               ),
