@@ -178,4 +178,11 @@ class AppStrings {
   static String goalPlan({required String goal, required int goalDuration}) {
     return "Goal was $goal in $goalDuration days";
   }
+
+  static String titleGoalHistoryChart = "Goal History Chart";
+  static String noHistory = "No History found";
+  static String caloriesToBurn = "Calories To Burn";
+  static String caloriesBurned = "Calories Burned";
+  static String xAxisText ="X Axis : Goal with Duration taken/Total duration";
+  static String yAxisText ="Y Axis : Calories in kcal";
 }

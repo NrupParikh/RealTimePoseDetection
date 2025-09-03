@@ -3,6 +3,8 @@ import 'package:get/get.dart';
 import 'package:pose_detection/Components/button_widget.dart';
 import 'package:pose_detection/Components/frosted_glass_effect.dart';
 import 'package:pose_detection/Constants/app_colors.dart';
+import 'package:pose_detection/Constants/app_string.dart';
+import 'package:pose_detection/Screens/goalHistory/goalHistoryChartDialog/legend_item.dart';
 import 'package:pose_detection/Screens/goalHistory/goal_history_controller.dart';
 import 'package:pose_detection/Screens/goalHistory/goalHistoryChartDialog/history_bar_chart.dart';
 
@@ -28,7 +30,6 @@ class GoalHistoryChartDialogState extends State<GoalHistoryChartDialog> {
   Widget build(BuildContext context) {
     final goalHistoryList =
         widget.controller.goalStatusData.value?.goalStatusHistory;
-    print("Tag_goalHistoryList ${goalHistoryList?.length}");
     final BorderRadius dialogBorderRadius = BorderRadius.circular(20);
 
     return Dialog(
@@ -43,10 +44,9 @@ class GoalHistoryChartDialogState extends State<GoalHistoryChartDialog> {
         child: IntrinsicHeight(
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Goal History Chart",
+                AppStrings.titleGoalHistoryChart,
                 style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
@@ -61,7 +61,7 @@ class GoalHistoryChartDialogState extends State<GoalHistoryChartDialog> {
                     widget.controller.goalStatusData.value == null
                         ? Center(
                           child: Text(
-                            "No History found",
+                            AppStrings.noHistory,
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 12,
@@ -82,25 +82,25 @@ class GoalHistoryChartDialogState extends State<GoalHistoryChartDialog> {
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: const [
+                      children: [
                         const SizedBox(height: 16),
                         LegendItem(
                           color: Colors.orangeAccent,
-                          text: 'Calories To Burn',
+                          text: AppStrings.caloriesToBurn,
                         ),
                         LegendItem(
                           color: Colors.greenAccent,
-                          text: 'Calories Burned',
+                          text: AppStrings.caloriesBurned,
                         ),
                       ],
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      "X Axis : Goal with Duration taken/Total duration",
+                      AppStrings.xAxisText,
                       style: const TextStyle(color: Colors.white),
                     ),
                     Text(
-                      "Y Axis : Calories in kcal",
+                      AppStrings.yAxisText,
                       style: const TextStyle(color: Colors.white),
                     ),
                   ],
