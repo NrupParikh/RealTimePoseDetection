@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 /// A widget that creates a frosted glass effect with a gradient background.
