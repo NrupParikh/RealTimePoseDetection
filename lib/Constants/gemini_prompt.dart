@@ -159,4 +159,22 @@ $jsonStructure
   ]
 }
 ''';
+
+  static String taskDescMealPlan = """
+1. Generate vegetarian Indian weekly meal plan with 2 options for each in array.
+""";
+
+  static String jsonStructureForMealPlan = """
+{
+  "mealPlan": [
+    {
+      "day": "string",
+      "breakfast": "string",
+      "lunch": "String",
+      "snack": "String",
+      "dinner": "String"
+    },    
+  ]
+}
+""";
 }

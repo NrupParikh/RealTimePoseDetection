@@ -10,4 +10,5 @@ class PageName {
   static const bmiCalcScreen = "/bmi_calc_screen";
   static const dashboard = "/dashboard";
   static const goalHistory = "/goal_history";
+  static const mealPlan = "/meal_plan";
 }

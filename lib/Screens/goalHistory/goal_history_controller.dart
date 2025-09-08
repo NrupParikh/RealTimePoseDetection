@@ -21,10 +21,10 @@ class GoalHistoryController extends GetxController {
   void onInit() {
     super.onInit();
     print("Tag_goal_history_controller");
-    handleFitnessPlan();
+    handleGoalHistory();
   }
 
-  Future<void> handleFitnessPlan() async {
+  Future<void> handleGoalHistory() async {
  
       await getGoalHistory().then((result) async {
         if (result.item1) {
@@ -74,7 +74,7 @@ class GoalHistoryController extends GetxController {
             );
             print("Tag_goal_history_parsed ${data.goalStatusHistory.length}");
             goalStatusData.value = data;
-            if (goalStatusData.value != null) {              
+            if (goalStatusData.value != null && data.goalStatusHistory.length>0) {              
               return Tuple3(
                 true,
                 appResponse.message.toString(),

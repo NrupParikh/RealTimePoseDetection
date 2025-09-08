@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:pose_detection/Constants/app_key.dart';
 import 'package:pose_detection/api/apiModels/fitness_plan_response.dart';
 import 'package:pose_detection/api/apiModels/fitness_tips_response.dart';
+import 'package:pose_detection/api/apiModels/meal_plan_response.dart';
 import 'package:pose_detection/api/apiModels/profile.dart';
 import 'package:pose_detection/api/apiModels/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -221,5 +222,38 @@ class SecureStorageSingleton {
     }
     final profile = getProfileData();
     return profile?.caloriesStatus;
+  }
+
+
+   void storeMealPlan(MealPlanResponse mealPlan) {
+    if (!_initialized) {
+      throw Exception("SecureStorageSingleton not initialized.");
+    }
+    final String mealPlanData = jsonEncode(mealPlan.toJson());
+    _prefs.setString(AppKey.keyMealPlan, mealPlanData);
+  }
+
+  MealPlanResponse? getMealPlan() {
+    if (!_initialized) {
+      throw Exception("SecureStorageSingleton not initialized.");
+    }
+    final String? mealPlanData = _prefs.getString(AppKey.keyMealPlan);
+    if (mealPlanData == null) {
+      if (kDebugMode) {
+        print('No Meal Plan in SharedPreferences.');
+      }
+      return null;
+    }
+    try {
+      final Map<String, dynamic> mealPlanDataMap = jsonDecode(
+        mealPlanData,
+      );
+      return MealPlanResponse.fromJson(mealPlanDataMap);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error decoding FitnessTips: $e');
+      }
+      return null;
+    }
   }
 }

@@ -51,7 +51,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
         backgroundColor: Colors.transparent,
-        elevation: 0,
+        elevation: 0,        
       ),
       drawer: MyNavigationDrawer(),
       body: Stack(
@@ -93,13 +93,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           final burned = controller.totalBurnedCal.value;
                           final perDayCaloriesToBurn =
                               plan?.estimatedCaloriesBurned.perDay ?? 0;
-                          final totalDays = controller.durationInDays();   
-                          final totalCaloriesToBurn = perDayCaloriesToBurn * totalDays;   
+                          final totalDays = controller.durationInDays();
+                          final totalCaloriesToBurn =
+                              perDayCaloriesToBurn * totalDays;
                           final progress =
                               totalCaloriesToBurn > 0
-                                  ? (burned / totalCaloriesToBurn).clamp(0.0, 1.0)
+                                  ? (burned / totalCaloriesToBurn).clamp(
+                                    0.0,
+                                    1.0,
+                                  )
                                   : 0.0;
-                          print("Tag_progress: $progress");        
+                          print("Tag_progress: $progress");
 
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -171,10 +175,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                                 ),
                                                 SizedBox(width: 8),
                                                 Expanded(
-                                                  child: Text(                                                  
+                                                  child: Text(
                                                     AppStrings.goalText(
                                                       perDayCaloriesToBurn,
-                                                      totalCaloriesToBurn
+                                                      totalCaloriesToBurn,
                                                     ),
                                                     softWrap: true,
                                                     maxLines: 2,
@@ -211,7 +215,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
                                         () => Text(
                                           AppStrings.challengeDayText(
                                             controller.day.value, // current day
-                                            controller.durationInDays(), // total days
+                                            controller
+                                                .durationInDays(), // total days
                                             burned,
                                           ),
                                           style: const TextStyle(

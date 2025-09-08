@@ -6,4 +6,5 @@ class AppKey {
   static const keyFitnessTips = "key_fitness_tips";  
   static const keyFitnessPlan = "key_fitness_plan"; 
   static const keyGoalHistory = "key_goal_history"; 
+  static const keyMealPlan = "key_meal_plan"; 
 }
