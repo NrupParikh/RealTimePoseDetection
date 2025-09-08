@@ -69,6 +69,7 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
     final isProfileSelected = Get.currentRoute == PageName.profile;
     final isBMISelected = Get.currentRoute == PageName.bmiCalcScreen;
     final isGoalHistorySelected = Get.currentRoute == PageName.goalHistory;
+    final isMealPlanSelected = Get.currentRoute == PageName.mealPlan;
     return Drawer(
       child: FrostedGlass(
         applyFilter: false,
@@ -129,11 +130,22 @@ class _MyNavigationDrawerState extends State<MyNavigationDrawer> {
                       },
                     ),
                     buildDrawerSection(
+                      icon: Icons.restaurant_menu_outlined,
+                      title: AppStrings.weeklyMealPlan,
+                      isSelected: isMealPlanSelected,
+                      onTap: () {
+                        Get.back();
+                        if (Get.currentRoute != PageName.mealPlan) {
+                          Get.offAllNamed(PageName.mealPlan);
+                        }
+                      },
+                    ),
+                    buildDrawerSection(
                       icon: Icons.history_outlined,
                       title: AppStrings.goalHistory,
                       isSelected: isGoalHistorySelected,
                       onTap: () {
-                       Get.back();
+                        Get.back();
                         if (Get.currentRoute != PageName.goalHistory) {
                           Get.offAllNamed(PageName.goalHistory);
                         }

@@ -185,4 +185,12 @@ class AppStrings {
   static String caloriesBurned = "Calories Burned";
   static String xAxisText ="X Axis : Goal with Duration taken/Total duration";
   static String yAxisText ="Y Axis : Calories in kcal";
+
+  static const weeklyMealPlan = "Weekly Meal Plan";
+
+  static const breakfast = "Breakfast";
+  static const lunch = "Lunch";
+  static const snacks = "Snacks";
+  static const dinner = "Dinner";
+  static const bullet = '\u2022';
 }

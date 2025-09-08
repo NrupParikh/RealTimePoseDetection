@@ -285,4 +285,39 @@ class ApiService {
       rethrow;
     }
   }
+
+
+    // Save Meal Plan
+  Future<AppResponse> saveMealPlanAPI({required String mealPlan}) async {
+    try {
+      print("Tag_Save_meal_plan_API_Call");
+      final response = await _networkService.post(
+        url: "${ApiConstants.mealPlans}",
+        data: mealPlan  ,
+        showProgressBar: false,
+      );
+      return _networkService.handleException(response);
+    } catch (e) {
+      if (kDebugMode) {
+        print("TAG Exception: $e");
+      }
+      rethrow;
+    }
+  }
+
+    // Get Meal Plan
+  Future<AppResponse> getMealPlanAPI() async {
+    try {
+      final response = await _networkService.get(
+        url: "${ApiConstants.mealPlans}",
+        showProgressBar: false,
+      );
+      return _networkService.handleException(response);
+    } catch (e) {
+      if (kDebugMode) {
+        print("TAG Exception: $e");
+      }
+      rethrow;
+    }
+  }
 }

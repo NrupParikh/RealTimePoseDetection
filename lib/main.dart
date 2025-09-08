@@ -9,6 +9,8 @@ import 'package:pose_detection/Screens/bmi_calc/bmi_calc_binding.dart';
 import 'package:pose_detection/Screens/bmi_calc/bmi_calc_screen.dart';
 import 'package:pose_detection/Screens/dashboard/dashboard_binding.dart';
 import 'package:pose_detection/Screens/dashboard/dashboard_screen.dart';
+import 'package:pose_detection/Screens/mealPlan/meal_plan_binding.dart';
+import 'package:pose_detection/Screens/mealPlan/meal_plan.dart';
 import 'package:pose_detection/Screens/detection/detection_controller.dart';
 import 'package:pose_detection/Screens/detection/detection_screen.dart';
 import 'package:pose_detection/Screens/exerciseList/navigationDrawer/nav_drawer_binding.dart';
@@ -129,6 +131,13 @@ class MyApp extends StatelessWidget {
           name: PageName.goalHistory,
           page: () => GoalHistory(),
           bindings: [NavDrawerBinding(), GoalHistoryBinding()],
+          transition: Transition.noTransition,
+          transitionDuration: Duration.zero,
+        ),
+        GetPage(
+          name: PageName.mealPlan,
+          page: () => MealPlan(),
+          bindings: [NavDrawerBinding(), MealPlanBinding()],
           transition: Transition.noTransition,
           transitionDuration: Duration.zero,
         ),
