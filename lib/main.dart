@@ -24,6 +24,8 @@ import 'package:pose_detection/Screens/login/login_screen.dart';
 import 'package:pose_detection/Screens/onboard/on_board_screen.dart';
 import 'package:pose_detection/Screens/profile/profile.dart';
 import 'package:pose_detection/Screens/profile/profile_binding.dart';
+import 'package:pose_detection/Screens/recipe/recipe.dart';
+import 'package:pose_detection/Screens/recipe/recipe_binding.dart';
 import 'package:pose_detection/Screens/register/register_binding.dart';
 import 'package:pose_detection/Screens/register/register_screen.dart';
 import 'package:pose_detection/Singleton/sercure_storage_singleton.dart';
@@ -141,7 +143,14 @@ class MyApp extends StatelessWidget {
           transition: Transition.noTransition,
           transitionDuration: Duration.zero,
         ),
-      ],
+        GetPage(
+          name: PageName.recipe,
+          page: () => Recipe(),
+          bindings: [RecipeBinding()],
+          transition: Transition.noTransition,
+          transitionDuration: Duration.zero,
+        ),
+      ],    
     );
   }
 }

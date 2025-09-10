@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pose_detection/Constants/app_string.dart';
 import 'package:pose_detection/Constants/page_name.dart';
 
-class MealTile extends StatelessWidget {
+class RecipeTile extends StatelessWidget {
   final IconData icon;
   final String title;
   final List<String>? items;
 
-  const MealTile({
+  const RecipeTile({
     super.key,
     required this.icon,
     required this.title,
@@ -42,22 +43,12 @@ class MealTile extends StatelessWidget {
                               arguments: {"title": "${item}"},
                             );
                           },
-                          child: Chip(
-                            backgroundColor: Colors.black.withValues(
-                              alpha: 0.5,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(
-                                Radius.circular(4),
-                              ),
-                            ),
-                            label: Text(
-                              "$item",
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          child: Text(
+                            "${AppStrings.bullet} $item",
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
