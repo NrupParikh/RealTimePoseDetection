@@ -9,8 +9,6 @@ class RecipeResponse {
   final String calories;
   final List<IngredientSection> ingredients;
   final List<InstructionSection> instructions;
-  // final List<String> ingredients;
-  // final List<String> instructions;
   final NutritionalBreakdown nutritionalBreakdown;
   final String youtubeUrl;
 
@@ -29,8 +27,8 @@ class RecipeResponse {
    factory RecipeResponse.fromJson(Map<String, dynamic> json) {
     return RecipeResponse(
       recipeName: json["recipe_name"] ?? "",
-      preparationTime: json["preparation_time"] ?? "",
-      cookingTime: json["cooking_time"] ?? "",
+      preparationTime: json["prep_time"] ?? "",
+      cookingTime: json["cook_time"] ?? "",
       calories: json["calories"] ?? "",
       ingredients: (json["ingredients"] as List<dynamic>)
           .map((e) => IngredientSection.fromJson(e))
@@ -39,21 +37,21 @@ class RecipeResponse {
           .map((e) => InstructionSection.fromJson(e))
           .toList(),
       nutritionalBreakdown:
-          NutritionalBreakdown.fromJson(json["nutritional_breakdown"]),
-      youtubeUrl: json["youtube_url"] ?? "",
+          NutritionalBreakdown.fromJson(json["nutrition"]),
+      youtubeUrl: json["yt_url"] ?? "",
     );
   }
 
   /// Convert Recipe to Map
     Map<String, dynamic> toJson() => {
         "recipe_name": recipeName,
-        "preparation_time": preparationTime,
-        "cooking_time": cookingTime,
+        "prep_time": preparationTime,
+        "cook_time": cookingTime,
         "calories": calories,
         "ingredients": ingredients.map((e) => e.toJson()).toList(),
         "instructions": instructions.map((e) => e.toJson()).toList(),
-        "nutritional_breakdown": nutritionalBreakdown.toJson(),
-        "youtube_url": youtubeUrl,
+        "nutrition": nutritionalBreakdown.toJson(),
+        "yt_url": youtubeUrl,
       };
 
    static RecipeResponse fromJsonString(String str) {
