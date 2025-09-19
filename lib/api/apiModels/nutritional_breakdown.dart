@@ -1,3 +1,4 @@
+
 class NutritionalBreakdown {
   final String protein;
   final String carbs;
@@ -13,14 +14,17 @@ class NutritionalBreakdown {
 
   factory NutritionalBreakdown.fromJson(Map<String, dynamic> json) {
     return NutritionalBreakdown(
-      protein: json['protein'] ?? "",
-      carbs: json['carbs'] ?? "",
-      fats: json['fats'] ?? "",
-      fiber: json['fiber'] ?? "", 
+      protein: json["protein"] ?? "",
+      carbs: json["carbs"] ?? "",
+      fats: json["fats"] ?? "",
+      fiber: json["fiber"] ?? "",
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {"protein": protein, "carbs": carbs, "fats": fats, "fiber": fiber};
-  }
+  Map<String, dynamic> toJson() => {
+        "protein": protein,
+        "carbs": carbs,
+        "fats": fats,
+        "fiber": fiber,
+      };
 }

@@ -1,22 +1,127 @@
 import 'package:get/get.dart';
+import 'package:pose_detection/Components/fancy_alert_dialog.dart';
+import 'package:pose_detection/Components/session_expire_controller.dart';
 import 'package:pose_detection/Constants/app_string.dart';
+import 'package:pose_detection/Constants/gemini_prompt.dart';
+import 'package:pose_detection/Singleton/api_service_singleton.dart';
 import 'package:pose_detection/api/apiModels/recipe_response.dart';
+import 'package:pose_detection/api/apiModels/recipe_response_data.dart';
+import 'package:pose_detection/api/api_service.dart';
+import 'package:pose_detection/api/gemini_api_service.dart';
+import 'package:tuple/tuple.dart';
 
 class RecipeController extends GetxController {
   final Map<String, dynamic> recipe;
   RecipeController(this.recipe);
   final RxString title = AppStrings.recipe.obs;
+  final ApiService _apiService = ApiServiceSingleton().apiService;
   final Rx<RecipeResponse?> recipeDataModel = Rx<RecipeResponse?>(null);
+  final geminiService = GeminiApiService();
+  final RxBool isLoading = false.obs;
+  final RxString errorMessage = ''.obs;
+  final SessionExpireController sessionController =
+      Get.find<SessionExpireController>();
 
   @override
-  void onInit() {
+  void onInit() async {
     super.onInit();
     print("Tag_recipe_controller");
     print("Recipe Title: ${recipe["title"]}");
     title.value = recipe['title'];
-    recipeDataModel.value = RecipeResponse.fromJsonString(newText2);
-    print("Tag_recipeDataModel.value ${recipeDataModel.value?.calories}");
+    // title.value = "Moong Dal Chilla";
+    // recipeDataModel.value = RecipeResponse.fromJsonString(moongDalChilla);
+    // print("Tag_recipeDataModel.value ${recipeDataModel.value?.calories}");
+
+    // await getGeminiRecipe(title.value);
    
+    handleRecipe(title.value);
+  }
+
+  @override
+  void onClose() {
+    super.onClose();
+  }
+
+  Future<void> handleRecipe(String recipeName) async {
+    // =========== OUR API CHECK
+    await getRecipeFromAPI(recipeName).then((result) async {
+      if (result.item1) {
+        print("Success");
+      } else if (result.item3 == 401) {
+        displaySessionExpireDialog(result);
+      } else {
+        // =========== GEMINI API CALL
+        await callRecipeFromGemini(title.value);
+      }
+    });
+  }
+
+  Future<void> callRecipeFromGemini(String recipeName) async {
+    final recipe = await getGeminiRecipe(recipeName);
+
+    if (recipe != null) {
+      final recipeDataInString = recipeDataModel.value?.toJsonString();
+      print("Tag_recipeName ${recipeName}");
+      print("Tag_recipeDataInString ${recipeDataInString}");
+      // =========== SAVE TO OUR API
+      final result = await saveRecipe(recipeName, recipeDataInString!);
+      if (result.item1) {
+      } else if (result.item3 == 401) {
+        displaySessionExpireDialog(result);
+      } else {
+        showFancyDialog(result.item2.toString());
+      }
+    }
+  }
+
+  void displaySessionExpireDialog(Tuple3<bool, String?, int> result) {
+    if (Get.context != null && !Get.isDialogOpen!) {
+      sessionController.showSessionExpiredDialog(
+        Get.context!,
+        result.item2.toString(),
+      );
+    }
+  }
+
+  void showFancyDialog(String message) {
+    if (Get.context != null && !Get.isDialogOpen!) {
+      FancyAlertDialog.showFancyAlertDialog(
+        context: Get.context!,
+        title: AppStrings.appName,
+        message: message,
+        onOkPressed: () {
+          Get.back();
+        },
+        onCancelPressed: null,
+      );
+    }
+  }
+
+  Future<RecipeResponse?> getGeminiRecipe(String recipeName) async {
+    try {
+      isLoading.value = true;
+      errorMessage.value = '';
+      recipeDataModel.value = null;
+
+      final recipePrompt = GeminiPrompt.buildRecipePrompt(
+        recipeName: recipeName,
+        jsonStructure: GeminiPrompt.jsonStructureForRecipe,
+      );
+
+      final jsonMap = await geminiService.fetchJsonResponse(recipePrompt);
+      recipeDataModel.value = RecipeResponse.fromJson(jsonMap);
+
+      if (recipeDataModel.value != null) {
+        return recipeDataModel.value;
+      }
+      return null;
+    } catch (e) {
+      isLoading.value = false;
+      errorMessage.value = e.toString();
+      return null;
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   // Request
@@ -25,7 +130,7 @@ class RecipeController extends GetxController {
  * 
  */
 
-String newText = """{
+  String vegBiriyaniWithRaita = """{
   "recipe_name": "Vegetable Biryani with Raita",
   "prep_time": "30m",
   "cook_time": "45m",
@@ -83,7 +188,7 @@ String newText = """{
   "yt_url": "https://www.youtube.com/results?search_query=vegetable+biryani+recipe"
 }""";
 
-String newText2 = """{
+  String vegIdliWithSambhar = """{
   "recipe_name": "Vegetable Idli with Sambhar",
   "prep_time": "20m",
   "cook_time": "30m",
@@ -167,5 +272,175 @@ String newText2 = """{
   },
   "yt_url": "https://www.youtube.com/results?search_query=vegetable+idli+recipe"
 }""";
-}
 
+  String moongDalChilla = """{
+  "recipe_name": "Moong Dal Chilla",
+  "prep_time": "6h",
+  "cook_time": "20m",
+  "calories": "220",
+  "ingredients": [
+    {
+      "section": "Batter",
+      "items": [
+        "1 cup moong dal",
+        "1/2 inch ginger",
+        "1-2 green chilies",
+        "1/4 tsp asafoetida",
+        "Salt to taste",
+        "Water as needed"
+      ]
+    },
+    {
+      "section": "Vegetables",
+      "items": [
+        "1/4 cup chopped onion",
+        "1/4 cup chopped tomato",
+        "1/4 cup chopped coriander leaves",
+        "1/4 tsp red chili powder",
+        "1/4 tsp garam masala"
+      ]
+    },
+    {
+      "section": "Other",
+      "items": [
+        "Oil for cooking"
+      ]
+    }
+  ],
+  "instructions": [
+    {
+      "section": "Preparation",
+      "steps": [
+        "Soak moong dal for 6 hours.",
+        "Grind into a smooth batter with ginger, green chilies, and asafoetida.",
+        "Add salt and mix well."
+      ]
+    },
+    {
+      "section": "Mixing Vegetables",
+      "steps": [
+        "Add chopped onion, tomato, coriander leaves, red chili powder, and garam masala to the batter.",
+        "Mix everything evenly."
+      ]
+    },
+    {
+      "section": "Cooking",
+      "steps": [
+        "Heat a non-stick tawa and grease lightly with oil.",
+        "Pour a ladleful of batter and spread into a thin circle.",
+        "Cook on medium flame until golden on one side.",
+        "Flip and cook the other side until crisp.",
+        "Repeat with remaining batter."
+      ]
+    },
+    {
+      "section": "Serving",
+      "steps": [
+        "Serve hot moong dal chilla with green chutney or yogurt."
+      ]
+    }
+  ],
+  "nutrition": {
+    "protein": "12g",
+    "carbs": "35g",
+    "fats": "6g",
+    "fiber": "6g"
+  },
+  "yt_url": "https://www.youtube.com/watch?v=31uzn1F2h7c"
+}""";
+
+  Future<Tuple3<bool, String?, int>> saveRecipe(
+    String recipeName,
+    String recipeData,
+  ) async {
+    print("Tag_Save_recipe_Function");
+    try {
+      isLoading.value = true;
+      var appResponse = await _apiService.saveRecipeAPI(
+        recipe: recipeName,
+        recipeData: recipeData,
+      );
+      // For 200 or 201 handling we use result=1
+      if (appResponse.result == 1) {
+        isLoading.value = false;
+        return Tuple3(
+          true,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      } else {
+        isLoading.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      }
+    } catch (ex) {
+      isLoading.value = false;
+      return Tuple3(false, "$ex", 0);
+    }
+  }
+
+  Future<Tuple3<bool, String?, int>> getRecipeFromAPI(String recipeName) async {
+    print("Tag_getRecipeFromAPI");
+    try {
+      isLoading.value = true;
+      var appResponse = await _apiService.getRecipeAPI(recipeName);
+      if (appResponse.statusCode == 200) {
+        print("Tag_success200");
+        isLoading.value = false;
+        if (appResponse.data is Map<String, dynamic>) {
+          print("Tag_appResponse.data is a Map");
+          try {
+            final RecipeData data = RecipeData.fromJson(appResponse.data);
+            recipeDataModel.value =
+                recipeDataModel.value =
+                    data.recipeDescription.isNotEmpty
+                        ? data.recipeDescription.first
+                        : null;
+            print("Tag_recipe_name ${data.recipeName.toString()}");
+            print("Tag_recipe_data ${data.recipeDescription}");
+            return Tuple3(
+              true,
+              appResponse.message.toString(),
+              appResponse.statusCode.toInt(),
+            );
+          } catch (e) {
+            isLoading.value = false;
+            return Tuple3(
+              false,
+              "Error parsing ApiResponse",
+              appResponse.statusCode.toInt(),
+            );
+          }
+        } else {
+          print("Tag_appResponse.data is not a Map");
+          isLoading.value = false;
+          return Tuple3(
+            false,
+            "appResponse.data is not a Map",
+            appResponse.statusCode.toInt(),
+          );
+        }
+      } else if (appResponse.statusCode == 401) {
+        isLoading.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      } else {
+        isLoading.value = false;
+        return Tuple3(
+          false,
+          appResponse.message.toString(),
+          appResponse.statusCode.toInt(),
+        );
+      }
+    } catch (ex) {
+      isLoading.value = false;
+      return Tuple3(false, "$ex", 0);
+    }
+  }
+}
