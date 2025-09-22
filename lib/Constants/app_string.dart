@@ -193,4 +193,17 @@ class AppStrings {
   static const snacks = "Snacks";
   static const dinner = "Dinner";
   static const bullet = '\u2022';
+  static const noMealPlan = "No meal plan found";
+  static const recipe = "Recipe";
+  static const preparation = "Preparation";
+  static const cookingTime = "Cooking Time";
+  static const calories = "Calories";
+  static const ingredients = "Ingredients";
+  static const instructions = "Instructions";
+  static const nutritionalBreakdown="Nutritional Breakdown";
+  static const protein = "Protein";
+  static const carbs = "Carbs";
+  static const fats = "Fats";
+  static const fiber = "Fiber";
+  static const items = "Items";
 }

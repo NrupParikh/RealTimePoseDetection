@@ -11,4 +11,5 @@ class PageName {
   static const dashboard = "/dashboard";
   static const goalHistory = "/goal_history";
   static const mealPlan = "/meal_plan";
+  static const recipe = "/recipe";
 }

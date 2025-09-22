@@ -77,7 +77,7 @@ class MealPlanState extends State<MealPlan> {
                         : (mealPlans == null || mealPlans.isEmpty)
                         ? Center(
                           child: Text(
-                            "No meal plan found",
+                            AppStrings.noMealPlan,
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 16,
@@ -124,7 +124,7 @@ class MealPlanState extends State<MealPlan> {
                                           },
                                           body: Column(
                                             children: [
-                                              MealTile(
+                                              MealTile( 
                                                 icon:
                                                     Icons
                                                         .breakfast_dining_outlined, 

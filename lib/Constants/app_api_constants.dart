@@ -10,4 +10,5 @@ class ApiConstants {
   static const caloriesStatus = "profile/calories-status";
   static const goalStatus = "goal-status";
   static const mealPlans= "meal-plans";
+  static const recipe = "receipts";
 }

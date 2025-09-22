@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:pose_detection/Constants/app_api_constants.dart';
 import 'package:pose_detection/api/apiModels/app_response.dart';
@@ -287,7 +289,7 @@ class ApiService {
   }
 
 
-    // Save Meal Plan
+  // Save Meal Plan
   Future<AppResponse> saveMealPlanAPI({required String mealPlan}) async {
     try {
       print("Tag_Save_meal_plan_API_Call");
@@ -305,11 +307,50 @@ class ApiService {
     }
   }
 
-    // Get Meal Plan
+  // Get Meal Plan
   Future<AppResponse> getMealPlanAPI() async {
     try {
       final response = await _networkService.get(
         url: "${ApiConstants.mealPlans}",
+        showProgressBar: false,
+      );
+      return _networkService.handleException(response);
+    } catch (e) {
+      if (kDebugMode) {
+        print("TAG Exception: $e");
+      }
+      rethrow;
+    }
+  }
+
+  // Save Recipe
+  Future<AppResponse> saveRecipeAPI({required String recipe,required String recipeData}) async {
+     Map<String, dynamic> dataToSave = {
+      'recipe_name': recipe,
+      'recipe_description': [jsonDecode(recipeData)],
+    };
+
+    try {
+      print("Tag_Save_recipe_API_Call");
+      final response = await _networkService.post(
+        url: "${ApiConstants.recipe}",
+        data: dataToSave,
+        showProgressBar: false,
+      );
+      return _networkService.handleException(response);
+    } catch (e) {
+      if (kDebugMode) {
+        print("TAG Exception: $e");
+      }
+      rethrow;
+    }
+  }
+
+  // Get Recipe
+  Future<AppResponse> getRecipeAPI(String recipeName) async {
+    try {
+      final response = await _networkService.get(
+        url: "${ApiConstants.recipe}/${recipeName}",
         showProgressBar: false,
       );
       return _networkService.handleException(response);

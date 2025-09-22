@@ -177,4 +177,44 @@ $jsonStructure
   ]
 }
 """;
+
+  // static String buildRecipePrompt({
+  //   required String recipeName
+  // }) {
+  //   return """JSON only. Recipe: ${recipeName}. Fields: recipe_name, prep_time, cook_time, calories, ingredients[{section,items[]}], instructions[{section,steps[]}], nutrition{protein,carbs,fats,fiber}, yt_url. Rules: short vals (30m not minutes), group items, concise steps, readable. Also search and insert fitting YouTube url in yt_url.""";
+  // }
+
+  static String jsonStructureForRecipe = """
+{
+  "recipe_name": "string",
+  "prep_time": "string",
+  "cook_time": "string",
+  "calories": "string",
+  "ingredients": [
+    { "section": "string", "items": ["string"] }
+  ],
+  "instructions": [
+    { "section": "string", "steps": ["string"] }
+  ],
+  "nutrition": {
+    "protein": "string",
+    "carbs": "string",
+    "fats": "string",
+    "fiber": "string"
+  },
+  "yt_url": "string"
+}
+""";
+
+  static String buildRecipePrompt({
+    required String recipeName,
+    required String jsonStructure,
+  }) {
+    return """
+Recipe: $recipeName  
+Return ONLY a JSON object in this structure:
+$jsonStructure
+Rules: short vals (30m not 30 minutes), group items, concise steps, readable. yt_url must be a direct YouTube video link (https://www.youtube.com/watch?v=...), never a search link.
+""";
+  }
 }
